@@ -5,11 +5,11 @@
 
 /* ── Layout principal ─────────────────────────────────── */
 .main-content {
-    margin-top: var(--topbar-height, 64px);
-    background: var(--background, #0a0a0a);
-    padding: var(--spacing-lg, 24px);
-    min-height: calc(100vh - var(--topbar-height, 64px));
-  }
+  margin-top: var(--topbar-height, 64px);
+  background: var(--background, #0a0a0a);
+  padding: var(--spacing-lg, 24px);
+  min-height: calc(100vh - var(--topbar-height, 64px));
+}
   
   /* ── Header ───────────────────────────────────────────── */
   .header {
@@ -868,7 +868,6 @@
   @media (min-width: 1440px) {
     .main-content {
       max-width: 1440px;
-      margin-left: auto;
       margin-right: auto;
     }
   }

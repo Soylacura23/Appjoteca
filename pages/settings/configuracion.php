@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../../backend/config/auth.php';
-require_once __DIR__ . '/../../backend/settings/configuracion-back.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
-requiereRol([1, 2])
+require_once __DIR__ . '/../../backend/settings/configuracion-back.php';
+requiereRol([1, 2]);
 ?>
 
 <!DOCTYPE html>
@@ -96,15 +96,15 @@ requiereRol([1, 2])
                     <div class="profile-card">
                         <div class="profile-avatar">
                             <div class="avatar-ring">
-                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5i85gK-_bvctyE_bJ5weN23Nv-GjB40-BUc1--p-q6UYMjmOv7YRqI6AnKkkDgXtAnQQDnrCU7DOfnGaEIJfqAsLsjhD90oWtzkmE81Qrl88X9tNNjefqvjRQIIvB_T-mk6fTA3Rv2k7WvqqCJ-RoTiBYOhBhUgj1Ea3hCFp7A41Uu_QuIIFIAtbVu-hWaiL4xZm2Ga-klmlSIL2w_MmVyvOQ0wzX4xmGiBzhhZ_TAjEuFhDee7IJb4ndnILVOZsSoK7Wuxuh1XV0" alt="Foto de perfil" id="profileAvatarImg">
+                                <img src="<?= htmlspecialchars($foto_actual, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil" id="profileAvatarImg">
                             </div>
                             <button class="avatar-edit" id="avatarEditBtn" aria-label="Cambiar foto de perfil">
                                 <span class="material-symbols-outlined">photo_camera</span>
                             </button>
-                            <input type="file" id="avatarInput" accept="image/*" hidden>
+                            <input type="file" id="avatarInput" accept="image/*" name="nueva_foto" hidden >
                         </div>
                         <div class="profile-info">
-                            <h2 class="profile-name"><?=$mi_nombre; ?></h2>
+                            <h2 class="profile-name"><?= htmlspecialchars($mi_nombre, ENT_QUOTES, 'UTF-8'); ?></h2>
                             <div class="profile-role">
                                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified</span>
                                 <span><?= $mi_rol; ?> Verificado</span>
@@ -121,7 +121,7 @@ requiereRol([1, 2])
                                     <span class="material-symbols-outlined">badge</span>
                                     <div class="meta-content">
                                         <span class="meta-label">Documento</span>
-                                        <span class="meta-value" id="displayDocument">DNI <?= $documento; ?></span>
+                                        <span class="meta-value" id="displayDocument">DNI | <?= htmlspecialchars($documento, ENT_QUOTES, 'UTF-8'); ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +134,7 @@ requiereRol([1, 2])
                             <span>Documento de Identidad</span>
                         </div>
                         <div class="id-doc-preview" id="idDocPreview">
-                            <img src="<?= $foto_documento; ?>" alt="Documento ID" id="idDocImage" loading="lazy">
+                            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento ID" id="idDocImage" loading="lazy">
                             <div class="id-doc-blur-overlay">
                                 <span class="material-symbols-outlined">visibility_off</span>
                                 <span>Click para visualizar</span>
@@ -168,7 +168,7 @@ requiereRol([1, 2])
                                     <label for="usernameInput">Nombre de Usuario</label>
                                     <div class="input-wrapper">
                                         <span class="material-symbols-outlined input-icon">person_outline</span>
-                                        <input type="text" id="usernameInput" value="<?= $mi_usuario; ?>" autocomplete="username">
+                                        <input type="text" id="usernameInput" value="<?= htmlspecialchars($mi_usuario, ENT_QUOTES, 'UTF-8'); ?>" autocomplete="username">
                                         <button class="input-action-btn" id="saveUsernameBtn">
                                             <span class="material-symbols-outlined">save</span>
                                             <span class="btn-text">Guardar</span>
@@ -180,7 +180,7 @@ requiereRol([1, 2])
                                     <label for="documentInput">Número de Documento</label>
                                     <div class="input-wrapper">
                                         <span class="material-symbols-outlined input-icon">badge</span>
-                                        <input type="text" id="documentInput" value="DNI <?= $documento; ?>" readonly>
+                                        <input type="text" id="documentInput" value="DNI | <?= htmlspecialchars($documento); ?>" readonly>
                                         <span class="material-symbols-outlined lock-icon">lock</span>
                                     </div>
                                     <span class="input-hint hint-warning">Requiere solicitud al bibliotecario para modificar</span>
@@ -353,7 +353,7 @@ requiereRol([1, 2])
             <span class="material-symbols-outlined">close</span>
         </button>
         <div class="id-doc-overlay-content">
-            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80" alt="Documento de Identidad" id="idDocOverlayImg">
+            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de Identidad" id="idDocOverlayImg">
         </div>
     </div>
 

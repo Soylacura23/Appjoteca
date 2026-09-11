@@ -71,13 +71,13 @@ goBackButton.addEventListener('click', ()=>{
 
 const configBtn = document.querySelector('.config');
 configBtn.addEventListener('click', () =>{
-    window.location.href = "../pages/ajustes/ajustes.html";
+    window.location.href = "../pages/ajustes/ajustes.php";
 
 });
 
 const signOut = document.querySelector('.signout');
 signOut.addEventListener('click', () => {
-    window.location.href = "../../../index.php";
+    window.location.href = "../../../backend/auth/logout.php";
 });
 
 

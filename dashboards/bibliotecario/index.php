@@ -1,68 +1,77 @@
 <?php
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
-requiereRol([3])
+requiereRol([3]);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Bibliotecario</title>
+    
+    <!-- Fuentes e Íconos -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- 1. THEME GLOBAL -->
+    <link rel="stylesheet" href="../../shared/css/theme.css">
+    
+    <!-- 2. Componentes Compartidos -->
+    <link rel="stylesheet" href="../../shared/css/components/navbar.css">
+    <link rel="stylesheet" href="../../shared/css/components/notifications.css">
+    <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    
+    <!-- 3. Estilos Locales del Dashboard -->
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="../../shared/css/components/footer.css">
-    <link rel="favicon" type="image/png"  href="../../shared/images/logo-appjoteca.png">
+    <link rel="stylesheet" href="css/typography.css">
     
+    <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
 </head>
 <body>
-    <header class="topbar">
+
+    <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+    <?php include '../../shared/layouts/notifications.php'; ?>
+    <?php include '../../shared/layouts/menu-off-canvas.php'; ?>
+
+    <header class="topbar" role="banner">
         <div class="topbar-inner">
-            <!--responsive menu button-->
-            <button id="menu-activar" class="hamburguer">
-                <span class="material-symbols-outlined">Menu</span>
-            </button>
-            
-            <!--end responsive menu button-->
-
-            <div class="logo">
-                <div id="logo"></div>
-                <h1 class="headline-md text-primary">APPJOTECA</h1>
+            <a href="#" class="topbar-logo">
+                <div class="logo" aria-hidden="true"></div>
+                <span class="logo-text">AppJoteca</span>
+            </a>
+            <div class="topbar-search">
+                <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+                <span class="material-symbols-outlined topbar-search-icon">search</span>
             </div>
-
-            <div class="search-engine">
-                <form id="search-form">
-                    <button type="submit">
-                        <span class="material-symbols-outlined search-icon">search</span>
-                    </button>
-                    <input id="search" name="query" type="search" placeholder="Busca libros, funciones o usuarios" required minlength="1">
-                </form>
-            </div>
-            
-            <div class="topbar-derecha">
-
-                <div class="notification-tray">
+            <div class="topbar-actions">
+                <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
                     <span class="material-symbols-outlined">notifications</span>
-                </div>
+                    <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
+                </button>
+                
+                <!-- Botón de perfil inyectado por JS -->
+                <div id="profile-button-topbar"></div>
 
-                <div id="profile-button-topbar">
-
-                </div>
-
+                <button class="icon-btn menu-toggle-btn" id="menu-activar" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
             </div>
         </div>
-
-
-
+        <div class="topbar-search-mobile" aria-hidden="true">
+            <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+        </div>
     </header>
 
     <aside id="sidebar" class="sidebar">
-    <nav class="sidebar-navigator">
+        <nav class="sidebar-navigator">
             <ul class="menu-items">
                 <li>
                     <a href="index.php" class="menu-item active">
@@ -88,14 +97,6 @@ requiereRol([3])
                         <span class="menu-texto">Usuarios</span>
                     </a>
                 </li>
-                
-                <li>
-                    <a href="pages/programas/programas.php" class="menu-item">
-                        <span class="material-symbols-outlined">school</span>
-                        <span class="menu-texto">Programas</span>
-                    </a>
-                </li>
-
                 <li>
                     <a href="pages/reportes/reportes.php" class="menu-item">
                         <span class="material-symbols-outlined">analytics</span>
@@ -112,29 +113,25 @@ requiereRol([3])
         </nav>
     </aside>
 
+    <?php include '../../shared/layouts/menu-movil.php'; ?>
+
     <main id="main-content" class="main-content">
 
         <section class="hero-section">
             <div class="hero-content">
-                
                 <p class="text-primary text-sm">DASHBOARD PRINCIPAL</p>
-
                 <h1 class="headline-xl white-text">Supervisión de la biblioteca</h1>
 
                 <div class="hero-image">
-                    <img src="images/dashboard-background.png" class="hero-background">
+                    <img src="images/dashboard-background.png" class="hero-background" alt="Fondo Dashboard">
 
                     <div class="hero-overlay">
-
-
                         <div class="hero-text" id="hero-text">
-                            <h2 class="headline-xl white-text" id="headline-lg">Bienvenido de vuelta, <br> <?= $mi_nombre ?></h2>
+                            <h2 class="headline-xl white-text" id="headline-lg">Bienvenido de vuelta, <br> <?= htmlspecialchars($mi_nombre) ?></h2>
                             <p class="text-body">Gestiona el inventario, revisa los préstamos activos y administra los usuarios de la biblioteca.</p>
                         </div>
 
                         <div class="hero-buttons">
-
-                    
                             <button class="hero-image-button inventory" type="button">
                                 <span class="material-symbols-outlined">list_alt_check</span>
                                 <span class="btn-text text-body">Inventario</span>
@@ -145,31 +142,17 @@ requiereRol([3])
                                     <span class="text-body white-text">Usuarios</span>
                                 </a>
                             </button>
-
                         </div>
                     </div>
-
-                
-                    
                 </div>
-
-                
-
             </div>
-
-
         </section>
 
-
-
-        
         <section class="estadisticas">
-            
             <div class="stats-grid">
-                
                 <div class="stat-card">
                     <p class="label text-sm">LIBROS TOTALES</p>
-                    <h3 class="stat-number white-text headline-md"></h3>
+                    <h3 class="stat-number white-text headline-md">2450</h3>
                     <span class="percentage text-tertiary text-xs">
                         <span class="material-symbols-outlined">arrow_upward</span>
                         +2,8%
@@ -179,9 +162,7 @@ requiereRol([3])
                 <div class="stat-card warning">
                     <p class="label text-sm">APROBACIONES PENDIENTES</p>
                     <h3 class="stat-number white-text error headline-md">48</h3>
-                    <span class=" text-xs error">
-                        ATENCIÓN URGENTE
-                    </span>
+                    <span class="text-xs error">ATENCIÓN URGENTE</span>
                 </div>
 
                 <div class="stat-card">
@@ -195,30 +176,25 @@ requiereRol([3])
 
                 <div class="stat-card">
                     <p class="label text-sm">PRÉSTAMOS VENCIDOS</p>
-                    <h3 class="stat-number white-text  headline-md">15</h3>
+                    <h3 class="stat-number white-text headline-md">15</h3>
                     <span class="percentage text-xs text-tertiary">
                         <span class="material-symbols-outlined">arrow_downward</span>
                         -5%
                     </span>
                 </div>
-
             </div>
-
         </section>
 
         <div class="two-col-grid">
             <section class="pending">
                 <div class="reservation-table-container">
-
                     <table class="reservation">
                         <thead>
                             <tr class="first-tr">
                                 <th class="headline-md white-text" colspan="3">Fila de reservación</th>
-
                                 <th class="viewbutton">
                                     <button>VER TODOS</button>
                                 </th>
-
                             </tr>
                             <tr>
                                 <th class="text-outline text-xs">USUARIO</th>
@@ -226,65 +202,44 @@ requiereRol([3])
                                 <th class="text-outline text-xs">SOLICITADO EN</th>
                                 <th class="text-outline text-xs">ACCIÓN</th>
                             </tr>
-
                         </thead>
-
                         <tbody>
                             <tr>
                                 <td class="white-text text-xs">
                                     <div class="first-td">
-                                        <span class="material-symbols-outlined text-secondary">
-                                            account_circle
-                                        </span>
+                                        <span class="material-symbols-outlined text-secondary">account_circle</span>
                                         <span class="name">Julián Medina</span>
                                     </div>
                                 </td>
-                                <td class="white-text text-xs">El Alquemista</td>
-                                <td class="text-outline text-xs">
-                                    Oct 12, 2026
-                                </td>
+                                <td class="white-text text-xs">El Alquimista</td>
+                                <td class="text-outline text-xs">Oct 12, 2026</td>
                                 <td class="actions-btn">
                                     <button class="btn-accept">
-                                        <span class="material-symbols-outlined check">
-                                            check
-                                        </span>
-
+                                        <span class="material-symbols-outlined check">check</span>
                                     </button>
                                     <button class="btn-reject">
-                                        
-                                        <span class="material-symbols-outlined reject">
-                                            close
-                                        </span>
+                                        <span class="material-symbols-outlined reject">close</span>
                                     </button>
                                 </td>
                             </tr>
-
-
                         </tbody>
                     </table>
                 </div>
-                
             </section>
 
             <section class="actions">
                 <div class="one-column-grid">
-
                     <div class="featured-card">
-                        <img src="images/libro.png" class="featured-image">
+                        <img src="images/libro.png" class="featured-image" alt="Libro Destacado">
                         <div class="featured-overlay">
                             <p class="text-xs text-primary">RESERVACIÓN DESTACADA</p>
                             <h5 class="headline-md white-text">Cien Años de soledad</h5>
-
-                            <button class="btn-text text-body" id="btn-featured" type="button">
-                                VER DETALLES
-                            </button>
+                            <button class="btn-text text-body" id="btn-featured" type="button">VER DETALLES</button>
                         </div>
                     </div>
 
                     <div class="socialntw-card">
                         <p class="headline-md text-secondary">Redes sociales</p>
-                    
-
                         <button class="white-text text-xs" id="whatsApp-icon" type="button">
                             <span class="left-button">
                                 <i class="fab fa-whatsapp" style="color: #25D366;"></i>
@@ -293,7 +248,6 @@ requiereRol([3])
                             <span class="right-button">
                                 <span class="material-symbols-outlined">arrow_forward</span>
                             </span>
-
                         </button>
 
                         <button class="white-text text-xs" id="gmail-icon" type="button">
@@ -304,21 +258,17 @@ requiereRol([3])
                             <span class="right-button">
                                 <span class="material-symbols-outlined">arrow_forward</span>
                             </span>
-                            
-                            
                         </button>
                     </div>
 
                     <div class="history">
                         <p class="text-outline text text-body">HISTORIAL</p>
-
                         <div class="trail">
                             <div class="active_icon"></div>
                             <div class="trail-content">
                                 <span class="text-sm text-secondary">Nuevo libro registrado</span>
                                 <span class="text-sm text-outline">Hace 2 minutos</span>
                             </div>
-
                         </div>
 
                         <div class="trail">
@@ -327,118 +277,21 @@ requiereRol([3])
                                 <span class="text-sm text-secondary">Reserva aceptada</span> 
                                 <span class="text-sm text-outline">Hace 1 hora</span>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
-            
-
             </section>
-
         </div>
 
         <button class="add_button" type="button" aria-label="Añadir nuevo libro">
             <span class="material-symbols-outlined">add</span>
         </button>
 
-          <!-- ══════════════════════════════════════════
-       FOOTER
-  ══════════════════════════════════════════════ -->
-  <footer class="footer" role="contentinfo">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">AppJoteca</span>
-        <p class="footer-tagline">
-          Punto de acceso institucional para fomentar la lectura en los estudiantes de la institución.
-        </p>
-        <div class="footer-social">
-          <button class="footer-social-btn" aria-label="Sitio web">
-            <span class="material-symbols-outlined">language</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Compartir">
-            <span class="material-symbols-outlined">share</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Correo electrónico">
-            <span class="material-symbols-outlined">mail</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="footer-nav-cols">
-        <div class="footer-col">
-          <p class="footer-col-title">Explorar</p>
-          <nav>
-            <a href="#">El Catálogo</a>
-            <a href="#">Nuevos Ingresos</a>
-            <a href="#">Mi Biblioteca</a>
-            <a href="#">Mapa Institucional</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Sistema</p>
-          <nav>
-            <a href="#">Términos de Uso</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Soporte</a>
-            <a href="#">Accesibilidad</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Acceso</p>
-          <nav>
-            <a href="#">Acceso Institucional</a>
-            <a href="#">Panel Administrativo</a>
-            <a href="#">Contacto</a>
-          </nav>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        &copy; 2024 AppJoteca &nbsp;·&nbsp; Sistema de Biblioteca Institucional
-      </p>
-    </div>
-  </footer>
-
-
+        <!-- FOOTER -->
+        <?php include '../../shared/layouts/footer.php'; ?>
 
     </main>
 
-    
-
-    <div id="overlay" class="overlay">
-
-    </div>
-
-    <div class="notification-container" id="notification-container">
-
-
-    </div>
-
-    <div class="menu-off-canva">
-        <span class="material-symbols-outlined arrow-back">arrow_back_ios</span>
-        <div id="profile-button-menu">
-            
-        </div>
-
-        <div class="menu-buttons">
-            <button class="config">
-                <span class="material-symbols-outlined">settings</span>
-                Configuración
-            </button>
-            <button class="signout">
-                <span class="material-symbols-outlined">logout</span>
-                Cerrar Sesión
-            </button>
-        </div>
-    </div>
-
-    
-
-
-
-   <script src="js/global.js"></script>
+    <script src="../../shared/js/global.js"></script>
 </body>
 </html>

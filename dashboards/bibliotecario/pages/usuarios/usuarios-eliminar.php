@@ -1,40 +1,47 @@
 <?php
-// Mismos requires (y misma profundidad de ruta) que usuarios.php, para que
-// esta acción quede protegida por la misma sesión/rol que la página que la usa.
-require_once __DIR__ . '/../../backend/config/auth.php';
-require_once __DIR__ . '/../../backend/Database/conexion.php';
+require_once __DIR__ . '/../../../../backend/config/auth.php';
+require_once __DIR__ . '/../../../../backend/Database/conexion.php';
 
-header('Content-Type: application/json; charset=utf-8');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-// Solo Bibliotecario (rol 3) puede eliminar usuarios, igual que en usuarios.php.
-// auth.php ya llamó session_start() y valida que exista sesión activa;
-// requiereRol() corta la ejecución con 403 si el rol no coincide.
-requiereRol([3]);
+    header('Content-Type: application/json; charset=utf-8');
 
-$id_usuario = filter_input(INPUT_POST, 'id_usuario', FILTER_VALIDATE_INT);
+    $id_usuario = filter_input(INPUT_POST, 'id_usuario', FILTER_VALIDATE_INT);
 
-if (!$id_usuario) {
-    http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'id_usuario inválido']);
+    if (!$id_usuario) {
+        echo json_encode(['ok' => false, 'error' => 'ID de usuario inválido']);
+        exit();
+    } 
+    elseif
+
+    ($id_usuario == (int) $_SESSION['usuario_id']) {
+        echo json_encode(['ok' => false, 'error' => 'No puedes eliminar tu propia cuenta']);
+        exit();
+    }
+    else {
+
+        $sql = $connection->prepare('DELETE FROM usuarios WHERE id_usuario = ?');
+        $sql->bind_param('i', $id_usuario);
+        
+        if ($sql->execute()){
+
+            if ($sql->affected_rows > 0) {
+                echo json_encode(['ok' => true]);
+            } else {
+                echo json_encode(['ok' => false, 'error' => 'Usuario no encontrado']);
+            }
+        };
+
+        $sql->close();
+        $connection->close();
+    }
+} else{
+    
+    http_response_code(405);
+    header('Allow: POST');
+
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok' => false, 'error' => 'Método no permitido'], JSON_UNESCAPED_UNICODE );
     exit();
-}
 
-if ($id_usuario === (int) $_SESSION['usuario_id']) {
-    http_response_code(409);
-    echo json_encode(['ok' => false, 'error' => 'No puedes eliminar tu propia cuenta']);
-    exit();
-}
-
-$stmt = $connection->prepare('DELETE FROM usuarios WHERE id_usuario = ?');
-$stmt->bind_param('i', $id_usuario);
-$exito = $stmt->execute();
-
-if ($exito && $stmt->affected_rows > 0) {
-    echo json_encode(['ok' => true]);
-} else {
-    http_response_code(404);
-    echo json_encode(['ok' => false, 'error' => 'Usuario no encontrado o no se pudo eliminar']);
-}
-
-$stmt->close();
-$connection->close();
+};

@@ -179,9 +179,68 @@
   flex: 1;
 }
 
+.tabulator-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 350px; /* Ancho máximo del buscador */
+  margin-bottom: 20px; /* Separación con la tabla */
+  display: flex;
+  align-items: center;
+}
+
+/* El ícono de la lupa flotante */
+.tabulator-search-wrapper .search-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none; /* Para que el clic pase a través del ícono hacia el input */
+  transition: color 0.3s ease;
+}
+
+/* El campo de texto */
+.tabulator-search-input {
+  width: 100%;
+  background: #141414; /* Fondo oscuro de tus tarjetas */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px 12px 44px; /* Padding izquierdo más grande para no tapar el ícono */
+  color: #e2e2e2;
+  font-family: var(--font-body, "Manrope", sans-serif);
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* El texto que dice "Buscar usuario..." (Placeholder) */
+.tabulator-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── ESTADOS INTERACTIVOS (Hover y Focus) ── */
+
+.tabulator-search-input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Cuando el usuario hace clic para escribir */
+.tabulator-search-input:focus {
+  border-color: var(--primary, #c9a84c); /* Borde dorado */
+  background: #1a1a1a;
+  box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Resaltar el ícono cuando el input está activo */
+.tabulator-search-input:focus ~ .search-icon,
+.tabulator-search-wrapper:focus-within .search-icon {
+  color: var(--primary, #c9a84c);
+}
+
 .user-tables {
   width: 100%;
-  border-radius: var(--radius-xl, 16px);
+  border-radius: var(--radius-sm, 16px);
   background: var(--surface-container, #141414);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
@@ -274,6 +333,119 @@
 
 .status-active { color: #22c55e; }
 .status-inactive { color: #888; }
+
+/* ── Acciones de Tabulator ───────────────────────────────── */
+.acciones-placeholder {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant, #888);
+  font-style: italic;
+}
+
+.acciones-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+}
+
+.btn-accept {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.btn-accept:hover {
+  background: rgba(34, 197, 94, 0.25);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+}
+
+.btn-reject {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-reject:hover {
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+
+.tabulator .tabulator-footer {
+  background-color: var(--surface-container, #141414) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: var(--on-surface-variant, #888) !important;
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--on-surface, #f0f0f0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+  background: var(--primary, #c9a84c) !important;
+  color: var(--on-primary, #0a0a0a) !important;
+}
+
+.tabulator .tabulator-footer {
+  background-color: transparent !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 15px 10px !important;
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+  background-color: #ffffff !important;
+  color: #4f46e5 !important; 
+  border: 1px solid #e0e7ff !important;
+  border-radius: 8px !important; 
+  padding: 8px 14px !important;
+  margin: 0 4px !important;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3) !important;
+  transform: translateY(-1px); 
+  cursor: pointer;
+}
+
+
+.tabulator .tabulator-footer .tabulator-page.active {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+  border-color: #4f46e5 !important;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4) !important;
+}
+
+
+.tabulator .tabulator-footer .tabulator-page:disabled,
+.tabulator .tabulator-footer .tabulator-page.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background-color: #f9fafb !important;
+  color: #9ca3af !important;
+  border-color: #e5e7eb !important;
+  box-shadow: none !important;
+  transform: none !important; 
+}
 
 /* ── Overlay detalle ────────────────────────────────────────── */
 .user-detail-overlay {
@@ -383,12 +555,16 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 20px;
+  padding: 16px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+.detail-body > * {
+  flex: 0 0 auto;
+  min-height: auto;
+}
 @media (min-width: 640px) {
   .detail-body { padding: 24px 28px 28px; gap: 24px; }
 }
@@ -471,7 +647,7 @@
   background: var(--surface-container, #1a1a1a);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-xl, 16px);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .section-label {
@@ -495,6 +671,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: auto;
+  overflow: visible;
 }
 
 .detail-bio {

@@ -6,10 +6,6 @@
    Contiene: custom properties, reset, overlay, botón de perfil,
              menú off-canvas de perfil y scrollbar.
    ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Custom Properties (Design Tokens)
-   ──────────────────────────────────────────────── */
    :root {
     /* ── Paleta ── */
     --background:                 #000000;

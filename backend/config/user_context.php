@@ -10,6 +10,8 @@ $diccionario_roles = [
     2 => 'Docente',
     3 => 'Bibliotecario',
 ];
+define('BASE_URL', '/Appjoteca/');
+
 
 $mi_id       = $_SESSION['usuario_id'] ?? null;
 $mi_nombre   = $_SESSION['nombre'] ?? '';
@@ -18,9 +20,11 @@ $mi_rol_num  = $_SESSION['rol'] ?? null;
 $mi_rol      = $diccionario_roles[$mi_rol_num] ?? 'Usuario';
 $mi_documento= $_SESSION['documento'];
 
+
+
 $mi_foto = !empty($_SESSION['foto_perfil'])
-    ? $_SESSION['foto_perfil']
-    : '../../assets/images/default-avatar.png';
+    ? BASE_URL . $_SESSION['foto_perfil']
+    : BASE_URL .'assets/images/default-avatar.png';
 
 if (!isset($_SESSION['resumen_libros']) && $mi_id) {
 
@@ -56,18 +60,17 @@ if (!isset($_SESSION['resumen_libros']) && $mi_id) {
             }
             $query->close();
         }
-        $connection->close();
     }
 
 ?>
 
 <script>
-    window.AppUser = {
-        id: "<?php echo $mi_id; ?>",
-        nombre: "<?php echo $mi_nombre; ?>",
-        usuario: "<?php echo $mi_usuario; ?>",
-        rol: "<?php echo $mi_rol; ?>",
-        foto: "<?php echo $mi_foto; ?>",
-        libros: <?php echo json_encode($_SESSION['resumen_libros'] ?? null); ?>
-    };
+    window.AppUser = <?php echo json_encode([
+        'id' => $mi_id,
+        'nombre' => $mi_nombre,
+        'usuario' => $mi_usuario,
+        'rol' => $mi_rol,
+        'foto' => $mi_foto,
+        'libros' => $_SESSION['resumen_libros'] ?? null
+    ]); ?>;
 </script>

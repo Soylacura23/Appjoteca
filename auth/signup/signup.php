@@ -19,9 +19,6 @@
 
 <body>
 
-  <!-- ════════════════════════════════════════════════════════
-       HEADER FIJO
-       ════════════════════════════════════════════════════════ -->
   <header class="signup-header" role="banner">
     <div class="signup-header-container">
       <a href="../../index.php" class="logo-link" aria-label="Ir al inicio de Appjoteca">
@@ -35,16 +32,11 @@
     </div>
   </header>
 
-  <!-- ════════════════════════════════════════════════════════
-       SHELL PRINCIPAL — Single global scroll
-       ════════════════════════════════════════════════════════ -->
   <main class="signup-shell" role="main">
 
-    <!-- ── Panel del formulario (izquierda en desktop, arriba en móvil) ── -->
     <section class="signup-form-panel" aria-label="Formulario de registro">
       <div class="signup-form-wrapper">
 
-        <!-- ── SELECTOR DE ROL ── -->
         <div class="role-selector" role="group" aria-label="Selecciona tu tipo de acceso">
           <p class="role-selector-label" id="role-label">¿Quién eres?</p>
           <div class="role-grid" role="radiogroup" aria-labelledby="role-label">
@@ -69,18 +61,13 @@
 
           </div>
         </div>
-        <!-- /role-selector -->
-
-        <!-- ── Encabezado del formulario ── -->
         <header class="signup-heading">
           <h3 class="signup-title">Crear Cuenta Institucional</h3>
           <p class="signup-subtitle">Completa tus datos para acceder a la biblioteca digital.</p>
         </header>
 
-        <!-- ── Formulario ── -->
         <form id="signup-form" class="signup-form" novalidate autocomplete="on" action="../../backend/auth/register-send.php" method="POST" enctype="multipart/form-data">
 
-          <!-- Campo: Nombre completo -->
           <div class="field-group">
             <label class="field-label" for="nombre">Nombres y apellidos <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper">
@@ -96,7 +83,6 @@
             </div>
           </div>
 
-          <!-- Campo: Nombre de usuario -->
           <div class="field-group">
             <label class="field-label" for="usuario">Nombre de usuario único <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper">
@@ -116,7 +102,6 @@
             <p class="field-hint">Solo letras, números, punto, guión y guión bajo. No se podrá cambiar después.</p>
           </div>
 
-          <!-- Campo: Correo institucional -->
           <div class="field-group">
             <label class="field-label" for="email">Correo institucional <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper">
@@ -133,7 +118,6 @@
             <p class="field-hint">Solo dominios institucionales permitidos.</p>
           </div>
 
-          <!-- Campo: Tarjeta de identidad / Cédula -->
           <div class="field-group">
             <label class="field-label" for="cedula">Tarjeta de identidad / Cédula <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper">
@@ -150,8 +134,29 @@
             </div>
           </div>
 
+          <div class="field-group">
+            <label class="field-label">Documento adjunto <span class="required-mark" aria-hidden="true">*</span></label>
+            <div class="file-upload-wrapper">
+              <input 
+                type="file" 
+                id="cedula-file" 
+                name="cedula_file" 
+                class="file-input" 
+                accept=".pdf, image/png, image/jpeg, image/webp" 
+                required 
+                aria-label="Subir documento de identidad"
+              >
+              <label for="cedula-file" class="file-upload-label">
+                <span class="material-symbols-outlined" aria-hidden="true">cloud_upload</span>
+                <div class="file-upload-text">
+                  <strong>Suelta el archivo aquí o busca en el dispositivo</strong>
+                  <span>Formatos: PDF, PNG, JPG o WEBP (Máx. 10MB)</span>
+                </div>
+              </label>
+              <div id="cedula-preview" class="file-preview" hidden></div>
+            </div>
+          </div>
         
-          <!-- Campo: Contraseña -->
           <div class="field-group">
             <label class="field-label" for="contrasena">Contraseña <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper field-wrapper--password">
@@ -177,7 +182,6 @@
             <p class="field-hint">Mínimo 8 caracteres.</p>
           </div>
 
-          <!-- Campo: Confirmar contraseña -->
           <div class="field-group">
             <label class="field-label" for="contrasena2">Confirmar contraseña <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="field-wrapper field-wrapper--password">
@@ -201,7 +205,6 @@
             </div>
           </div>
 
-          <!-- Mensaje de error -->
           <div
             id="signup-error"
             class="signup-error"
@@ -213,7 +216,6 @@
             <span id="signup-error-text">Error en el registro.</span>
           </div>
 
-          <!-- Mensaje de éxito -->
           <div
             id="signup-success"
             class="signup-success"
@@ -225,27 +227,18 @@
             <span id="signup-success-text">Cuenta creada correctamente.</span>
           </div>
 
-          <!-- Botón de submit -->
           <button type="submit" class="btn-signup">
             <span id="btn-signup-text">Crear Cuenta</span>
             <span class="btn-signup-shine" aria-hidden="true"></span>
           </button>
 
         </form>
-        <!-- /signup-form -->
-
-        <!-- Enlace a login -->
         <div class="signup-login-link">
           <p>¿Ya tienes cuenta? <a href="../login/login.php">Inicia sesión</a></p>
         </div>
 
       </div>
-      <!-- /signup-form-wrapper -->
-
-    </section>
-    <!-- /signup-form-panel -->
-
-    
+      </section>
     <section class="signup-visual" aria-hidden="true">
       <div class="signup-visual-overlay"></div>
       <img
@@ -273,11 +266,6 @@
     </section>
 
   </main>
-  <!-- /signup-shell -->
-
-  <!-- ════════════════════════════════════════════════════════
-       FOOTER INSTITUCIONAL (el mismo del proyecto)
-       ════════════════════════════════════════════════════════ -->
   <footer class="footer" role="contentinfo">
     <div class="footer-inner">
       <div class="footer-brand">

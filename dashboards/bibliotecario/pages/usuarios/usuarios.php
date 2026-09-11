@@ -7,28 +7,6 @@ require_once __DIR__ . '/../../../../backend/config/auth.php';
 require_once __DIR__ . '/../../../../backend/config/user_context.php';
 
 requiereRol([3]);
-
-require_once __DIR__ . '/../../../../backend/Database/conexion.php';
-
-$usuarios = [];
-$resultado = mysqli_query($connection, "SELECT id_usuario, id_rol, nombre_apellido, nombre_usuario, correo_institucional, documento, foto_perfil, foto_documento, biografia, estado FROM usuarios WHERE id_rol = 1, 2");
-
-while ($fila = mysqli_fetch_assoc($resultado)) {
-    $usuarios[] = [
-        'id'             => $fila['id_usuario'],
-        'rol'            => $diccionario_roles[$fila['id_rol']] ?? 'Sin rol',
-        'nombre'         => $fila['nombre_apellido'],
-        'usuario'        => $fila['nombre_usuario'],
-        'correo'         => $fila['correo_institucional'],
-        'documento'      => $fila['documento'],
-        'foto_perfil'    => $fila['foto_perfil'],
-        'foto_documento' => $fila['foto_documento'],
-        'biografia'      => $fila['biografia'],
-        'estado'         => $fila['estado'] == 1 ? 'activo' : 'inactivo',
-    ];
-}
-
-mysqli_close($connection);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -41,54 +19,64 @@ mysqli_close($connection);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_midnight.min.css">
-    <link rel="stylesheet" href="usuarios.css">
+    <!-- 1. THEME GLOBAL -->
+    <link rel="stylesheet" href="../../../../shared/css/theme.css">
+
+    <!-- 2. Componentes Compartidos -->
+    <link rel="stylesheet" href="../../../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../../../shared/css/components/notifications.css">
-    <link rel="stylesheet" href="../../css/theme.css">
     <link rel="stylesheet" href="../../../../shared/css/components/footer.css">
-    <link rel="favicon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
+    
+
+    <!-- 3. Estilos Locales del Dashboard -->
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="usuarios.css">
+    <link rel="stylesheet" href="../../css/typography.css">
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
 <base target="_self">
 </head>
 <body>
 
-    <!-- Topbar -->
-    <header class="topbar">
-        <div class="topbar-inner">
-            <button id="menu-activar" class="hamburguer">
-                <span class="material-symbols-outlined">Menu</span>
+<div id="overlay" class="overlay" aria-hidden="true"></div>
+
+<?php include '../../../../shared/layouts/notifications.php'; ?>
+<?php include '../../../../shared/layouts/menu-off-canvas.php'; ?>
+
+<header class="topbar" role="banner">
+    <div class="topbar-inner">
+        <a href="#" class="topbar-logo">
+            <div class="logo" aria-hidden="true"></div>
+            <span class="logo-text">AppJoteca</span>
+        </a>
+        <div class="topbar-search">
+            <input type="text" id="search" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+            <span class="material-symbols-outlined topbar-search-icon">search</span>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn search-toggle-btn" id="search-toggle-btn" aria-label="Buscar" aria-expanded="false">
+                <span class="material-symbols-outlined">search</span>
+            </button>
+            <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
             </button>
 
-            <div class="logo">
-                <div id="logo"></div>
-                <h1 class="headline-md text-primary">APPJOTECA</h1>
-            </div>
+            <!-- Botón de perfil inyectado por JS -->
+            <div id="profile-button-topbar"></div>
 
-            <div class="search-engine">
-                <form id="search-form">
-                    <button type="submit">
-                        <span class="material-symbols-outlined search-icon">search</span>
-                    </button>
-                    <input id="search" name="query" type="search" placeholder="Busca libros, funciones o usuarios" required minlength="1">
-                </form>
-            </div>
-
-            <div class="topbar-derecha">
-                <button class="icon-btn search-toggle-btn" id="search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-
-                <button class="notification-tray" id="notification-tray-btn" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge hidden" aria-hidden="true"></span>
-                </button>
-
-                <div id="profile-button-topbar"></div>
-            </div>
+            <button class="icon-btn menu-toggle-btn" id="menu-activar" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
         </div>
-
-        <div class="topbar-search-mobile" id="topbar-search-mobile" aria-hidden="true">
-            <input type="text" placeholder="Buscar usuarios por nombre, rol o ID..." aria-label="Buscar usuarios" id="search-mobile-input">
-        </div>
-    </header>
+    </div>
+    <div class="topbar-search-mobile" id="topbar-search-mobile" aria-hidden="true">
+        <input type="text" id="search-mobile-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+    </div>
+</header>
 
     <!-- Nav SIDEBAR -->
     <aside id="sidebar" class="sidebar">
@@ -119,12 +107,6 @@ mysqli_close($connection);
                     </a>
                 </li>
 
-                <li>
-                    <a href="../programas/programas.php" class="menu-item">
-                        <span class="material-symbols-outlined">school</span>
-                        <span class="menu-texto">Programas</span>
-                    </a>
-                </li>
 
                 <li>
                     <a href="../reportes/reportes.php" class="menu-item">
@@ -193,7 +175,10 @@ mysqli_close($connection);
         </section>
 
         <section class="users-section" aria-label="Listado de usuarios">
-            <div class="user-tables">
+        <div class="tabulator-search-wrapper">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" id="users-search" class="tabulator-search-input" placeholder="Buscar usuario (nombre, correo...)">
+        </div>
                 <div id="users-table"></div>
             </div>
         </section>
@@ -201,62 +186,7 @@ mysqli_close($connection);
           <!-- ══════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════ -->
-  <footer class="footer" role="contentinfo">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">AppJoteca</span>
-        <p class="footer-tagline">
-          Punto de acceso institucional para fomentar la lectura en los estudiantes de la institución.
-        </p>
-        <div class="footer-social">
-          <button class="footer-social-btn" aria-label="Sitio web">
-            <span class="material-symbols-outlined">language</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Compartir">
-            <span class="material-symbols-outlined">share</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Correo electrónico">
-            <span class="material-symbols-outlined">mail</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="footer-nav-cols">
-        <div class="footer-col">
-          <p class="footer-col-title">Explorar</p>
-          <nav>
-            <a href="#">El Catálogo</a>
-            <a href="#">Nuevos Ingresos</a>
-            <a href="#">Mi Biblioteca</a>
-            <a href="#">Mapa Institucional</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Sistema</p>
-          <nav>
-            <a href="#">Términos de Uso</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Soporte</a>
-            <a href="#">Accesibilidad</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Acceso</p>
-          <nav>
-            <a href="#">Acceso Institucional</a>
-            <a href="#">Panel Administrativo</a>
-            <a href="#">Contacto</a>
-          </nav>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        &copy; 2024 AppJoteca &nbsp;·&nbsp; Sistema de Biblioteca Institucional
-      </p>
-    </div>
-  </footer>
+  <?php include '../../../../shared/layouts/footer.php'; ?>
     </main>
 
     <!-- Overlay detalle de usuario -->
@@ -354,33 +284,13 @@ mysqli_close($connection);
         </div>
     </div>
 
-    <div id="overlay" class="overlay"></div>
+    <!-- FOOTER -->
+  
 
-    <div class="notification-container" id="notification-container"></div>
-
-    <div class="menu-off-canva">
-        <span class="material-symbols-outlined arrow-back">arrow_back_ios</span>
-        <div id="profile-button-menu"></div>
-        <div class="menu-buttons">
-            <button class="config">
-                <span class="material-symbols-outlined">settings</span>
-                Configuración
-            </button>
-            <button class="signout" href="../../../../backend/auth/logout.php">
-                <span class="material-symbols-outlined">logout</span>
-                Cerrar Sesión
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // Usuarios recién consultados por PHP en esta carga, listos para Tabulator.
-        // Se asigna explícitamente en window: un `const`/`let` de script global
-        // NO queda como propiedad de window, y usuarios.js lee window.USUARIOS_DATA.
-        window.USUARIOS_DATA = <?= json_encode($usuarios, JSON_UNESCAPED_UNICODE) ?>;
-    </script>
     <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
-    <script src="../../js/global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../../../shared/js/components/alert.js"></script>
+    <script src="../../../../shared/js/global.js"></script>
     <script src="usuarios.js"></script>
 </body>
 </html>

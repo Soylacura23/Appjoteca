@@ -1,3 +1,12 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+require_once __DIR__ . '/../../../../backend/config/auth.php';
+require_once __DIR__ . '/../../../../backend/config/user_context.php';
+requiereRol([3]);
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,49 +15,60 @@
     <title>Reservaciones · APPJOTECA</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
-    <link rel="stylesheet" href="../../css/global.css">
+    <!-- 1. THEME GLOBAL -->
+    <link rel="stylesheet" href="../../../../shared/css/theme.css">
+    
+    <!-- 2. Componentes Compartidos -->
+    <link rel="stylesheet" href="../../../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../../../shared/css/components/notifications.css">
-    <link rel="stylesheet" href="../../css/theme.css">
     <link rel="stylesheet" href="../../../../shared/css/components/footer.css">
+    
+    <!-- 3. Estilos Locales del Dashboard -->
+    <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="reservaciones.css">
-    <link rel="favicon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
+    <link rel="stylesheet" href="../../css/typography.css">
+    
+    <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
 <base target="_self">
 </head>
 <body>
 
-    <!-- Topbar -->
-    <header class="topbar">
-        <div class="topbar-inner">
-            <button id="menu-activar" class="hamburguer">
+<div id="overlay" class="overlay" aria-hidden="true"></div>
+
+<?php include '../../../../shared/layouts/notifications.php'; ?>
+<?php include '../../../../shared/layouts/menu-off-canvas.php'; ?>
+
+<header class="topbar" role="banner">
+    <div class="topbar-inner">
+        <a href="#" class="topbar-logo">
+            <div class="logo" aria-hidden="true"></div>
+            <span class="logo-text">AppJoteca</span>
+        </a>
+        <div class="topbar-search">
+            <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+            <span class="material-symbols-outlined topbar-search-icon">search</span>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
+                <span class="material-symbols-outlined">search</span>
+            </button>
+            <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
+            </button>
+            
+            <!-- Botón de perfil inyectado por JS -->
+            <div id="profile-button-topbar"></div>
+
+            <button class="icon-btn menu-toggle-btn" id="menu-activar" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
                 <span class="material-symbols-outlined">menu</span>
             </button>
-            <div class="logo">
-                <div id="logo"></div>
-                <h1 class="headline-md text-primary">APPJOTECA</h1>
-            </div>
-            <div class="search-engine">
-                <form id="search-form">
-                    <button type="submit">
-                        <span class="material-symbols-outlined search-icon">search</span>
-                    </button>
-                    <input id="search" name="query" type="search" placeholder="Busca libros, funciones o usuarios" required minlength="1">
-                </form>
-            </div>
-            <div class="topbar-derecha">
-                <button class="icon-btn search-toggle-btn" id="search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-                <button class="notification-tray" id="notification-tray-btn" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge hidden" aria-hidden="true"></span>
-                </button>
-                <div id="profile-button-topbar"></div>
-            </div>
         </div>
-        <div class="topbar-search-mobile" id="topbar-search-mobile" aria-hidden="true">
-            <input type="text" placeholder="Buscar libros, funciones o usuarios..." aria-label="Buscar en reservaciones">
-        </div>
-    </header>
+    </div>
+    <div class="topbar-search-mobile" aria-hidden="true">
+        <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+    </div>
+</header>
 
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
@@ -78,13 +98,7 @@
                         <span class="menu-texto">Usuarios</span>
                     </a>
                 </li>
-                
-                <li>
-                    <a href="../programas/programas.php" class="menu-item">
-                        <span class="material-symbols-outlined">school</span>
-                        <span class="menu-texto">Programas</span>
-                    </a>
-                </li>
+
 
                 <li>
                     <a href="../reportes/reportes.php" class="menu-item">
@@ -102,6 +116,7 @@
         </nav>
     </aside>
 
+    <?php include '../../../../shared/layouts/menu-movil.php'; ?>
     <!-- Main Content -->
     <main id="main-content" class="main-content">
 
@@ -210,108 +225,12 @@
             </div>
         </section>
 
-          <!-- ══════════════════════════════════════════
-       FOOTER
-  ══════════════════════════════════════════════ -->
-  <footer class="footer" role="contentinfo">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">AppJoteca</span>
-        <p class="footer-tagline">
-          Punto de acceso institucional para fomentar la lectura en los estudiantes de la institución.
-        </p>
-        <div class="footer-social">
-          <button class="footer-social-btn" aria-label="Sitio web">
-            <span class="material-symbols-outlined">language</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Compartir">
-            <span class="material-symbols-outlined">share</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Correo electrónico">
-            <span class="material-symbols-outlined">mail</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="footer-nav-cols">
-        <div class="footer-col">
-          <p class="footer-col-title">Explorar</p>
-          <nav>
-            <a href="#">El Catálogo</a>
-            <a href="#">Nuevos Ingresos</a>
-            <a href="#">Mi Biblioteca</a>
-            <a href="#">Mapa Institucional</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Sistema</p>
-          <nav>
-            <a href="#">Términos de Uso</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Soporte</a>
-            <a href="#">Accesibilidad</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Acceso</p>
-          <nav>
-            <a href="#">Acceso Institucional</a>
-            <a href="#">Panel Administrativo</a>
-            <a href="#">Contacto</a>
-          </nav>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        &copy; 2024 AppJoteca &nbsp;·&nbsp; Sistema de Biblioteca Institucional
-      </p>
-    </div>
-  </footer>
+  <!-- FOOTER -->
+  <?php include '../../../../shared/layouts/footer.php'; ?>
 
     </main>
 
-    <!-- Overlay -->
-    <div id="overlay" class="overlay"></div>
-
-    <!-- Notificaciones -->
-    <div class="notification-container" id="notification-container">
-        <div class="notification-header">
-            <h3 class="notification-header-title">
-                Notificaciones
-                <span class="count-pill">0</span>
-            </h3>
-            <button class="notification-mark-all" id="mark-all-read">Marcar leídas</button>
-        </div>
-        <div class="notification-list" id="notification-list">
-            <div class="notification-empty" id="notification-empty">
-                <span class="material-symbols-outlined">notifications_none</span>
-                <p>No hay notificaciones nuevas</p>
-            </div>
-        </div>
-        <div class="notification-footer">
-            <button class="notification-see-all">Ver todas las notificaciones</button>
-        </div>
-    </div>
-
-    <!-- Menú Off-canvas -->
-    <div class="menu-off-canva">
-        <span class="material-symbols-outlined arrow-back">arrow_back_ios</span>
-        <div id="profile-button-menu"></div>
-        <div class="menu-buttons">
-            <button class="config">
-                <span class="material-symbols-outlined">settings</span>
-                Configuración
-            </button>
-            <button class="signout">
-                <span class="material-symbols-outlined">logout</span>
-                Cerrar Sesión
-            </button>
-        </div>
-    </div>
-
-    <script src="../../js/global.js"></script>
+    <script src="../../../../shared/js/global.js"></script>
     <script src="reservaciones.js"></script>
 </body>
 </html>
