@@ -10,7 +10,7 @@ try {
     require_once __DIR__ . '/../../backend/Database/conexion.php';
 
     // SI TU VARIABLE DE CONEXIÓN NO ES $conn, CÁMBIALA AQUÍ:
-    $conexion_db = $conn; // <-- Cambia $conn por $conexion o $mysqli según tu archivo conexion.php
+    $conexion_db = $connection; // <-- Cambia $conn por $conexion o $mysqli según tu archivo conexion.php
 
     $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
