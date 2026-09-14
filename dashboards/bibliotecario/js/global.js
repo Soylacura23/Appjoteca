@@ -74,10 +74,10 @@ configBtn.addEventListener('click', () =>{
     window.location.href = "../pages/ajustes/ajustes.php";
 
 });
-
+//cerar sesion biliotecario
 const signOut = document.querySelector('.signout');
 signOut.addEventListener('click', () => {
-    window.location.href = "../../../backend/auth/logout.php";
+    window.location.href = "/Appjoteca/backend/auth/logout.php";
 });
 
 
