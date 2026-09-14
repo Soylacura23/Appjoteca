@@ -1,11 +1,17 @@
 <?php
-session_start();
 
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
+require_once __DIR__ . '/../config/verify-csrf.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require("../Database/conexion.php"); 
+
 
 header('Content-Type: application/json');
 
@@ -39,6 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $usuario_db = $resultado->fetch_assoc();
 
         if (password_verify($pass_input, $usuario_db['password'])) {
+
+            session_regenerate_id(true);
+
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             
             $_SESSION['usuario_id'] = $usuario_db['id_usuario'];
             $_SESSION['usuario'] = $usuario_db['nombre_usuario'];
@@ -54,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 3 => '../../dashboards/bibliotecario/index.php'
             ];
 
-            $url_destino = $destinos[$id_rol] ?? '../../index.php';
+            $url_destino = $destinos[$usuario_db['id_rol']] ?? '../../index.php';
 
             echo json_encode([
                 'status' => 'success',

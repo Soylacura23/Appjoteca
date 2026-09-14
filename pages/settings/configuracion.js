@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const datos = new FormData();
         datos.append('accion', 'cambiar_foto');
         datos.append('nueva_foto', archivo);
+        datos.append('csrf_token', window.getCSRFToken());
 
         fetch('../../backend/settings/configuracion-back.php', {
             method: 'POST',
@@ -86,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData();
         formData.append('update_username', '1');
         formData.append('username', nuevo);
+        formData.append('csrf_token', window.getCSRFToken());
 
         fetch('../../backend/settings/configuracion-back.php', {
             method: 'POST',
@@ -240,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('current_password', currentPass);
         formData.append('new_password', newPassVal);
         formData.append('confirm_password', confirmVal);
+        formData.append('csrf_token', window.getCSRFToken());
 
         fetch('../../backend/settings/configuracion-back.php', {
             method: 'POST',

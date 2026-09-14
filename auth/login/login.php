@@ -1,3 +1,11 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -99,6 +107,7 @@
         <!-- ── Formulario ── -->
         <form id="login-form" class="login-form" novalidate autocomplete="on" action="../../backend/auth/login-send.php" method="POST">
 
+          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
           <!-- Campo: Usuario -->
           <div class="field-group">
             <label class="field-label" for="usuario">Nombre único</label>

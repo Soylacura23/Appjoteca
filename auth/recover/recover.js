@@ -1,4 +1,8 @@
 // ── Referencias al DOM ──────────────────────────────────────
+function getCSRFToken() {
+  const meta = document.querySelector('meta[name="csrf-token"]');
+  return meta ? meta.getAttribute('content') : '';
+}
 const form          = document.getElementById('recover-form');
 const correoInput   = document.getElementById('correo');
 const codeInputs    = document.querySelectorAll('.code-input');
@@ -60,6 +64,7 @@ btnSend.addEventListener('click', async () => {
     const formData = new FormData();
     formData.append('action', 'send_code');
     formData.append('correo', correo);
+    formData.append('csrf_token', getCSRFToken());
 
     const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
     const data = await res.json();
@@ -102,6 +107,7 @@ codeInputs.forEach((input, i) => {
         const formData = new FormData();
         formData.append('action', 'verify_code');
         formData.append('codigo', codigo);
+        formData.append('csrf_token', getCSRFToken());
 
         const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
         const data = await res.json();
@@ -153,6 +159,7 @@ form.addEventListener('submit', async (e) => {
     const formData = new FormData();
     formData.append('action', 'update_password');
     formData.append('nueva_contrasena', passInput.value);
+    formData.append('csrf_token', getCSRFToken());
 
     const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
     const data = await res.json();

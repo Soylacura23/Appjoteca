@@ -1,8 +1,17 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Registro en AppJoteca</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,6 +76,8 @@
         </header>
 
         <form id="signup-form" class="signup-form" novalidate autocomplete="on" action="../../backend/auth/register-send.php" method="POST" enctype="multipart/form-data">
+
+          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
           <div class="field-group">
             <label class="field-label" for="nombre">Nombres y apellidos <span class="required-mark" aria-hidden="true">*</span></label>

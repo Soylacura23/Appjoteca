@@ -1,8 +1,17 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
   <title>Recuperar Acceso en AppJoteca</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,6 +72,7 @@
         <!-- ── Formulario ── -->
         <form id="recover-form" class="recover-form" novalidate autocomplete="on" action="../../backend/auth/procesarecover.php" method="POST">
 
+          
           <!-- ── PASO 1: Correo institucional ── -->
           <section class="recover-step" id="step-1" aria-label="Paso 1: Identifica tu cuenta">
             <div class="step-header">

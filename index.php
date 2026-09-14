@@ -1,9 +1,10 @@
 
-+<?php
+<?php
 
 if (session_status() === PHP_SESSION_NONE) { 
     session_start(); 
 }
+
 require("backend/Database/conexion.php");
 
 if (!isset($_SESSION['totales_biblioteca'])) {
@@ -63,7 +64,7 @@ $cantidad_colecciones= $_SESSION['totales_biblioteca']['colecciones'] ?? 0;
 
         <nav class="main-nav">
             <ul class="nav-list">
-                <li><a href="#" class="nav-link">Sobre Nosotros</a></li>
+                <li><a href="pages/sobre-nosotros/about-us.php" class="nav-link">Sobre Nosotros</a></li>
                 <li><a href="#" class="nav-link">Contacto</a></li>
             </ul>
         </nav>
@@ -104,7 +105,7 @@ $cantidad_colecciones= $_SESSION['totales_biblioteca']['colecciones'] ?? 0;
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
             </a>
-            <a href="#" class="btn btn-secondary btn-hero">
+            <a href="pages/sobre-nosotros/about-us.php" class="btn btn-secondary btn-hero">
                 <span>Más Información</span>
             </a>
         </div>
@@ -479,62 +480,7 @@ $cantidad_colecciones= $_SESSION['totales_biblioteca']['colecciones'] ?? 0;
     <!-- ══════════════════════════════════════════
          FOOTER
     ══════════════════════════════════════════════ -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <span class="footer-logo">AppJoteca</span>
-                <p class="footer-tagline">
-                    Punto de acceso institucional para fomentar la lectura en los estudiantes de la institución.
-                </p>
-                <div class="footer-social">
-                    <button class="footer-social-btn" aria-label="Sitio web">
-                        <span class="material-symbols-outlined">language</span>
-                    </button>
-                    <button class="footer-social-btn" aria-label="Compartir">
-                        <span class="material-symbols-outlined">share</span>
-                    </button>
-                    <button class="footer-social-btn" aria-label="Correo electrónico">
-                        <span class="material-symbols-outlined">mail</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="footer-nav-cols">
-                <div class="footer-col">
-                    <p class="footer-col-title">Explorar</p>
-                    <nav>
-                        <a href="#">El Catálogo</a>
-                        <a href="#">Nuevos Ingresos</a>
-                        <a href="#">Mi Biblioteca</a>
-                        <a href="#">Mapa Institucional</a>
-                    </nav>
-                </div>
-                <div class="footer-col">
-                    <p class="footer-col-title">Sistema</p>
-                    <nav>
-                        <a href="#">Términos de Uso</a>
-                        <a href="#">Privacidad</a>
-                        <a href="#">Soporte</a>
-                        <a href="#">Accesibilidad</a>
-                    </nav>
-                </div>
-                <div class="footer-col">
-                    <p class="footer-col-title">Acceso</p>
-                    <nav>
-                        <a href="#">Acceso Institucional</a>
-                        <a href="#">Panel Administrativo</a>
-                        <a href="#">Contacto</a>
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p class="footer-copyright">
-                &copy; 2024 AppJoteca &nbsp;·&nbsp; Sistema de Biblioteca Institucional
-            </p>
-        </div>
-    </footer>
+    <?php include 'shared/layouts/footer.php'; ?>
 
 <script src="shared/js/menu.js"></script>
 <script src="shared/js/landing.js"></script>

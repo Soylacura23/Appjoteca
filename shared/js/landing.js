@@ -3,9 +3,6 @@
   
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   
-    /* ============================================ */
-    /*   NAVBAR: se define visualmente al hacer scroll */
-    /* ============================================ */
     var header = document.getElementById("mainHeader");
     function updateHeader() {
       if (!header) return;

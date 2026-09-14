@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
-    // Helper para alertas SweetAlert2 con el estilo institucional
     function alerta(icon, title, text) {
         Swal.fire({
             icon: icon,
@@ -13,19 +12,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- 1. Inicialización de Tabulator.js ---
+    
     const table = new Tabulator("#tabla-bibliotecarios", {
-        ajaxURL: "../../backend/api_bibliotecarios.php?action=listar",
+        data: [], 
         layout: "fitColumns",
         responsiveLayout: "collapse",
         placeholder: "No se encontraron bibliotecarios registrados",
         columns: [
             { title: "ID", field: "id", width: 70, hozAlign: "center" },
             { title: "Documento", field: "documento" },
-            { title: "Nombres", field: "nombres" },
-            { title: "Apellidos", field: "apellidos" },
-            { title: "Correo Electrónico", field: "correo" },
-            { title: "Fecha de Alta", field: "creado_en", hozAlign: "center" },
+            { title: "Nombre y Apellido", field: "nombre_apellido" },
+            { title: "Correo Electrónico", field: "correo_institucional" },
+            { title: "Fecha de Alta", field: "fecha_registro", hozAlign: "center" },
             { 
                 title: "Acciones", 
                 hozAlign: "center",
@@ -37,14 +35,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 cellClick: function(e, cell) {
                     if (e.target.closest('.action-delete-btn')) {
                         const rowData = cell.getRow().getData();
-                        confirmarEliminacion(rowData.id, `${rowData.nombres} ${rowData.apellidos}`);
+                        confirmarEliminacion(rowData.id, rowData.nombre_apellido);
                     }
                 }
             }
         ]
     });
 
-    // --- 2. Modal Controls ---
+    function cargarBibliotecarios() {
+        // Usamos FormData para enviar la acción en el cuerpo de la petición
+        const formData = new FormData();
+        formData.append('action', 'listar');
+        formData.append('csrf_token', window.getCSRFToken());
+
+        fetch('../../backend/admin/api_bibliotecarios.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                
+                table.setData(data);
+            })
+            .catch(error => {
+                console.error('Error al cargar la lista:', error);
+                alerta('error', 'Error de Conexión', 'No se pudieron cargar los bibliotecarios.');
+            });
+    }
+
+    
+    cargarBibliotecarios();
+
+    // --- 2. Controles de la Modal ---
     const modal = document.getElementById('modalRegistro');
     const btnAbrir = document.getElementById('btnAbrirModal');
     const btnCerrar = document.getElementById('btnCerrarModal');
@@ -62,40 +84,49 @@ document.addEventListener('DOMContentLoaded', function () {
     btnCerrar.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // --- 3. Registrar Bibliotecario via AJAX ---
+    // --- 3. Registrar Bibliotecario ---
     const form = document.getElementById('formBibliotecario');
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
+        const pass = document.getElementById('passInput').value;
+        const passConfirm = document.getElementById('passConfirmInput').value;
+
+        if (pass !== passConfirm) {
+            alerta('warning', 'Las contraseñas no coinciden', 'Por favor, asegúrate de escribir la misma contraseña en ambos campos.');
+            return;
+        }
+
         const formData = new FormData(form);
         formData.append('action', 'crear');
+        formData.append('csrf_token', getCSRFToken());
 
         fetch('../../backend/api_bibliotecarios.php', {
             method: 'POST',
             body: formData
         })
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
                 alerta('success', 'Registro Exitoso', data.message);
                 form.reset();
                 closeModal();
-                table.replaceData(); // Recargar datos en la tabla
+                cargarBibliotecarios(); // Actualizamos la tabla manualmente
             } else {
                 alerta('error', 'Error de Registro', data.message);
             }
         })
-        .catch(err => {
-            console.error('Error:', err);
-            alerta('error', 'Error del Servidor', 'No se pudo completar la operación.');
+        .catch(error => {
+            console.error('Error:', error);
+            alerta('error', 'Error del Servidor', 'No se pudo guardar el registro.');
         });
     });
 
-    // --- 4. Eliminar Bibliotecario ---
-    function confirmarEliminacion(id, nombreCompleto) {
+    // --- 4. Eliminar Bibliotecario (FETCH) ---
+    function confirmarEliminacion(id, nombre_apellido) {
         Swal.fire({
             title: '¿Eliminar bibliotecario?',
-            text: `Está a punto de remover el acceso a ${nombreCompleto}. Esta acción no se puede deshacer.`,
+            text: `Está a punto de remover el acceso a ${nombre_apellido}. Esta acción no se puede deshacer.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
@@ -111,22 +142,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('action', 'eliminar');
                 formData.append('id', id);
+                formData.append('csrf_token', getCSRFToken());
 
                 fetch('../../backend/api_bibliotecarios.php', {
                     method: 'POST',
                     body: formData
                 })
-                .then(res => res.json())
+                .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         alerta('success', 'Eliminado', data.message);
-                        table.replaceData();
+                        cargarBibliotecarios(); // Actualizamos la tabla manualmente
                     } else {
                         alerta('error', 'Error', data.message);
                     }
                 })
-                .catch(err => {
-                    console.error('Error:', err);
+                .catch(error => {
+                    console.error('Error:', error);
                     alerta('error', 'Error de Red', 'No se pudo eliminar el registro.');
                 });
             }

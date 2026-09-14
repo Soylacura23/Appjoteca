@@ -111,7 +111,9 @@
             
             fetch('procesar-accion.php', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': window.getCSRFToken()
+               },
               body: new URLSearchParams({ id: id_usuario, accion: accion })
             })
             .then(respuesta => respuesta.json())
@@ -246,7 +248,9 @@
   
       fetch('usuarios-eliminar.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                   'X-CSRF-TOKEN': window.getCSRFToken()
+         },
         body: 'id_usuario=' + encodeURIComponent(id)
       })
         .then(function (respuesta) { return respuesta.json(); })

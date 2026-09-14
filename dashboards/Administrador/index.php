@@ -1,9 +1,12 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 
-// Solo permite el acceso al rol Administrador (ej. Rol 1)
-requiereRol([1]);
+// Solo permite el acceso al rol Administrador (4)
+requiereRol([4])
 ?>
 
 <!DOCTYPE html>
@@ -97,58 +100,71 @@ requiereRol([1]);
 
     <!-- MODAL DE REGISTRO DE BIBLIOTECARIO -->
     <div class="modal-overlay" id="modalRegistro" aria-hidden="true">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Registrar Nuevo Bibliotecario</h3>
-                <button type="button" class="modal-close" id="btnCerrarModal">&times;</button>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Registrar Nuevo Bibliotecario</h3>
+            <button type="button" class="modal-close" id="btnCerrarModal">&times;</button>
+        </div>
+        <form id="formBibliotecario" class="form-grid">
+            <div class="form-group">
+                <label for="docInput">Documento de Identidad</label>
+                <div class="input-wrapper">
+                    <span class="material-symbols-outlined input-icon">badge</span>
+                    <input type="text" id="docInput" name="documento" placeholder="Número de documento" required>
+                </div>
             </div>
-            <form id="formBibliotecario" class="form-grid">
+            
+            <div class="form-grid form-grid--2">
                 <div class="form-group">
-                    <label for="docInput">Documento de Identidad</label>
+                    <label for="nombreInput">Nombre y Apellido</label>
                     <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">badge</span>
-                        <input type="text" id="docInput" name="documento" placeholder="Número de documento" required>
-                    </div>
-                </div>
-                <div class="form-grid form-grid--2">
-                    <div class="form-group">
-                        <label for="nombreInput">Nombres</label>
-                        <div class="input-wrapper">
-                            <span class="material-symbols-outlined input-icon">person</span>
-                            <input type="text" id="nombreInput" name="nombres" placeholder="Nombres" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="apellidoInput">Apellidos</label>
-                        <div class="input-wrapper">
-                            <span class="material-symbols-outlined input-icon">person</span>
-                            <input type="text" id="apellidoInput" name="apellidos" placeholder="Apellidos" required>
-                        </div>
+                        <span class="material-symbols-outlined input-icon">person</span>
+                        <input type="text" id="nombreInput" name="nombre_apellido" placeholder="Nombre completo" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="emailInput">Correo Electrónico</label>
+                    <label for="usuarioInput">Nombre de Usuario</label>
                     <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">alternate_email</span>
-                        <input type="email" id="emailInput" name="correo" placeholder="correo@institucional.edu" required>
+                        <span class="material-symbols-outlined input-icon">account_circle</span>
+                        <input type="text" id="usuarioInput" name="nombre_usuario" placeholder="Ej: bibliotecario_01" required>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label for="emailInput">Correo Institucional</label>
+                <div class="input-wrapper">
+                    <span class="material-symbols-outlined input-icon">alternate_email</span>
+                    <input type="email" id="emailInput" name="correo_institucional" placeholder="correo@institucional.edu" required>
+                </div>
+            </div>
+            
+            <div class="form-grid form-grid--2">
                 <div class="form-group">
-                    <label for="passInput">Contraseña Acceso</label>
+                    <label for="passInput">Contraseña</label>
                     <div class="input-wrapper">
                         <span class="material-symbols-outlined input-icon">lock</span>
-                        <input type="password" id="passInput" name="password" placeholder="Contraseña de inicio de sesión" required>
+                        <input type="password" id="passInput" name="password" placeholder="Contraseña" required>
                     </div>
                 </div>
-                <div class="form-actions" style="margin-top: 15px;">
-                    <button type="submit" class="btn-gold" style="width: 100%; justify-content: center;">
-                        <span class="material-symbols-outlined">save</span>
-                        Guardar Registro
-                    </button>
+                <div class="form-group">
+                    <label for="passConfirmInput">Confirmar Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-outlined input-icon">lock_reset</span>
+                        <input type="password" id="passConfirmInput" name="confirm_password" placeholder="Repite la contraseña" required>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 15px;">
+                <button type="submit" class="btn-gold" style="width: 100%; justify-content: center;">
+                    <span class="material-symbols-outlined">save</span>
+                    Guardar Registro
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- FOOTER -->
     <?php include '../../shared/layouts/footer.php'; ?>

@@ -5,6 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require("../Database/conexion.php");
+require_once __DIR__ . '/../config/verify-csrf.php';
 
 header('Content-Type: application/json');
 
@@ -12,7 +13,8 @@ $rol_recibido = $_POST['rol'] ?? '';
 
 $tabla_roles = [
     'estudiante' => 1,
-    'profesor'   => 2  
+    'profesor'   => 2,
+    'bibliotecario' => 3  
 ];
 
 if (!array_key_exists($rol_recibido, $tabla_roles)) {
@@ -38,7 +40,7 @@ $id_rol = $tabla_roles[$rol_recibido];
         date_default_timezone_set('America/Bogota');
         $fecha_creacion = date("Y-m-d");
 
-        $uploadDir = __DIR__ . '/../../uploads/profiles/';
+        $uploadDir = __DIR__ . '/../../uploads/profiles/documents/';
 
         if (!isset($_FILES['cedula_file']) || $_FILES['cedula_file']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['status' => 'error', 'message' => 'Error al subir el archivo o archivo no recibido.']);
@@ -78,7 +80,7 @@ $id_rol = $tabla_roles[$rol_recibido];
 
         move_uploaded_file($file['tmp_name'], $rutaDestino);
 
-        $rutaRelativaBD = 'uploads/profiles/' . $nuevoNombre;
+        $rutaRelativaBD = 'uploads/profiles/documents/' . $nuevoNombre;
 
         $estado = '1';
         
@@ -88,7 +90,7 @@ $id_rol = $tabla_roles[$rol_recibido];
         $query = $connection->prepare($sql);
 
         $query->bind_param(
-            "isssssss",
+            "issssssss",
             $id_rol, 
             $nombre,
             $usuario,

@@ -1070,13 +1070,7 @@ img {
 .cta-final-bg {
   position: absolute;
   inset: -15% 0;
-  /*
-    IMAGEN DE FONDO DEL CTA FINAL
-    ------------------------------
-    Debe quedar muy tenue: usa una imagen oscura, de baja saturación.
-    El overlay negro ya está calibrado para dejarla casi como textura.
-  */
-  background-image: url("../../assets/images/books/header.png");
+  background-image: url("../../assets/images/headers/header.png");
   background-size: cover;
   background-position: center;
   opacity: 0.18;

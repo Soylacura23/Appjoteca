@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileMenu.innerHTML = `
       <nav class="mobile-nav">
         <ul class="mobile-nav-list">
-          <li><a href="#" class="mobile-nav-link">Sobre Nosotros</a></li>
+          <li><a href="/Appjoteca/pages/sobre-nosotros/about-us.php" class="mobile-nav-link">Sobre Nosotros</a></li>
           <li><a href="#" class="mobile-nav-link">Contacto</a></li>
         </ul>
-        <a href="#" class="btn btn-primary btn-mobile">
+        <a href="/Appjoteca/auth/login/login.php" class="btn btn-primary btn-mobile">
           <span>Iniciar Sesión</span>
         </a>
       </nav>

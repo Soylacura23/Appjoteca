@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../Database/conexion.php';
 
+require_once __DIR__ . '/../config/verify-csrf.php';
+
 $mi_id = $_SESSION['usuario_id'] ?? null;
 define('BASE_URL', '/Appjoteca/');
 

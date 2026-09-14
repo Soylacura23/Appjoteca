@@ -1,0 +1,306 @@
+/* ================================================================
+   catalogo.css — Estilos para el Catálogo de Libros (AppJoteca)
+   Diseño nativo responsive utilizando variables CSS del sistema.
+   ================================================================ */
+
+/* ── Layout General ── */
+.catalog-main {
+    padding-top: calc(var(--topbar-h) + var(--sp-xl));
+    padding-bottom: var(--sp-2xl);
+    padding-left: var(--px);
+    padding-right: var(--px);
+    min-height: 100vh;
+}
+
+.catalog-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ── Encabezado de la página ── */
+.catalog-header {
+    margin-bottom: var(--sp-xl);
+    animation: fadeInUp 0.5s ease both;
+}
+
+.catalog-title {
+    font-family: var(--font-headline);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--on-surface);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: var(--sp-sm);
+}
+
+.catalog-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    color: var(--secondary);
+    max-width: 650px;
+    font-weight: 300;
+    opacity: 0.85;
+    line-height: 1.6;
+}
+
+/* ── Barra de búsqueda y Filtros ── */
+.catalog-filter-bar {
+    background: rgba(31, 31, 31, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+    margin-bottom: var(--sp-2xl);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.catalog-search-input {
+    width: 100%;
+    background: var(--surface-container-lowest);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--on-surface);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    padding: 14px 16px 14px 48px;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.catalog-search-input:focus {
+    box-shadow: 0 0 0 1px rgba(242, 202, 80, 0.5);
+}
+
+.filter-categories {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px;
+    scrollbar-width: none;
+}
+
+.filter-categories::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-chip {
+    white-space: nowrap;
+    padding: 8px 20px;
+    border-radius: var(--radius-md);
+    background: var(--surface-container-high);
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-chip:hover {
+    color: var(--primary);
+}
+
+.filter-chip.active {
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(242, 202, 80, 0.25);
+}
+
+/* ── Grid de Libros ── */
+.bookshelf-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-xl) var(--sp-md);
+}
+
+.catalog-book-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-cover-wrap {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    margin-bottom: var(--sp-md);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    filter: drop-shadow(0 10px 15px rgba(242, 202, 80, 0.15));
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.book-cover-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.book-hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--sp-md);
+}
+
+.overlay-action {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+/* Hovers */
+.catalog-book-card:hover .book-cover-wrap {
+    filter: drop-shadow(0 20px 30px rgba(242, 202, 80, 0.3));
+    transform: translateY(-8px) scale(1.02);
+}
+
+.catalog-book-card:hover .book-cover-wrap img {
+    transform: scale(1.1);
+}
+
+.catalog-book-card:hover .book-hover-overlay {
+    opacity: 1;
+}
+
+.catalog-book-card:hover .book-title {
+    color: var(--primary);
+}
+
+.book-title {
+    font-family: var(--font-headline);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--on-surface);
+    transition: color 0.3s ease;
+    line-height: 1.3;
+}
+
+.book-author {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+}
+
+/* ── Paginación ── */
+.pagination-container {
+    margin-top: var(--sp-2xl);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--sp-md);
+}
+
+.page-numbers {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.page-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: var(--on-surface);
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.page-btn:hover {
+    background: rgba(242, 202, 80, 0.1);
+    border-color: rgba(242, 202, 80, 0.5);
+}
+
+.page-btn.active {
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+    border-color: var(--primary);
+}
+
+.page-ellipsis {
+    width: 44px;
+    text-align: center;
+    color: #666;
+}
+
+/* ── Animaciones ── */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Responsive breakpoints ── */
+@media (min-width: 600px) {
+    .catalog-title {
+        font-size: 3.5rem;
+    }
+
+    .catalog-filter-bar {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .bookshelf-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp-xl) var(--sp-lg);
+    }
+}
+
+@media (min-width: 900px) {
+    .catalog-title {
+        font-size: 4rem;
+    }
+
+    .bookshelf-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .bookshelf-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}

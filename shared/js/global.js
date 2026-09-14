@@ -12,6 +12,10 @@
     /* ════════════════════════════════════════════
        Config
     ════════════════════════════════════════════ */
+    window.getCSRFToken = function() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    };
     const PROFILE_IMAGE = window.AppUser.foto;
     const PROFILE_NAME  = window.AppUser.nombre;
     const PROFILE_ROLE  = window.AppUser.rol;
