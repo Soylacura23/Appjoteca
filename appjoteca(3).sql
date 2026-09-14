@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 04-09-2026 a las 06:02:30
+-- Tiempo de generación: 14-09-2026 a las 14:35:31
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,11 +20,15 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `appjoteca`
 --
+CREATE DATABASE IF NOT EXISTS `appjoteca` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `appjoteca`;
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `autores`
+--
+-- Creación: 30-08-2026 a las 23:33:38
 --
 
 CREATE TABLE `autores` (
@@ -37,6 +41,8 @@ CREATE TABLE `autores` (
 --
 -- Estructura de tabla para la tabla `bibliotecas`
 --
+-- Creación: 30-08-2026 a las 23:21:22
+--
 
 CREATE TABLE `bibliotecas` (
   `id_biblioteca` int(11) NOT NULL,
@@ -48,6 +54,8 @@ CREATE TABLE `bibliotecas` (
 --
 -- Estructura de tabla para la tabla `colecciones`
 --
+-- Creación: 30-08-2026 a las 23:26:04
+--
 
 CREATE TABLE `colecciones` (
   `id_coleccion` int(11) NOT NULL,
@@ -58,7 +66,25 @@ CREATE TABLE `colecciones` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `comentarios`
+--
+-- Creación: 14-09-2026 a las 03:52:02
+--
+
+CREATE TABLE `comentarios` (
+  `id_comentario` int(11) NOT NULL,
+  `nombre` varchar(50) DEFAULT NULL,
+  `tipo_comentario` varchar(50) DEFAULT NULL,
+  `comentario` varchar(1000) DEFAULT NULL,
+  `correo` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `dewey`
+--
+-- Creación: 30-08-2026 a las 23:22:44
 --
 
 CREATE TABLE `dewey` (
@@ -72,6 +98,8 @@ CREATE TABLE `dewey` (
 --
 -- Estructura de tabla para la tabla `editoriales`
 --
+-- Creación: 30-08-2026 a las 23:20:48
+--
 
 CREATE TABLE `editoriales` (
   `id_editorial` int(11) NOT NULL,
@@ -82,6 +110,8 @@ CREATE TABLE `editoriales` (
 
 --
 -- Estructura de tabla para la tabla `ejemplares`
+--
+-- Creación: 30-08-2026 a las 23:39:15
 --
 
 CREATE TABLE `ejemplares` (
@@ -95,6 +125,8 @@ CREATE TABLE `ejemplares` (
 
 --
 -- Estructura de tabla para la tabla `libros`
+--
+-- Creación: 30-08-2026 a las 23:31:54
 --
 
 CREATE TABLE `libros` (
@@ -116,6 +148,8 @@ CREATE TABLE `libros` (
 --
 -- Estructura de tabla para la tabla `libro_autor`
 --
+-- Creación: 30-08-2026 a las 23:34:36
+--
 
 CREATE TABLE `libro_autor` (
   `id_detalle` int(11) NOT NULL,
@@ -128,6 +162,8 @@ CREATE TABLE `libro_autor` (
 --
 -- Estructura de tabla para la tabla `materias`
 --
+-- Creación: 30-08-2026 a las 23:24:11
+--
 
 CREATE TABLE `materias` (
   `id_materia` int(11) NOT NULL,
@@ -139,6 +175,8 @@ CREATE TABLE `materias` (
 
 --
 -- Estructura de tabla para la tabla `prestamos`
+--
+-- Creación: 30-08-2026 a las 23:46:40
 --
 
 CREATE TABLE `prestamos` (
@@ -157,6 +195,8 @@ CREATE TABLE `prestamos` (
 --
 -- Estructura de tabla para la tabla `reservas`
 --
+-- Creación: 30-08-2026 a las 23:43:42
+--
 
 CREATE TABLE `reservas` (
   `id_reserva` int(11) NOT NULL,
@@ -174,6 +214,8 @@ CREATE TABLE `reservas` (
 --
 -- Estructura de tabla para la tabla `roles`
 --
+-- Creación: 30-08-2026 a las 20:39:24
+--
 
 CREATE TABLE `roles` (
   `id_rol` int(11) NOT NULL,
@@ -187,12 +229,15 @@ CREATE TABLE `roles` (
 INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 (1, 'estudiante'),
 (2, 'profesor'),
-(3, 'bibliotecario');
+(3, 'bibliotecario'),
+(4, 'administrador');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `tipos_materiales`
+--
+-- Creación: 30-08-2026 a las 23:27:05
 --
 
 CREATE TABLE `tipos_materiales` (
@@ -204,6 +249,8 @@ CREATE TABLE `tipos_materiales` (
 
 --
 -- Estructura de tabla para la tabla `usuarios`
+--
+-- Creación: 06-09-2026 a las 03:48:14
 --
 
 CREATE TABLE `usuarios` (
@@ -217,18 +264,21 @@ CREATE TABLE `usuarios` (
   `password` varchar(255) DEFAULT NULL,
   `foto_perfil` varchar(50) DEFAULT NULL,
   `biografia` text DEFAULT NULL,
-  `estado` varchar(50) DEFAULT NULL,
-  `fecha_registro` date DEFAULT NULL
+  `estado` varchar(10) DEFAULT NULL,
+  `fecha_registro` date DEFAULT NULL,
+  `ultimo_cambio_nombre` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`) VALUES
-(4, 1, 'Simón Montoya Soto', 'simon.ms', 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', NULL, NULL, '1', '2026-08-30'),
-(5, 1, 'simoncito', 'simon.me', 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', NULL, NULL, NULL, '2026-08-30'),
-(6, 1, 'salome Montoya Pareja', 'salome.montoyap', 'salome.montoya@iemanueljbetancur.edu.co', '10236777544', NULL, '$2y$10$TB6ikW2kERzCx8/ncWiAyuvnf22V8IuT7sO23/z9lcRQYx54AVPQ6', NULL, NULL, NULL, '2026-09-02');
+INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`, `ultimo_cambio_nombre`) VALUES
+(4, 1, 'Simón Montoya Soto', 'simon.ms', 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$10$eBMwcJQfbGzWtqPWl8Eh0O3cPioBvrjb579/pBmeaZ0x8jRi769lq', NULL, NULL, '1', '2026-08-30', NULL),
+(5, 1, 'simoncito', 'simon.mo', 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, NULL, '2026-08-30', '2026-09-06 21:44:13'),
+(7, 3, 'simonmontoya', 'simon.bibliotecario', 'simon.biblioteca@iemanueljbetancur.edu.co', '11864630345', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', NULL, NULL, '1', '2026-09-04', NULL),
+(8, 2, 'simon profesor', 'simon.profesor', 'simon.profesor@iemanueljbetancur.edu.co', '1187472934', 'uploads/profiles/doc_82034dc7cf179fa01ae324707a3ff48e.pdf', '$2y$10$Fugnc824oVYRylQVb8Xjhu6Jqsqo9nFUeixxOW4sUWnz8y4uOr862', NULL, NULL, '1', '2026-09-11', NULL),
+(9, 2, 'Felipe Piedrahita Nieto', 'felipe_244', 'felipe.piedrahita@iemanueljbetancur.edu.co', '1022329667', 'uploads/profiles/doc_c120f85cf9ebfc7dab2e5066880508bf.pdf', '$2y$10$s2fYYgy2/yEPO/Pxf8Bfwu07tkuQdAGlxBGSpSaXi72EaO/NlYcsS', NULL, NULL, '1', '2026-09-11', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -252,6 +302,12 @@ ALTER TABLE `bibliotecas`
 ALTER TABLE `colecciones`
   ADD PRIMARY KEY (`id_coleccion`),
   ADD KEY `id_biblioteca` (`id_biblioteca`);
+
+--
+-- Indices de la tabla `comentarios`
+--
+ALTER TABLE `comentarios`
+  ADD PRIMARY KEY (`id_comentario`);
 
 --
 -- Indices de la tabla `dewey`
@@ -337,6 +393,12 @@ ALTER TABLE `usuarios`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `comentarios`
+--
+ALTER TABLE `comentarios`
+  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `ejemplares`
 --
 ALTER TABLE `ejemplares`
@@ -346,13 +408,13 @@ ALTER TABLE `ejemplares`
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Restricciones para tablas volcadas
