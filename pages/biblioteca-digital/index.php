@@ -1,3 +1,15 @@
+<?php
+require_once "../../backend/config/auth.php";
+require_once "../../backend/config/user_context.php";
+require_once "../../backend/Database/conexion.php";
+
+// Consulta de libros
+$resultado_libros = false;
+if (isset($connection) && $connection) {
+    $sql = "SELECT * FROM libros";
+    $resultado_libros = mysqli_query($connection, $sql);
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -234,7 +246,7 @@
 
                 <a href="#" class="mobile-menu-item">
                     <div class="mobile-menu-item-thumb">
-                        <img src="/assets/images/books/cien-años-de-soledad.jpg" alt="Cien Años de Soledad" loading="lazy">
+                        <img src="../../assets/images/books/cien-años-de-soledad.jpg" alt="Cien Años de Soledad" loading="lazy">
                     </div>
                     <div class="mobile-menu-item-info">
                         <p class="mobile-menu-item-name">Cien Años de Soledad</p>
@@ -245,7 +257,7 @@
 
                 <a href="#" class="mobile-menu-item">
                     <div class="mobile-menu-item-thumb">
-                        <img src="/assets/images/books/constelaciones-doradas.png" alt="Constelaciones Doradas" loading="lazy">
+                        <img src="../../assets/images/books/constelaciones-doradas.png" alt="Constelaciones Doradas" loading="lazy">
                     </div>
                     <div class="mobile-menu-item-info">
                         <p class="mobile-menu-item-name">Constelaciones Doradas</p>
@@ -256,7 +268,7 @@
 
                 <a href="#" class="mobile-menu-item">
                     <div class="mobile-menu-item-thumb">
-                        <img src="/assets/images/books/acheron.jpg" alt="Archivo Acheron" loading="lazy">
+                        <img src="../../assets/images/books/acheron.jpg" alt="Archivo Acheron" loading="lazy">
                     </div>
                     <div class="mobile-menu-item-info">
                         <p class="mobile-menu-item-name">Archivo Acheron</p>
@@ -320,7 +332,7 @@
                 </h1>
             </div>
 
-            <!-- Carrusel -->
+            <!-- Carrusel Destacados con PHP Dinámico -->
             <div class="carousel-wrapper">
                 <div class="carousel-fade carousel-fade--left" aria-hidden="true"></div>
                 <div class="carousel-fade carousel-fade--right" aria-hidden="true"></div>
@@ -333,52 +345,24 @@
                 </button>
 
                 <div class="featured-carousel" id="featuredCarousel" role="list" aria-label="Libros destacados">
-
-                    <div class="featured-card" role="listitem">
-                        <div class="featured-cover">
-                            <img src="../../assets/images/books/cien-años-de-soledad.jpg" alt="Cien Años de Soledad" loading="lazy">
-                        </div>
-                        <div class="featured-info">
-                            <span class="featured-tag">Literatura</span>
-                            <p class="featured-title">Cien Años de Soledad</p>
-                            <p class="featured-desc">Una saga familiar que atraviesa generaciones en el mítico Macondo, tejida con el realismo mágico de García Márquez.</p>
-                            <a href="/pages/biblioteca-catalogo/vista-libro/book-view.php" class="btn-primary" style="align-self:flex-start">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver libro
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="featured-card" role="listitem">
-                        <div class="featured-cover">
-                            <img src="/assets/images/books/constelaciones-doradas.png" alt="Constelaciones Doradas" loading="lazy">
-                        </div>
-                        <div class="featured-info">
-                            <span class="featured-tag">Ciencia</span>
-                            <p class="featured-title">Constelaciones Doradas</p>
-                            <p class="featured-desc">Un atlas celestial del siglo XVII que cartografió el firmamento con una precisión sorprendente para su época.</p>
-                            <a href="#" class="btn-primary" style="align-self:flex-start">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver libro
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="featured-card" role="listitem">
-                        <div class="featured-cover">
-                            <img src="../../assets/images/books/acheron.jpg" alt="Archivo Acheron" loading="lazy">
-                        </div>
-                        <div class="featured-info">
-                            <span class="featured-tag">Arquitectura</span>
-                            <p class="featured-title">Archivo Acheron</p>
-                            <p class="featured-desc">Documentación completa de un edificio nunca construido: planos, memorias y especulaciones de un maestro olvidado.</p>
-                            <a href="#" class="btn-primary" style="align-self:flex-start">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver libro
-                            </a>
-                        </div>
-                    </div>
-
+                    <?php if ($resultado_libros && mysqli_num_rows($resultado_libros) > 0): ?>
+                        <?php while ($libro = mysqli_fetch_assoc($resultado_libros)): ?>
+                            <div class="featured-card" role="listitem">
+                                <div class="featured-cover">
+                                    <img src="<?php echo htmlspecialchars($libro['imagen'] ?? '../../assets/images/books/cien-años-de-soledad.jpg'); ?>" alt="<?php echo htmlspecialchars($libro['titulo']); ?>" loading="lazy">
+                                </div>
+                                <div class="featured-info">
+                                    <span class="featured-tag"><?php echo htmlspecialchars($libro['categoria'] ?? 'General'); ?></span>
+                                    <p class="featured-title"><?php echo htmlspecialchars($libro['titulo']); ?></p>
+                                    <p class="featured-desc"><?php echo htmlspecialchars($libro['descripcion'] ?? 'Sin descripción disponible.'); ?></p>
+                                    <a href="../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>" class="btn-primary" style="align-self:flex-start">
+                                        <span class="material-symbols-outlined">auto_stories</span>
+                                        Ver libro
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -423,7 +407,7 @@
 
 
         <!-- ──────────────────────────────────────
-             CATÁLOGO
+             CATÁLOGO DINÁMICO DESDE MYSQL
         ─────────────────────────────────────────── -->
         <section class="catalog-section" aria-label="Catálogo de libros">
             <div class="catalog-header">
@@ -442,71 +426,51 @@
                 </div>
             </div>
 
-            <!-- Grid de tarjetas -->
+            <!-- Grid de tarjetas dinámicas -->
             <div class="book-grid">
-
-                <article class="book-card" aria-label="Cien Años de Soledad">
-                    <div class="book-cover-wrapper">
-                        <img src="/assets/images/books/cien-años-de-soledad.jpg" alt="Cien Años de Soledad" class="book-cover" loading="lazy" onclick="verLibro()">
-                        <span class="book-badge">Literatura</span>
-                        <div class="book-card-cta">
-                            <button class="book-card-cta-btn" onclick="verLibro()">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver Libro
-                            </button>
+                <?php 
+                if ($resultado_libros) {
+                    mysqli_data_seek($resultado_libros, 0); // Reiniciar el puntero para leer los datos de nuevo
+                }
+                
+                if ($resultado_libros && mysqli_num_rows($resultado_libros) > 0): 
+                    while ($libro = mysqli_fetch_assoc($resultado_libros)): 
+                ?>
+                    <article class="book-card" aria-label="<?php echo htmlspecialchars($libro['titulo']); ?>">
+                        <div class="book-cover-wrapper">
+                            <img 
+                                src="<?php echo htmlspecialchars($libro['imagen'] ?? '../../assets/images/books/cien-años-de-soledad.jpg'); ?>" 
+                                alt="<?php echo htmlspecialchars($libro['titulo']); ?>" 
+                                class="book-cover" 
+                                loading="lazy" 
+                                onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>'"
+                            >
+                            <span class="book-badge"><?php echo htmlspecialchars($libro['categoria'] ?? 'Literatura'); ?></span>
+                            <div class="book-card-cta">
+                                <button class="book-card-cta-btn" onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>'">
+                                    <span class="material-symbols-outlined">auto_stories</span>
+                                    Ver Libro
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="book-info">
-                        <h4 class="book-title">Cien Años de Soledad</h4>
-                        <p class="book-author">Gabriel García Márquez</p>
-                        <div class="book-tags">
-                            <span class="book-tag">Realismo Mágico</span>
-                            <span class="book-tag">Clásico</span>
+                        <div class="book-info">
+                            <h4 class="book-title"><?php echo htmlspecialchars($libro['titulo']); ?></h4>
+                            <p class="book-author"><?php echo htmlspecialchars($libro['autor']); ?></p>
+                            <?php if (!empty($libro['etiqueta'])): ?>
+                                <div class="book-tags">
+                                    <span class="book-tag"><?php echo htmlspecialchars($libro['etiqueta']); ?></span>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    </div>
-                </article>
-
-                <article class="book-card" aria-label="Constelaciones Doradas">
-                    <div class="book-cover-wrapper">
-                        <img src="../../assets/images/books/constelaciones-doradas.png" alt="Constelaciones Doradas" class="book-cover" loading="lazy">
-                        <span class="book-badge">Ciencia</span>
-                        <div class="book-card-cta">
-                            <button class="book-card-cta-btn">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver Libro
-                            </button>
-                        </div>
-                    </div>
-                    <div class="book-info">
-                        <h4 class="book-title">Constelaciones Doradas</h4>
-                        <p class="book-author">Atlas Celestial</p>
-                        <div class="book-tags">
-                            <span class="book-tag">Astronomía</span>
-                            <span class="book-tag">Siglo XVII</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="book-card" aria-label="Ética a Nicómaco">
-                    <div class="book-cover-wrapper">
-                        <img src="../../assets/images/books/etica-a-nicomaco.jpg" alt="Ética a Nicómaco" class="book-cover" loading="lazy">
-                        <span class="book-badge">Filosofía</span>
-                        <div class="book-card-cta">
-                            <button class="book-card-cta-btn">
-                                <span class="material-symbols-outlined">auto_stories</span>
-                                Ver Libro
-                            </button>
-                        </div>
-                    </div>
-                    <div class="book-info">
-                        <h4 class="book-title">Ética a Nicómaco</h4>
-                        <p class="book-author">Aristóteles</p>
-                        <div class="book-tags">
-                            <span class="book-tag">Tratado</span>
-                        </div>
-                    </div>
-                </article>
-
+                    </article>
+                <?php 
+                    endwhile; 
+                else: 
+                ?>
+                    <p style="color: #fff; grid-column: 1 / -1; padding: 20px;">
+                        No hay libros disponibles en la base de datos.
+                    </p>
+                <?php endif; ?>
             </div><!-- /book-grid -->
         </section><!-- /catalog-section -->
 

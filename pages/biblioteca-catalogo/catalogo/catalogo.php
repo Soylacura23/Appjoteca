@@ -1,14 +1,8 @@
-
-
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-require_once __DIR__ . '/../../../backend/config/auth.php';
-require_once __DIR__ . '/../../../backend/config/user_context.php';
+require_once __DIR__ . '/../../backend/config/auth.php';
+require_once __DIR__ . '/../../backend/config/user_context.php';
 
-// Control de acceso según los roles del sistema
-
+requiereRol([1, 2]);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,11 +19,11 @@ require_once __DIR__ . '/../../../backend/config/user_context.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Estilos compartidos y de componentes -->
-    <link rel="stylesheet" href="../../../shared/css/theme.css">
-    <link rel="stylesheet" href="../../../shared/css/components/notifications.css">
-    <link rel="stylesheet" href="../../../shared/css/components/navbar.css">
-    <link rel="stylesheet" href="../../../shared/css/components/footer.css">
-    <link rel="stylesheet" href="../../../shared/css/components/book-card.css">
+    <link rel="stylesheet" href="../../shared/css/theme.css">
+    <link rel="stylesheet" href="../../shared/css/components/notifications.css">
+    <link rel="stylesheet" href="../../shared/css/components/navbar.css">
+    <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../shared/css/components/book-card.css">
 
     <!-- Estilos específicos de la página -->
     <link rel="stylesheet" href="catalogo.css">
@@ -40,8 +34,8 @@ require_once __DIR__ . '/../../../backend/config/user_context.php';
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
     <!-- NOTIFICACIONES Y MENÚS SHARED -->
-    <?php include '../../../shared/layouts/notifications.php'; ?>
-    <?php include '../../../shared/layouts/menu-off-canvas.php'; ?>
+    <?php include '../../shared/layouts/notifications.php'; ?>
+    <?php include '../../shared/layouts/menu-off-canvas.php'; ?>
 
     <!-- BARRA DE NAVEGACIÓN PRINCIPAL -->
     <header class="topbar" role="banner">
@@ -51,7 +45,7 @@ require_once __DIR__ . '/../../../backend/config/user_context.php';
                 <span class="logo-text">AppJoteca</span>
             </a>
             <div class="topbar-search">
-                <input type="text" class="topbar-search-input" placeholder="Buscar por título, autor o ISBN..." aria-label="Buscar en el catálogo">
+                <input type="text" class="topbar-search-input catalog-search-input" placeholder="Buscar por título, autor o ISBN..." aria-label="Buscar en el catálogo">
                 <span class="material-symbols-outlined topbar-search-icon">search</span>
             </div>
             <nav class="topbar-nav" aria-label="Navegación principal">
@@ -74,12 +68,12 @@ require_once __DIR__ . '/../../../backend/config/user_context.php';
             </div>
         </div>
         <div class="topbar-search-mobile" aria-hidden="true">
-            <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+            <input type="text" class="catalog-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
         </div>
     </header>
 
     <!-- MENÚ MÓVIL -->
-    <?php include '../../../shared/layouts/menu-movil.php'; ?>
+    <?php include '../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL DEL CATÁLOGO -->
     <main class="catalog-main">
@@ -108,157 +102,22 @@ require_once __DIR__ . '/../../../backend/config/user_context.php';
                 </div>
             </section>
 
-            <!-- Grid de Libros -->
-            <section class="bookshelf-grid">
-                <!-- Tarjeta 1 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/la_metamorfosis.jpg" alt="La Estética del Silencio" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">La Estética del Silencio</h3>
-                    <p class="book-author">Sontag, Susan</p>
-                </article>
+            <!-- Grid de Libros (Renderizado dinámicamente por catalogo.js) -->
+            <section class="bookshelf-grid" id="bookshelf-grid"></section>
 
-                <!-- Tarjeta 2 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/etica-a-nicomaco.jpg" alt="Geometría del Alma" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Geometría del Alma</h3>
-                    <p class="book-author">Descartes, René</p>
-                </article>
-
-                <!-- Tarjeta 3 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/civilizaciones-perdidas.jpg" alt="Arquitectura Neoclásica" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Arquitectura Neoclásica</h3>
-                    <p class="book-author">Palladio, Andrea</p>
-                </article>
-
-                <!-- Tarjeta 4 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/acheron.jpg" alt="Sombras del Crepúsculo" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Sombras del Crepúsculo</h3>
-                    <p class="book-author">Rilke, Rainer Maria</p>
-                </article>
-
-                <!-- Tarjeta 5 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/cien-años-de-soledad.jpg" alt="Crónica de una Era" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Crónica de una Era</h3>
-                    <p class="book-author">Hobsbawm, Eric</p>
-                </article>
-
-                <!-- Tarjeta 6 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/cosmos.jpg" alt="Trópico de Cáncer" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Trópico de Cáncer</h3>
-                    <p class="book-author">Miller, Henry</p>
-                </article>
-
-                <!-- Tarjeta 7 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/constelaciones-doradas.png" alt="Atlas de lo Invisible" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Atlas de lo Invisible</h3>
-                    <p class="book-author">Cheshire, James</p>
-                </article>
-
-                <!-- Tarjeta 8 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/la_metamorfosis.jpg" alt="Memorias de Adriano" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Memorias de Adriano</h3>
-                    <p class="book-author">Yourcenar, Marguerite</p>
-                </article>
-
-                <!-- Tarjeta 9 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/etica-a-nicomaco.jpg" alt="Ensayo sobre la Ceguera" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">Ensayo sobre la Ceguera</h3>
-                    <p class="book-author">Saramago, José</p>
-                </article>
-
-                <!-- Tarjeta 10 -->
-                <article class="catalog-book-card">
-                    <div class="book-cover-wrap">
-                        <img src="../../assets/images/books/la_metamorfosis.jpg" alt="La Metamorfosis" loading="lazy">
-                        <div class="book-hover-overlay">
-                            <span class="overlay-action">Ver Detalles</span>
-                        </div>
-                    </div>
-                    <h3 class="book-title">La Metamorfosis</h3>
-                    <p class="book-author">Kafka, Franz</p>
-                </article>
-            </section>
-
-            <!-- Paginación -->
-            <nav class="pagination-container" aria-label="Navegación de páginas">
-                <button class="page-btn page-nav" aria-label="Página anterior" type="button">
-                    <span class="material-symbols-outlined">chevron_left</span>
-                </button>
-                <div class="page-numbers">
-                    <button class="page-btn active" type="button">1</button>
-                    <button class="page-btn" type="button">2</button>
-                    <button class="page-btn" type="button">3</button>
-                    <span class="page-ellipsis">...</span>
-                    <button class="page-btn" type="button">12</button>
-                </div>
-                <button class="page-btn page-nav" aria-label="Siguiente página" type="button">
-                    <span class="material-symbols-outlined">chevron_right</span>
-                </button>
-            </nav>
+            <!-- Paginación (Renderizada dinámicamente por catalogo.js) -->
+            <nav class="pagination-container" aria-label="Navegación de páginas"></nav>
 
         </div>
     </main>
 
     <!-- FOOTER -->
-    <?php include '../../../shared/layouts/footer.php'; ?>
+    <?php include '../../shared/layouts/footer.php'; ?>
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../../../shared/js/components/navbar.js"></script>
-    <script src="../../../shared/js/global.js"></script>
+    <script src="../../shared/js/components/navbar.js"></script>
+    <script src="../../shared/js/global.js"></script>
     <script src="catalogo.js"></script>
 </body>
 </html>
-

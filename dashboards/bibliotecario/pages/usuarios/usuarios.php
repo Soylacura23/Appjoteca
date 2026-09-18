@@ -13,6 +13,7 @@ requiereRol([3]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
     <title>Usuarios · APPJOTECA</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
@@ -112,6 +113,12 @@ requiereRol([3]);
                     <a href="../reportes/reportes.php" class="menu-item">
                         <span class="material-symbols-outlined">analytics</span>
                         <span class="menu-texto">Reportes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../configuracion-catalogo/configuracion-catalogo.php" class="menu-item">
+                        <span class="material-symbols-outlined">auto_stories</span>
+                        <span class="menu-texto">Catálogo</span>
                     </a>
                 </li>
                 <li>

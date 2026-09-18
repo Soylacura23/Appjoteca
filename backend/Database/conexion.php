@@ -6,6 +6,8 @@ $user = $_ENV['DB_USER'];
 $pw = $_ENV['DB_PASS'];
 $database = $_ENV['DB_NAME'];
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 $connection = new mysqli($host, $user, $pw, $database);
 $connection->set_charset("utf8mb4"); 
 

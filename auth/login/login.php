@@ -94,6 +94,16 @@ if (empty($_SESSION['csrf_token'])) {
               </div>
             </label>
 
+            <label class="role-card" title="Acceso como Administrador">
+              <input type="radio" name="rol" value="Administrador" class="role-radio" aria-label="Administrador" form="login-form">
+              <div class="role-card-inner">
+                <span class="material-symbols-outlined role-icon" aria-hidden="true">settings_account_box
+                </span>
+                <span class="role-name">Administrador</span>
+                <span class="role-desc">Administra la biblioteca</span>
+              </div>
+            </label>
+
           </div>
         </div>
         <!-- /role-selector -->

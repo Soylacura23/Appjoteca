@@ -24,7 +24,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tabla_roles = [
         'estudiante' => 1,
         'profesor'   => 2,
-        'bibliotecario' => 3  
+        'bibliotecario' => 3,
+        'administrador' => 4  
     ];
 
     if (!array_key_exists($rol_recibido, $tabla_roles)) {
@@ -61,7 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $destinos = [
                 1 => '../../dashboards/estudiante/index.php',
                 2 => '../../dashboards/docente/index.php',
-                3 => '../../dashboards/bibliotecario/index.php'
+                3 => '../../dashboards/bibliotecario/index.php',
+                4 => '../../dashboards/Administrador/index.php'
             ];
 
             $url_destino = $destinos[$usuario_db['id_rol']] ?? '../../index.php';

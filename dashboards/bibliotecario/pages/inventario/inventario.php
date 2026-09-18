@@ -107,6 +107,12 @@ requiereRol([3]);
                     </a>
                 </li>
                 <li>
+                    <a href="../configuracion-catalogo/configuracion-catalogo.php" class="menu-item">
+                        <span class="material-symbols-outlined">auto_stories</span>
+                        <span class="menu-texto">Catálogo</span>
+                    </a>
+                </li>
+                <li>
                     <a href="../ajustes/ajustes.php" class="menu-item">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="menu-texto">Ajustes</span>

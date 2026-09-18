@@ -46,7 +46,7 @@ if (empty($_SESSION['csrf_token'])) {
 
         <div class="header-actions">
             <span class="header-divider"></span>
-            <a href="auth/login/login.php" class="btn btn-primary btn-header">
+            <a href="../../auth/login/login.php" class="btn btn-primary btn-header">
                 <span>Acceder</span>
             </a>
         </div>
