@@ -180,11 +180,11 @@
             
         });
     }
-
+     //boton cerrar sesion
     const signOutBtn = document.querySelector('.menu-off-canva .signout');
     if (signOutBtn) {
         signOutBtn.addEventListener('click', () => {
-            window.location.href = '../../backend/auth/logout.php';
+            window.location.href = '/Appjoteca/backend/auth/logout.php';
         });
     }
 

@@ -56,7 +56,7 @@ requiereRol([1, 2]);
                 <span class="material-symbols-outlined topbar-search-icon">search</span>
             </div>
             <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="#" class="nav-link" data-nav="catalogo">Catálogo</a>
+                <a href="../biblioteca-digital/index.php" class="nav-link" data-nav="catalogo">Catálogo</a>
                 <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
                 <a href="#" class="nav-link" data-nav="panel">Panel</a>
             </nav>
