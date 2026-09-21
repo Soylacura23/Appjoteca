@@ -1,7 +1,23 @@
 <?php
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
+require_once __DIR__ . '/../../backend/Database/conexion.php';
+require_once __DIR__ . '/../../backend/models/historial.php';
+
 requiereRol([1, 2, 3]);
+
+$id_usuario = $_SESSION['id_usuario'] ?? $_SESSION['user_id'] ?? 0;
+$historialModel = new Historial($connection);
+
+$listaPrestamos    = $historialModel->obtenerPorUsuario($id_usuario, 'prestamo');
+$listaReservas     = $historialModel->obtenerPorUsuario($id_usuario, 'reserva');
+$listaDevoluciones = $historialModel->obtenerPorUsuario($id_usuario, 'devolucion');
+$listaIncidencias  = $historialModel->obtenerPorUsuario($id_usuario, 'incidencia');
+
+function formatearFechaHistorial($fecha) {
+    if (!$fecha) return '';
+    return date('d M. Y', strtotime($fecha));
+}
 ?>
 
 <!DOCTYPE html>
@@ -43,10 +59,9 @@ requiereRol([1, 2, 3]);
     <!-- BARRA DE NAVEGACIÓN -->
     <header class="topbar" role="banner">
         <div class="topbar-inner">
-            <a href="#" class="topbar-logo">
-                <div class="logo" aria-hidden="true"></div>
-                <span class="logo-text">AppJoteca</span>
-            </a>
+            <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
             <div class="topbar-search">
                 <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
                 <span class="material-symbols-outlined topbar-search-icon">search</span>
@@ -147,20 +162,25 @@ requiereRol([1, 2, 3]);
                         </div>
                     </div>
 
-                    <div class="timeline-list">
-                        <article class="timeline-card">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <p class="timeline-date">28 ago. 2026</p>
-                                <h3 class="timeline-title">
-                                    Préstamo realizado — <span class="book-name">Cien años de soledad</span>
-                                    <span class="ejemplar">· Ejemplar EJ-0045</span>
-                                </h3>
-                                <p class="timeline-meta">
-                                    Devuelto el <strong>1 sep. 2026</strong> · Estado: <strong>Devuelto</strong>
-                                </p>
-                            </div>
-                        </article>
+                   <div class="timeline-list">
+                        <?php if (!empty($listaPrestamos)): ?>
+                            <?php foreach ($listaPrestamos as $item): ?>
+                                <article class="timeline-card">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <p class="timeline-date"><?= formatearFechaHistorial($item['fecha']) ?></p>
+                                        <h3 class="timeline-title">
+                                            <?= htmlspecialchars($item['accion']) ?> — <span class="book-name"><?= htmlspecialchars($item['detalle']) ?></span>
+                                        </h3>
+                                        <?php if (!empty($item['referencia'])): ?>
+                                            <p class="timeline-meta"><?= htmlspecialchars($item['referencia']) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-msg" style="color: #888; padding: 15px 0;">No tienes préstamos registrados.</p>
+                        <?php endif; ?>
                     </div>
                 </section>
 
@@ -174,19 +194,25 @@ requiereRol([1, 2, 3]);
                         </div>
                     </div>
 
-                    <div class="timeline-list">
-                        <article class="timeline-card">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <p class="timeline-date">25 ago. 2026</p>
-                                <h3 class="timeline-title">
-                                    Reserva realizada — <span class="book-name">El principito</span>
-                                </h3>
-                                <p class="timeline-meta">
-                                    Convertida en préstamo el <strong>26 ago. 2026</strong>
-                                </p>
-                            </div>
-                        </article>
+                   <div class="timeline-list">
+                        <?php if (!empty($listaReservas)): ?>
+                            <?php foreach ($listaReservas as $item): ?>
+                                <article class="timeline-card">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <p class="timeline-date"><?= formatearFechaHistorial($item['fecha']) ?></p>
+                                        <h3 class="timeline-title">
+                                            <?= htmlspecialchars($item['accion']) ?> — <span class="book-name"><?= htmlspecialchars($item['detalle']) ?></span>
+                                        </h3>
+                                        <?php if (!empty($item['referencia'])): ?>
+                                            <p class="timeline-meta"><?= htmlspecialchars($item['referencia']) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-msg" style="color: #888; padding: 15px 0;">No tienes reservas registradas.</p>
+                        <?php endif; ?>
                     </div>
                 </section>
 
@@ -200,20 +226,25 @@ requiereRol([1, 2, 3]);
                         </div>
                     </div>
 
-                    <div class="timeline-list">
-                        <article class="timeline-card">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <p class="timeline-date">30 ago. 2026</p>
-                                <h3 class="timeline-title">
-                                    Libro devuelto — <span class="book-name">El principito</span>
-                                    <span class="ejemplar">· Ejemplar EJ-0012</span>
-                                </h3>
-                                <p class="timeline-meta">
-                                    Devuelto en <strong>Buzón Central</strong> · Recepción confirmada
-                                </p>
-                            </div>
-                        </article>
+                   <div class="timeline-list">
+                        <?php if (!empty($listaDevoluciones)): ?>
+                            <?php foreach ($listaDevoluciones as $item): ?>
+                                <article class="timeline-card">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <p class="timeline-date"><?= formatearFechaHistorial($item['fecha']) ?></p>
+                                        <h3 class="timeline-title">
+                                            <?= htmlspecialchars($item['accion']) ?> — <span class="book-name"><?= htmlspecialchars($item['detalle']) ?></span>
+                                        </h3>
+                                        <?php if (!empty($item['referencia'])): ?>
+                                            <p class="timeline-meta"><?= htmlspecialchars($item['referencia']) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-msg" style="color: #888; padding: 15px 0;">No tienes devoluciones registradas.</p>
+                        <?php endif; ?>
                     </div>
                 </section>
 
@@ -228,18 +259,24 @@ requiereRol([1, 2, 3]);
                     </div>
 
                     <div class="timeline-list">
-                        <article class="timeline-card">
-                            <div class="timeline-dot inactive"></div>
-                            <div class="timeline-content">
-                                <p class="timeline-date">15 ago. 2026</p>
-                                <h3 class="timeline-title">
-                                    Reserva cancelada — <span class="book-name">Crónica de una muerte anunciada</span>
-                                </h3>
-                                <p class="timeline-meta">
-                                    Cancelada por <strong>expiración</strong> · No se reclamó en 48 horas
-                                </p>
-                            </div>
-                        </article>
+                        <?php if (!empty($listaIncidencias)): ?>
+                            <?php foreach ($listaIncidencias as $item): ?>
+                                <article class="timeline-card">
+                                    <div class="timeline-dot inactive"></div>
+                                    <div class="timeline-content">
+                                        <p class="timeline-date"><?= formatearFechaHistorial($item['fecha']) ?></p>
+                                        <h3 class="timeline-title">
+                                            <?= htmlspecialchars($item['accion']) ?> — <span class="book-name"><?= htmlspecialchars($item['detalle']) ?></span>
+                                        </h3>
+                                        <?php if (!empty($item['referencia'])): ?>
+                                            <p class="timeline-meta"><?= htmlspecialchars($item['referencia']) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-msg" style="color: #888; padding: 15px 0;">No tienes incidencias registradas.</p>
+                        <?php endif; ?>
                     </div>
                 </section>
 

@@ -30,10 +30,9 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
   <header class="signup-header" role="banner">
     <div class="signup-header-container">
-      <a href="../../index.php" class="logo-link" aria-label="Ir al inicio de Appjoteca">
-        <img src="../../shared/images/logo-appjoteca.png" alt="Logo Appjoteca" class="logo-img">
-        <span class="logo-text">Appjoteca</span>
-      </a>
+          <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
       <a href="../../auth/login/login.php" class="btn-login-link" aria-label="Iniciar sesión">
         <span class="material-symbols-outlined" style="font-size:15px;">login</span>
         <span>Iniciar sesión</span>
