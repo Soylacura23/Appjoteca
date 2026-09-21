@@ -44,14 +44,14 @@ class libro {
         try {
             $this->db->begin_transaction();
 
-
-            $sqlLibro = "INSERT INTO libros (id_editorial, id_materia, id_tipo_material, isbn, titulo, edicion, ciudad, publicacion_year, serie, volumen) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sqlLibro = "INSERT INTO libros (id_editorial, id_materia, id_tipo_material, isbn, titulo, edicion, ciudad, publicacion_year, serie, volumen, portada) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $query = $this->db->prepare($sqlLibro);
 
+            // "iiissssssis" -> 's' adicional al final correspondiente a la portada
             $query->bind_param(
-                "iiissssssi", 
+                "iiissssssis", 
                 $datos_libro['id_editorial'], 
                 $datos_libro['id_materia'], 
                 $datos_libro['id_tipo_material'],
@@ -61,7 +61,8 @@ class libro {
                 $datos_libro['ciudad'],
                 $datos_libro['publicacion_year'], 
                 $datos_libro['serie'], 
-                $datos_libro['volumen']
+                $datos_libro['volumen'],
+                $datos_libro['portada']
             );
             $query->execute();
 

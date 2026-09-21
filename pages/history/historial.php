@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
-requiereRol([1, 2]);
+requiereRol([1, 2, 3]);
 ?>
 
 <!DOCTYPE html>

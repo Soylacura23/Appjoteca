@@ -1,0 +1,276 @@
+/* ============================================================
+   APPJOTECA — topbar.css (COMPONENTE ÚNICO)
+   Usado en index.php y about-us.php
+   Autosuficiente: define sus propias variables si no existen.
+   ============================================================ */
+
+   .main-header {
+    --tb-primary: var(--primary, #f2ca50);
+    --tb-primary-glow: rgba(242, 202, 80, 0.5);
+    --tb-gradient-gold: linear-gradient(135deg, #f2ca50 0%, #d4a017 50%, #b8860b 100%);
+    --tb-font-headline: var(--font-headline, 'Noto Serif', serif);
+    --tb-font-body: var(--font-body, 'Manrope', sans-serif);
+    --tb-transition-medium: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    --tb-transition-fast: 0.2s ease;
+  
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(10, 10, 10, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(242, 202, 80, 0.12);
+    padding: 0.9rem 2rem;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  
+  .main-header.is-scrolled {
+    background: rgba(5, 5, 5, 0.95);
+    border-bottom-color: rgba(242, 202, 80, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+  }
+  
+  /* ============ LOGO ============ */
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    position: relative;
+    text-decoration: none;
+  }
+  .logo-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 10px;
+    transition: var(--tb-transition-medium);
+  }
+  .logo-link:hover .logo-img {
+    transform: scale(1.05) rotate(-3deg);
+  }
+  .logo-text {
+    font-family: var(--tb-font-headline);
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--tb-gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.02em;
+    position: relative;
+  }
+  .logo-text::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--tb-primary), transparent);
+    transition: var(--tb-transition-medium);
+  }
+  .logo-link:hover .logo-text::after {
+    width: 100%;
+  }
+  
+  /* ============ NAVEGACIÓN ============ */
+  .main-nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-list li {
+    display: flex;
+    align-items: center;
+  }
+  .nav-list li:not(:last-child)::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    margin: 0 20px;
+    border-radius: 50%;
+    background: var(--tb-primary);
+    box-shadow: 0 0 8px var(--tb-primary-glow);
+    flex-shrink: 0;
+  }
+  .nav-link {
+    font-family: var(--tb-font-body);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.68);
+    position: relative;
+    padding: 8px 0;
+    text-decoration: none;
+    transition: var(--tb-transition-fast);
+    letter-spacing: 0.01em;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--tb-gradient-gold);
+    transition: var(--tb-transition-medium);
+    transform: translateX(-50%);
+  }
+  .nav-link:hover {
+    color: #fff;
+  }
+  .nav-link:hover::after {
+    width: 100%;
+    box-shadow: 0 0 10px var(--tb-primary-glow);
+  }
+  
+  /* ============ ACCIONES ============ */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ============ BOTÓN MÓVIL ============ */
+  .mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: 1px solid rgba(242, 202, 80, 0.2);
+    border-radius: 8px;
+    color: var(--tb-primary);
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+  }
+  .mobile-menu-btn:hover {
+    background: rgba(242, 202, 80, 0.08);
+    border-color: rgba(242, 202, 80, 0.4);
+  }
+  .mobile-menu-btn .material-symbols-outlined {
+    font-size: 1.5rem;
+    display: block;
+  }
+  
+  /* ============ MENÚ MÓVIL ============ */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
+    border-left: 1px solid rgba(242, 202, 80, 0.2);
+    z-index: 1100;
+    padding: 5rem 2rem 2rem;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .main-header.menu-open .mobile-menu {
+    right: 0;
+  }
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+  }
+  .mobile-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .mobile-nav-link {
+    display: block;
+    padding: 1rem 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--tb-font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .mobile-nav-link:hover,
+  .mobile-nav-link.active {
+    color: var(--tb-primary);
+    background: rgba(242, 202, 80, 0.08);
+    border-color: rgba(242, 202, 80, 0.25);
+  }
+  .btn-mobile {
+    margin-top: auto;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .main-header { padding: 0.85rem 1.5rem; }
+    .nav-list li:not(:last-child)::after { margin: 0 16px; }
+    .logo-text { font-size: 1.2rem; }
+  }
+  
+  @media (max-width: 900px) {
+    .main-nav { display: none; }
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-actions .btn-header { display: none; }
+  }
+  
+  @media (max-width: 600px) {
+    .main-header { padding: 0.75rem 1rem; }
+    .header-container { gap: 0.75rem; }
+    .logo-img { width: 38px; height: 38px; }
+    .logo-text { font-size: 1rem; letter-spacing: 1.5px; }
+  }
+  
+  @media (max-width: 380px) {
+    .logo-text { display: none; }
+  }

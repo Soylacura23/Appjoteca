@@ -1,0 +1,557 @@
+/* ============================================================
+   APPJOTECA — manual.css
+   ============================================================ */
+
+   :root {
+    --bg-base: #0a0a0a;
+    --bg-surface: #141414;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --primary: #f2ca50;
+    --primary-glow: rgba(242, 202, 80, 0.4);
+    --gradient-gold: linear-gradient(135deg, #f2ca50 0%, #d4a017 50%, #b8860b 100%);
+    --font-sans: 'Manrope', sans-serif;
+    --font-serif: 'Noto Serif', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+.gradient-text {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============ CABECERA ============ */
+.page-header {
+    padding: 8rem 2rem 3rem;
+    text-align: center;
+    background: radial-gradient(ellipse at top, rgba(242, 202, 80, 0.06) 0%, transparent 60%);
+}
+
+.page-header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-label {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--primary);
+    padding: 6px 16px;
+    border-radius: 50px;
+    background: rgba(242, 202, 80, 0.08);
+    border: 1px solid rgba(242, 202, 80, 0.2);
+}
+
+.page-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+/* ============ VISOR PDF ============ */
+.pdf-section {
+    width: 95%;
+    max-width: 1600px;
+    margin: 0 auto 5rem;
+    padding: 0 1rem;
+}
+
+.pdf-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-surface);
+    border: 1px solid rgba(242, 202, 80, 0.15);
+    border-radius: 12px 12px 0 0;
+    flex-wrap: wrap;
+}
+
+.pdf-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(242, 202, 80, 0.08);
+    border: 1px solid rgba(242, 202, 80, 0.2);
+    border-radius: 8px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pdf-btn:hover:not(:disabled) {
+    background: rgba(242, 202, 80, 0.15);
+    border-color: rgba(242, 202, 80, 0.4);
+}
+
+.pdf-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pdf-btn .material-symbols-outlined {
+    font-size: 1.3rem;
+}
+
+.pdf-page-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.pdf-page-info span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-download {
+    background: var(--gradient-gold);
+    color: #1a1a1a;
+    box-shadow: 0 4px 15px rgba(242, 202, 80, 0.25);
+}
+
+.btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(242, 202, 80, 0.45);
+}
+
+.btn-download .material-symbols-outlined {
+    font-size: 1.1rem;
+}
+
+.pdf-viewer {
+    position: relative;
+    background: #1a1a1a;
+    border: 1px solid rgba(242, 202, 80, 0.15);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 70vh;
+    overflow: auto;
+    max-height: 90vh;
+}
+
+.pdf-viewer canvas {
+    max-width: 100%;
+    height: auto !important;
+    display: block;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    background: #fff;
+}
+
+/* Loading */
+.pdf-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.pdf-loading.hidden {
+    display: none;
+}
+
+.pdf-loading .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+.spin {
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============ RESPONSIVE ============ */
+/* ============================================================
+   RESPONSIVE — COMPLETO
+   ============================================================ */
+
+/* ---------- 1400px+ : Desktop amplio ---------- */
+@media (min-width: 1400px) {
+    .pdf-section {
+        max-width: 1700px;
+    }
+    .pdf-viewer {
+        min-height: 75vh;
+        max-height: 92vh;
+        padding: 2rem;
+    }
+}
+
+/* ---------- 1200px - 1399px : Desktop ---------- */
+@media (max-width: 1399px) and (min-width: 1200px) {
+    .pdf-section {
+        width: 96%;
+        max-width: 1500px;
+    }
+    .pdf-viewer {
+        min-height: 72vh;
+        max-height: 90vh;
+    }
+}
+
+/* ---------- 992px - 1199px : Laptop ---------- */
+@media (max-width: 1199px) and (min-width: 992px) {
+    .pdf-section {
+        width: 96%;
+        max-width: 1200px;
+        margin-bottom: 4rem;
+    }
+    .pdf-viewer {
+        min-height: 68vh;
+        max-height: 88vh;
+        padding: 1.25rem;
+    }
+    .pdf-toolbar {
+        padding: 0.7rem 1rem;
+    }
+}
+
+/* ---------- 768px - 991px : Tablet horizontal ---------- */
+@media (max-width: 991px) and (min-width: 768px) {
+    .page-header {
+        padding: 7rem 1.75rem 2.5rem;
+    }
+    .pdf-section {
+        width: 96%;
+        max-width: 100%;
+        padding: 0 0.75rem;
+        margin-bottom: 3.5rem;
+    }
+    .pdf-toolbar {
+        padding: 0.65rem 1rem;
+        gap: 0.75rem;
+    }
+    .pdf-viewer {
+        min-height: 65vh;
+        max-height: 85vh;
+        padding: 1.25rem;
+    }
+    .pdf-page-info {
+        min-width: 110px;
+        font-size: 0.82rem;
+    }
+}
+
+/* ---------- 576px - 767px : Tablet vertical / móvil grande ---------- */
+@media (max-width: 767px) and (min-width: 576px) {
+    .page-header {
+        padding: 6.5rem 1.5rem 2rem;
+    }
+    .page-title {
+        font-size: clamp(1.75rem, 5vw, 2.25rem);
+    }
+    .page-subtitle {
+        font-size: 0.95rem;
+    }
+    .pdf-section {
+        width: 100%;
+        padding: 0 0.75rem;
+        margin-bottom: 3rem;
+    }
+    .pdf-toolbar {
+        padding: 0.65rem 0.9rem;
+        gap: 0.6rem;
+        border-radius: 10px 10px 0 0;
+    }
+    .pdf-btn {
+        width: 34px;
+        height: 34px;
+    }
+    .pdf-btn .material-symbols-outlined {
+        font-size: 1.2rem;
+    }
+    .pdf-page-info {
+        min-width: auto;
+        font-size: 0.8rem;
+    }
+    .btn-download {
+        padding: 0.55rem 1rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.75px;
+    }
+    .btn-download .material-symbols-outlined {
+        font-size: 1rem;
+    }
+    .pdf-viewer {
+        padding: 0.9rem;
+        min-height: 60vh;
+        max-height: 82vh;
+        border-radius: 0 0 10px 10px;
+    }
+}
+
+/* ---------- 480px - 575px : Móvil estándar ---------- */
+@media (max-width: 575px) and (min-width: 480px) {
+    .page-header {
+        padding: 6rem 1.25rem 1.75rem;
+    }
+    .section-label {
+        font-size: 0.68rem;
+        padding: 5px 14px;
+        letter-spacing: 2.5px;
+    }
+    .page-title {
+        font-size: clamp(1.6rem, 6vw, 2rem);
+    }
+    .page-subtitle {
+        font-size: 0.9rem;
+    }
+    .pdf-section {
+        width: 100%;
+        padding: 0 0.65rem;
+        margin-bottom: 2.75rem;
+    }
+    .pdf-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+        padding: 0.75rem;
+    }
+    .pdf-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+    .pdf-btn {
+        width: 34px;
+        height: 34px;
+    }
+    .btn-download {
+        width: 100%;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.75rem;
+    }
+    .pdf-viewer {
+        padding: 0.75rem;
+        min-height: 55vh;
+        max-height: 80vh;
+    }
+}
+
+/* ---------- 380px - 479px : Móvil pequeño ---------- */
+@media (max-width: 479px) and (min-width: 380px) {
+    .page-header {
+        padding: 5.5rem 1rem 1.5rem;
+    }
+    .section-label {
+        font-size: 0.65rem;
+        padding: 4px 12px;
+        letter-spacing: 2px;
+    }
+    .page-title {
+        font-size: clamp(1.45rem, 7vw, 1.85rem);
+    }
+    .page-subtitle {
+        font-size: 0.85rem;
+    }
+    .pdf-section {
+        width: 100%;
+        padding: 0 0.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .pdf-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.65rem;
+    }
+    .pdf-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+    .pdf-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .pdf-btn .material-symbols-outlined {
+        font-size: 1.15rem;
+    }
+    .pdf-page-info {
+        font-size: 0.75rem;
+    }
+    .btn-download {
+        width: 100%;
+        justify-content: center;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.5px;
+    }
+    .pdf-viewer {
+        padding: 0.6rem;
+        min-height: 50vh;
+        max-height: 78vh;
+        border-radius: 0 0 8px 8px;
+    }
+    .pdf-loading .material-symbols-outlined {
+        font-size: 2rem;
+    }
+    .pdf-loading p {
+        font-size: 0.85rem;
+    }
+}
+
+/* ---------- 320px - 379px : Móvil muy pequeño ---------- */
+@media (max-width: 379px) {
+    .page-header {
+        padding: 5rem 0.85rem 1.25rem;
+    }
+    .section-label {
+        font-size: 0.6rem;
+        padding: 4px 10px;
+        letter-spacing: 1.5px;
+    }
+    .page-title {
+        font-size: 1.35rem;
+    }
+    .page-subtitle {
+        font-size: 0.8rem;
+    }
+    .pdf-section {
+        width: 100%;
+        padding: 0 0.4rem;
+        margin-bottom: 2rem;
+    }
+    .pdf-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.55rem;
+        border-radius: 8px 8px 0 0;
+    }
+    .pdf-controls {
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.4rem;
+    }
+    .pdf-btn {
+        width: 30px;
+        height: 30px;
+    }
+    .pdf-btn .material-symbols-outlined {
+        font-size: 1.05rem;
+    }
+    .pdf-page-info {
+        font-size: 0.72rem;
+        letter-spacing: 0;
+    }
+    .btn-download {
+        width: 100%;
+        justify-content: center;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.68rem;
+        letter-spacing: 0.5px;
+    }
+    .btn-download .material-symbols-outlined {
+        font-size: 0.95rem;
+    }
+    .pdf-viewer {
+        padding: 0.5rem;
+        min-height: 45vh;
+        max-height: 75vh;
+        border-radius: 0 0 6px 6px;
+    }
+}
+
+/* ---------- Landscape en móviles (poca altura) ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+    .page-header {
+        padding: 5rem 1.5rem 1rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+    }
+    .page-subtitle {
+        font-size: 0.85rem;
+    }
+    .pdf-viewer {
+        min-height: 80vh;
+        max-height: none;
+    }
+}
+
+/* ---------- Pantallas táctiles (mejora taps) ---------- */
+@media (hover: none) and (pointer: coarse) {
+    .pdf-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+    .btn-download {
+        min-height: 42px;
+    }
+}
+
+/* ---------- Preferencia de movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .spin {
+        animation: none;
+    }
+    .btn-download:hover {
+        transform: none;
+    }
+}
