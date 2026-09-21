@@ -1,14 +1,15 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 1);          
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);                 
+ini_set('log_errors', 1);
+
 
 require("../Database/conexion.php");
 require_once __DIR__ . '/../config/verify-csrf.php';
 
 header('Content-Type: application/json');
-
 
 $rol_recibido = $_POST['rol'] ?? '';
 
@@ -87,13 +88,6 @@ if (!array_key_exists($mimeType, $allowedMimeTypes)) {
 
 $extension = $allowedMimeTypes[$mimeType];
 
-if (!is_dir($uploadDir)) {
-    if (!mkdir($uploadDir, 0755, true)) {
-        echo json_encode(['status' => 'error', 'message' => 'No se pudo crear la carpeta de documentos.']);
-        exit;
-    }
-}
-
 $nuevoNombre   = 'doc_' . bin2hex(random_bytes(16)) . '.' . $extension;
 $rutaDestino   = $uploadDir . $nuevoNombre;
 
@@ -106,10 +100,8 @@ $rutaRelativaBD = 'uploads/profiles/documents/' . $nuevoNombre;
 
 $estado = 'pendiente';
 
-/* ─────────────────────────────────────────────────────────────
-   COMPROBAR DUPLICADOS 
-   ───────────────────────────────────────────────────────────── */
-$checkSql  = "SELECT id FROM usuarios
+
+$checkSql  = "SELECT id_usuario FROM usuarios
               WHERE nombre_usuario = ? OR correo_institucional = ? OR documento = ?
               LIMIT 1";
 $checkStmt = $connection->prepare($checkSql);

@@ -5,7 +5,8 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 
-// Solo permite el acceso al rol Administrador (4)
+
+
 requiereRol([4])
 ?>
 
@@ -14,6 +15,7 @@ requiereRol([4])
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
     <title>Panel de Administrador - AppJoteca</title>
 
     <!-- Fuentes -->

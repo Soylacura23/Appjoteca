@@ -257,6 +257,11 @@ form.addEventListener('submit', async (e) => {
       body: formData
     });
 
+if (!respuesta.ok) {
+  const errorText = await respuesta.text();
+  throw new Error(`Error del servidor: ${respuesta.status} - ${errorText}`);
+}
+
     const resultado = await respuesta.json();
 
     if (resultado.status === 'success') {

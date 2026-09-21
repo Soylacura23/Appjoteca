@@ -177,21 +177,21 @@
 }
 
 /* =========================================
-   4. TABULATOR Y BOTÓN ELIMINAR
+   4. TABULATOR Y BOTÓN ELIMINAR (INTEGRACIÓN THEME.CSS)
    ========================================= */
-.btn-danger-sm {
+   .btn-danger-sm {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
     background: rgba(255, 180, 171, 0.1);
     border: 1px solid rgba(255, 180, 171, 0.3);
-    border-radius: var(--radius-full, 20px);
+    border-radius: var(--radius-full, 100px);
     color: var(--error, #ffb4ab);
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--ease-fast, 0.2s ease);
 }
 
 .btn-danger-sm:hover {
@@ -199,25 +199,78 @@
     color: #000;
 }
 
-.tabulator {
-    background-color: var(--surface-container, #1e1e1e) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+/* --- ESTILOS TABULATOR (INTEGRACIÓN APPJOTECA) --- */
+
+/* Contenedor principal de la tabla */
+.tabulator,
+.tabulator-tableholder,
+.tabulator-table {
+    background-color: var(--surface-container, #0d0d0d) !important;
     color: var(--on-surface, #e2e2e2) !important;
-    border-radius: var(--radius-md, 8px);
+    border: 1px solid rgba(242, 202, 80, 0.12) !important;
+    border-radius: var(--radius-md, 14px);
+    font-family: var(--font-body, 'Manrope', sans-serif) !important;
 }
 
-.tabulator-header, .tabulator-headers, .tabulator-col {
-    background-color: var(--surface-container-high, #2a2a2a) !important;
-    color: var(--on-surface, #fff) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+/* Cabecera / Encabezados de columnas */
+.tabulator .tabulator-header,
+.tabulator .tabulator-header .tabulator-headers,
+.tabulator .tabulator-header .tabulator-col {
+    background-color: var(--surface-container-high, #121212) !important;
+    color: var(--primary, #f2ca50) !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid rgba(242, 202, 80, 0.25) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
 }
 
-.tabulator-row {
-    background-color: transparent !important;
+/* Filas base */
+.tabulator .tabulator-row {
+    background-color: var(--surface-container, #0d0d0d) !important;
     color: var(--on-surface, #e2e2e2) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-.tabulator-row:hover {
-    background-color: rgba(255, 255, 255, 0.04) !important;
+/* Filas alternadas para mejor lectura */
+.tabulator .tabulator-row.tabulator-row-even {
+    background-color: var(--surface-container-low, #080808) !important;
+}
+
+/* Estado Hover sobre la fila */
+.tabulator .tabulator-row:hover {
+    background-color: rgba(242, 202, 80, 0.08) !important;
+}
+
+/* Celdas individuales */
+.tabulator .tabulator-cell {
+    border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+    padding: 12px 16px !important;
+    vertical-align: middle !important;
+    color: #ffffff !important; /* Forzar el texto en blanco puro */
+}
+
+/* Mensaje "No hay datos disponibles" (Placeholder) */
+.tabulator .tabulator-placeholder,
+.tabulator .tabulator-placeholder span {
+    background-color: var(--surface-container, #0d0d0d) !important;
+    color: var(--on-surface-variant, #d0c5af) !important;
+    font-size: 0.95rem !important;
+}
+
+/* Paginador (Footer) en caso de que esté activo */
+.tabulator .tabulator-footer {
+    background-color: var(--surface-container-high, #121212) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: var(--on-surface, #e2e2e2) !important;
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+    background-color: var(--surface-container-highest, #1c1c1c) !important;
+    color: var(--primary, #f2ca50) !important;
+    border: 1px solid rgba(242, 202, 80, 0.2) !important;
+    border-radius: var(--radius-xs, 4px);
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    background-color: var(--primary, #f2ca50) !important;
+    color: var(--on-primary-fixed, #241a00) !important;
 }

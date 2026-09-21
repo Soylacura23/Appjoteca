@@ -3,6 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache"); 
+header("Expires: 0"); 
+
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../auth/login/login.php");
     exit();
@@ -18,7 +22,7 @@ function requiereRol(array $roles) {
     global $mi_rol_num;
     if (!in_array($mi_rol_num, $roles)) {
         http_response_code(403);
-        require __DIR__ . '/../../errors/403.php';
+        require __DIR__ . '/../../errors/403/403.php';
         exit();
     }
 }

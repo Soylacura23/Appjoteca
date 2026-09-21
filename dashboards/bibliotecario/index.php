@@ -5,7 +5,6 @@ require_once __DIR__ . '/../../backend/Database/conexion.php';
 require_once __DIR__ . '/../../backend/models/historial.php';
 requiereRol([3]);
 
-// -------- Estadísticas --------
 $queryStats = "SELECT 
     (SELECT COUNT(*) FROM libros) as total_libros,
     (SELECT COUNT(*) FROM reservas WHERE estado = 'activa') as reservas_pendientes,
@@ -13,7 +12,6 @@ $queryStats = "SELECT
     (SELECT COUNT(*) FROM prestamos WHERE estado = 'activo' AND fecha_devolucion_prevista < CURDATE()) as prestamos_vencidos";
 $stats = $connection->query($queryStats)->fetch_assoc();
 
-// -------- Reservación destacada --------
 $queryFeatured = "SELECT l.titulo, l.portada, COUNT(r.id_reserva) as total_reservas 
     FROM libros l 
     LEFT JOIN reservas r ON l.id_libro = r.fk_id_libro_reserva 
@@ -22,7 +20,6 @@ $queryFeatured = "SELECT l.titulo, l.portada, COUNT(r.id_reserva) as total_reser
     LIMIT 1";
 $featured = $connection->query($queryFeatured)->fetch_assoc();
 
-// -------- Historial reciente (usando modelo) --------
 $modeloHistorial = new Historial($connection);
 $historial = $modeloHistorial->obtenerRecientes(5);
 ?>

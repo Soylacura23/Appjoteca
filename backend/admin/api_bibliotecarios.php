@@ -6,11 +6,11 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../config/verify-csrf.php';
 
-require_once __DIR__ . '/backend/Database/conexion.php';
+require_once __DIR__ . '/../Database/conexion.php';
 
 $action = $_POST['action'] ?? '';
 
-// 1. LISTAR BIBLIOTECARIOS
+// LISTAR BIBLIOTECARIOS
 if ($action === 'listar') {
     $sql = "SELECT id_usuario, documento, nombre_apellido, correo_institucional, fecha_registro FROM usuarios WHERE id_rol = 3";
     $result = $connection->query($sql);
@@ -25,7 +25,7 @@ if ($action === 'listar') {
     exit;
 }
 
-// 2. CREAR BIBLIOTECARIO
+// CREAR BIBLIOTECARIO
 if ($action === 'crear') {
     $documento = $_POST['documento'] ?? '';
     $nombre_apellido = $_POST['nombre_apellido'] ?? '';
@@ -71,11 +71,11 @@ if ($action === 'crear') {
     exit;
 }
 
-// 3. ELIMINAR BIBLIOTECARIO
+// ELIMINAR BIBLIOTECARIO
 if ($action === 'eliminar') {
     $id = intval($_POST['id'] ?? 0);
     
-    $stmt = $connection->prepare("DELETE FROM usuarios WHERE id = ? AND id_rol = 3");
+    $stmt = $connection->prepare("DELETE FROM usuarios WHERE id_usuario = ? AND id_rol = 3");
     
     if (!$stmt) {
         echo json_encode(['status' => 'error', 'message' => 'Error al preparar la eliminación.']);

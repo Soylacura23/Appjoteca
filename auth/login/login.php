@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+require_once __DIR__ . '/../../backend/config/auth-check.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -154,7 +155,7 @@ if (empty($_SESSION['csrf_token'])) {
     <aside class="login-visual" aria-hidden="true">
       <div class="login-visual-overlay"></div>
       <img
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh90-d0HDfPWjO0zWZSjQ37GedrEaIhx7jonR6q6mbV7J8HIq_-ZVZtBVC630JozQkh5qqcwdxpcoek36JrW2hs-rGgvXudQRN4T3cToBlyemRpSTd5ZNcxDn7Sr7nX6qD6oZGxXi3uEFa3dd9wgceURUteG5XPQiC93aQ1i4vwsN8kBvshVOYsz6ult6OvyPPe9YaUsVDzmEBplHHrVbv3av82bb-VHpDcvEaO7j3CNba79tbCVsbxYakDTBaqdUknb1XKqaBRtrw"
+        src="../../assets/images/headers/auth.png"
         alt=""
         class="login-visual-img"
         loading="eager"
@@ -185,5 +186,6 @@ if (empty($_SESSION['csrf_token'])) {
   </main>
 
   <script src="login.js"></script>
+  
 </body>
 </html>

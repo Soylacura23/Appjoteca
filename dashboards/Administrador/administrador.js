@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         responsiveLayout: "collapse",
         placeholder: "No se encontraron bibliotecarios registrados",
         columns: [
-            { title: "ID", field: "id", width: 70, hozAlign: "center" },
+            { title: "ID", field: "id_usuario", width: 10, hozAlign: "center" },
             { title: "Documento", field: "documento" },
             { title: "Nombre y Apellido", field: "nombre_apellido" },
             { title: "Correo Electrónico", field: "correo_institucional" },
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cellClick: function(e, cell) {
                     if (e.target.closest('.action-delete-btn')) {
                         const rowData = cell.getRow().getData();
-                        confirmarEliminacion(rowData.id, rowData.nombre_apellido);
+                        confirmarEliminacion(rowData.id_usuario, rowData.nombre_apellido);
                     }
                 }
             }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function cargarBibliotecarios() {
-        // Usamos FormData para enviar la acción en el cuerpo de la petición
+
         const formData = new FormData();
         formData.append('action', 'listar');
         formData.append('csrf_token', window.getCSRFToken());
