@@ -162,7 +162,7 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
             <span class="title-outline">HUMANIDAD</span>
         </h1>
         <p class="hero-description">
-            Un santuario digital donde el conocimiento es universal. Explora las obras que han moldeado nuestra existencia y descubre las ideas que definirán nuestro futuro.
+            Un santuario digital donde el conocimiento es universal. Le apostamos al fomento de la lectura para impulsar el conocimiento universal.
         </p>
         <div class="hero-actions">
             <a href="#booksScroll" class="btn btn-primary btn-glow">
