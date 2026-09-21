@@ -19,13 +19,9 @@
 <body class="error-page">
 
     <header class="error-header">
-        <div id="logo-container">
-
-            <div class="logo-img" aria-hidden="true"></div>
-
-            <div class="logo">AppJoteca<span class="neon-dot">.</span></div>
-
-        </div>
+            <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
         <a href="/" class="btn-discreet">
             <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
             Inicio

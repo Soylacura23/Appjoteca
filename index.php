@@ -128,10 +128,9 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
 
 <header class="main-header" id="mainHeader">
     <div class="header-container">
-        <a href="index.php" class="logo-link">
-            <img src="shared/images/logo-appjoteca.png" alt="Appjoteca Logo" class="logo-img">
-            <span class="logo-text">APPJOTECA</span>
-        </a>
+            <a href="../../index.php" class="logo-link">
+    <img src="shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
         <nav class="main-nav">
             <ul class="nav-list">
                 <li><a href="pages/sobre-nosotros/about-us.php" class="nav-link">Sobre Nosotros</a></li>
