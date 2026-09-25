@@ -1,18 +1,17 @@
-/* ================================================================
-   navbar.js — Componente Barra de Navegación
-   AppJoteca v2.0
-   ================================================================ */
-
-   document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
-    // ════════════════════════════════════════════
-    // Links de navegación — desktop
-    // ════════════════════════════════════════════
+    
     const navLinks = document.querySelectorAll('.nav-link');
 
     navLinks.forEach(function (link) {
         link.addEventListener('click', function (e) {
+            const href = link.getAttribute('href');
+
+            if (href && href !== '#' && !href.startsWith('#')) {
+                return; 
+            }
+
             e.preventDefault();
             navLinks.forEach(function (l) { l.classList.remove('active'); });
             link.classList.add('active');
@@ -28,18 +27,21 @@
     });
 
 
-    // ════════════════════════════════════════════
-    // Links de navegación — menú móvil
-    // ════════════════════════════════════════════
     const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 
     mobileNavLinks.forEach(function (link) {
         link.addEventListener('click', function (e) {
+            const href = link.getAttribute('href');
+
+            if (href && href !== '#' && !href.startsWith('#')) {
+                closeMobileMenu();
+                return;
+            }
+
             e.preventDefault();
             mobileNavLinks.forEach(function (l) { l.classList.remove('active'); });
             link.classList.add('active');
 
-            // Sincronizar estado activo con el nav de desktop
             const target = link.getAttribute('data-nav');
             if (target) {
                 navLinks.forEach(function (dl) {
@@ -52,9 +54,6 @@
     });
 
 
-    // ════════════════════════════════════════════
-    // Menú hamburguesa — apertura y cierre
-    // ════════════════════════════════════════════
     const menuToggleBtn    = document.querySelector('.menu-toggle-btn');
     const mobileMenu       = document.querySelector('.mobile-menu');
     const mobileMenuClose  = document.querySelector('.mobile-menu-close');
@@ -66,7 +65,7 @@
         if (mobileMenuOverlay) mobileMenuOverlay.classList.add('open');
         document.body.classList.add('menu-open');
         if (menuToggleBtn) menuToggleBtn.setAttribute('aria-expanded', 'true');
-        // Foco accesible al cerrar
+
         if (mobileMenuClose) {
             setTimeout(function () { mobileMenuClose.focus(); }, 80);
         }
@@ -104,9 +103,6 @@
     });
 
 
-    // ════════════════════════════════════════════
-    // Búsqueda móvil — toggle desplegable
-    // ════════════════════════════════════════════
     const searchToggleBtn   = document.querySelector('.search-toggle-btn');
     const searchMobileArea  = document.querySelector('.topbar-search-mobile');
     const searchMobileInput = searchMobileArea
@@ -131,9 +127,6 @@
     }
 
 
-    // ════════════════════════════════════════════
-    // Sincronizar inputs de búsqueda (topbar ↔ móvil)
-    // ════════════════════════════════════════════
     const topbarSearchInput = document.querySelector('.topbar-search-input');
 
     if (topbarSearchInput && searchMobileInput) {
@@ -146,9 +139,7 @@
     }
 
 
-    // ════════════════════════════════════════════
-    // Redimensionado — cerrar paneles en desktop
-    // ════════════════════════════════════════════
+   
     window.addEventListener('resize', function () {
         if (window.innerWidth >= 900) {
             closeMobileMenu();
@@ -158,5 +149,33 @@
             }
         }
     });
+
+    (function marcarActivoPorURL() {
+        const path = window.location.pathname;
+
+        document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(function (link) {
+            const href = link.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('#')) return;
+
+            // Compara el último segmento de la URL con el href
+            const hrefFile = href.split('/').pop();
+            if (hrefFile && path.endsWith(hrefFile)) {
+                document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(function (l) {
+                    l.classList.remove('active');
+                });
+                link.classList.add('active');
+
+                // Sincronizar con su contraparte (desktop ↔ móvil)
+                const target = link.getAttribute('data-nav');
+                if (target) {
+                    document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(function (l) {
+                        if (l.getAttribute('data-nav') === target) {
+                            l.classList.add('active');
+                        }
+                    });
+                }
+            }
+        });
+    })();
 
 });

@@ -57,7 +57,7 @@ requiereRol([4]);
                 <a href="#" class="nav-link active" data-nav="panel">Panel Admin</a>
             </nav>
             <nav class="topbar-nav" aria-label="Navegación Comentarios">
-                <a href="comentarios/comentarios.php" class="nav-link" data-nav="panel">Comentarios</a>
+                <a href="comentarios/comentarios.php" class="nav-link" data-nav="comentarios">Comentarios</a>
             </nav>
             <div class="topbar-actions">
                 <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">

@@ -87,44 +87,65 @@ document.addEventListener('DOMContentLoaded', function () {
     async function cargarComentarios() {
         if (cargando) return;
         cargando = true;
-
-        if (loading) loading.hidden = false;
+    
+        if (vacio) vacio.hidden = true;
         if (btnCargar) btnCargar.disabled = true;
-
+    
+        let loadingTimeout = setTimeout(() => {
+            if (loading) loading.hidden = false;
+        }, 300);
+    
         try {
             const data = await peticion('listar', { offset: offsetActual });
-
+    
             if (data.status !== 'success') {
                 alerta('error', 'Error', data.message || 'No se pudieron cargar los comentarios.');
                 return;
             }
-
-            if (contador) contador.textContent = data.total;
-
-            if (data.total === 0) {
-                if (vacio) vacio.hidden = false;
-                if (btnCargar) btnCargar.hidden = true;
-                return;
+    
+            const comentarios = Array.isArray(data.comentarios) ? data.comentarios : [];
+    
+            if (contador) {
+                const total = (typeof data.total === 'number')
+                    ? data.total
+                    : lista.children.length + comentarios.length;
+                contador.textContent = total;
             }
-
-            data.comentarios.forEach(c => {
+    
+            comentarios.forEach(c => {
                 lista.appendChild(crearCard(c));
             });
-
-            offsetActual += data.limit;
-
-            if (data.hay_mas) {
-                btnCargar.hidden = false;
-                btnCargar.disabled = false;
+    
+            if (typeof data.limit === 'number') {
+                offsetActual += data.limit;
             } else {
-                btnCargar.hidden = true;
+                offsetActual += comentarios.length;
             }
-
+    
+            const hayTarjetas = lista.children.length > 0;
+    
+            if (!hayTarjetas) {
+                if (vacio) vacio.hidden = false;
+                if (btnCargar) btnCargar.hidden = true;
+            } else {
+                if (vacio) vacio.hidden = true;
+                if (btnCargar) {
+                    const hayMas = !!data.hay_mas;
+                    btnCargar.hidden = !hayMas;
+                    btnCargar.disabled = false;
+                }
+            }
+    
         } catch (error) {
             console.error('Error al cargar comentarios:', error);
             alerta('error', 'Error de Conexión', 'No se pudieron cargar los comentarios.');
+
+            if (lista.children.length === 0 && vacio) {
+                vacio.hidden = false;
+            }
         } finally {
             cargando = false;
+            clearTimeout(loadingTimeout);
             if (loading) loading.hidden = true;
         }
     }
@@ -145,21 +166,25 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelButtonColor: 'rgba(255,255,255,0.1)'
         }).then(async (result) => {
             if (!result.isConfirmed) return;
-
+    
             try {
                 const data = await peticion('eliminar', { id: id });
                 if (data.status === 'success') {
                     const card = lista.querySelector(`.comentario-card[data-id="${id}"]`);
                     if (card) card.remove();
-
-                    const nuevoTotal = Math.max(0, parseInt(contador.textContent || '0', 10) - 1);
-                    contador.textContent = nuevoTotal;
-
+    
+                    // Actualizar contador
+                    if (contador) {
+                        const nuevoTotal = Math.max(0, parseInt(contador.textContent || '0', 10) - 1);
+                        contador.textContent = nuevoTotal;
+                    }
+    
+                    // ✅ Estado vacío solo si la lista quedó realmente vacía
                     if (lista.children.length === 0) {
                         if (vacio) vacio.hidden = false;
                         if (btnCargar) btnCargar.hidden = true;
                     }
-
+    
                     alerta('success', 'Eliminado', data.message);
                 } else {
                     alerta('error', 'Error', data.message);
