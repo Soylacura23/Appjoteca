@@ -59,76 +59,81 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     $resultado = $query->get_result();
 
-    if ($resultado->num_rows === 1) {
-        $usuario_db = $resultado->fetch_assoc();
-
-        if (password_verify($pass_input, $usuario_db['password'])) {
-
-            session_regenerate_id(true);
-
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            
-            $_SESSION['usuario_id'] = $usuario_db['id_usuario'];
-            $_SESSION['usuario'] = $usuario_db['nombre_usuario'];
-            $_SESSION['nombre'] = $usuario_db['nombre_apellido'];
-            $_SESSION['rol'] = $usuario_db['id_rol'];
-            $_SESSION['foto_perfil'] = $usuario_db['foto_perfil'];
-            $_SESSION['documento'] = $usuario_db['documento'];
-
-            if (isset($_POST['remember'])) {
-                $token = bin2hex(random_bytes(32));
-                $expiracion = time() + (86400 * 30); 
-
-                $sql_update_token = "UPDATE usuarios SET remember_token = ? WHERE id_usuario = ?";
-
-                $query_update = $connection->prepare($sql_update_token);
-
-                $query_update->bind_param("si", $token, $usuario_db['id_usuario']);
-
-                $query_update->execute();
-
-                setcookie(
-                    "remember_me",       
-                    $token,              
-                    $expiracion,         
-                    "/",              
-                    "",                 
-                    true,                
-                    true                 
-                );
-            }
-
-            
-
-            $destinos = [
-                1 => '../../dashboards/estudiante/index.php',
-                2 => '../../dashboards/docente/index.php',
-                3 => '../../dashboards/bibliotecario/index.php',
-                4 => '../../dashboards/Administrador/index.php'
-            ];
-
-            $url_destino = $destinos[$usuario_db['id_rol']] ?? '../../index.php';
-
-            echo json_encode([
-                'status' => 'success',
-                'redirect' => $url_destino
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
-        }
-
+    if ($resultado->num_rows < 1) {
         echo json_encode([
             'status' => 'error',
-            'message' => 'El usuario o la contraseña no son correctos.'
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
-
-    } else {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'El usuario o la contraseña no son correctos.'
+            'message' => 'No existe la cuenta o está pendiente de aprobación por parte de un administrador.'
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
+
+    $usuario_db = $resultado->fetch_assoc();
+
+    if (isset($usuario_db['estado']) && strtolower($usuario_db['estado']) === 'pendiente') {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No existe la cuenta o está pendiente de aprobación por parte de un administrador.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (password_verify($pass_input, $usuario_db['password'])) {
+
+        session_regenerate_id(true);
+
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        
+        $_SESSION['usuario_id'] = $usuario_db['id_usuario'];
+        $_SESSION['usuario'] = $usuario_db['nombre_usuario'];
+        $_SESSION['nombre'] = $usuario_db['nombre_apellido'];
+        $_SESSION['rol'] = $usuario_db['id_rol'];
+        $_SESSION['foto_perfil'] = $usuario_db['foto_perfil'];
+        $_SESSION['documento'] = $usuario_db['documento'];
+
+        if (isset($_POST['remember'])) {
+            $token = bin2hex(random_bytes(32));
+            $expiracion = time() + (86400 * 30); 
+
+            $sql_update_token = "UPDATE usuarios SET remember_token = ? WHERE id_usuario = ?";
+
+            $query_update = $connection->prepare($sql_update_token);
+
+            $query_update->bind_param("si", $token, $usuario_db['id_usuario']);
+
+            $query_update->execute();
+
+            setcookie(
+                "remember_me",       
+                $token,              
+                $expiracion,         
+                "/",              
+                "",                 
+                true,                
+                true                 
+            );
+        }
+
+        $destinos = [
+            1 => '../../dashboards/estudiante/index.php',
+            2 => '../../dashboards/docente/index.php',
+            3 => '../../dashboards/bibliotecario/index.php',
+            4 => '../../dashboards/Administrador/index.php'
+        ];
+
+        $url_destino = $destinos[$usuario_db['id_rol']] ?? '../../index.php';
+
+        echo json_encode([
+            'status' => 'success',
+            'redirect' => $url_destino
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'El usuario o la contraseña no son correctos.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);

@@ -9,7 +9,7 @@
    --------------------------------------------------------- */
 
    .config-main {
-    padding-top: 80px;                 /* navbar móvil más bajo */
+    padding-top: 80px;
     padding-bottom: 32px;
     min-height: 100vh;
     background-color: var(--background, #121212);
@@ -102,11 +102,11 @@
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;             /* Firefox */
+    scrollbar-width: none;
 }
 
 .admin-tabs-wrapper::-webkit-scrollbar {
-    display: none;                     /* Chrome / Safari */
+    display: none;
 }
 
 .admin-tabs {
@@ -149,7 +149,6 @@
     border-bottom-color: var(--primary, #f2ca50);
 }
 
-/* Badge rojo con número de pendientes */
 .tab-badge {
     display: inline-flex;
     align-items: center;
@@ -171,7 +170,6 @@
     50%      { box-shadow: 0 0 14px rgba(255, 82, 82, 0.9); }
 }
 
-/* ---- Paneles de pestaña ---- */
 .admin-panel {
     display: none;
 }
@@ -269,7 +267,7 @@
 }
 
 /* ---------------------------------------------------------
-   MODAL (MOBILE FIRST)
+   MODAL
    --------------------------------------------------------- */
 
 .modal-overlay {
@@ -280,7 +278,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
-    align-items: flex-end;             /* Móvil: modal desde abajo */
+    align-items: flex-end;
     justify-content: center;
     padding: 0;
     opacity: 0;
@@ -345,13 +343,11 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* ---- Formularios dentro del modal ---- */
 .form-grid {
     display: grid;
     gap: 14px;
 }
 
-/* En móvil, todo es una columna */
 .form-grid--2 {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -415,7 +411,7 @@
 }
 
 /* ---------------------------------------------------------
-   TABULATOR (INTEGRACIÓN APPJOTECA)
+   TABULATOR
    --------------------------------------------------------- */
 
 .tabulator,
@@ -488,7 +484,322 @@
 }
 
 /* =========================================================
-   BREAKPOINT · 480px  (móvil grande)
+   8. COMENTARIOS (BANDEJA)
+   ========================================================= */
+
+.comentarios-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+/* ---- Header del panel ---- */
+.comentarios-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 4px;
+}
+
+.comentarios-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.comentarios-titulo {
+    font-family: var(--font-headline, 'Noto Serif', serif);
+    font-size: 1.1rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.comentarios-subtitulo {
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+}
+
+.comentarios-subtitulo span {
+    color: var(--primary, #f2ca50);
+    font-weight: 700;
+}
+
+/* ---- Loading ---- */
+.comentarios-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 32px 16px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+    border: 1px dashed rgba(242, 202, 80, 0.2);
+}
+
+.comentarios-loading .material-symbols-outlined {
+    font-size: 20px;
+    animation: spin 1s linear infinite;
+    color: var(--primary, #f2ca50);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ---- Lista de tarjetas ---- */
+.comentarios-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* ---- Tarjeta de comentario ---- */
+.comentario-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    background: var(--surface-container, #1a1a1a);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-left: 3px solid rgba(242, 202, 80, 0.5);
+    border-radius: 12px;
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+    position: relative;
+}
+
+.comentario-card:hover {
+    background: var(--surface-container-high, #1f1f1f);
+    border-left-color: var(--primary, #f2ca50);
+    transform: translateY(-1px);
+}
+
+/* ---- Header de la tarjeta ---- */
+.comentario-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.comentario-card__autor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.comentario-card__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(242, 202, 80, 0.12);
+    border: 1px solid rgba(242, 202, 80, 0.3);
+    flex-shrink: 0;
+}
+
+.comentario-card__avatar .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--primary, #f2ca50);
+}
+
+.comentario-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.comentario-card__nombre {
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.comentario-card__correo {
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.comentario-card__correo:hover {
+    color: var(--primary, #f2ca50);
+    text-decoration: underline;
+}
+
+/* ---- Meta (tag + botón) ---- */
+.comentario-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.comentario-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--primary, #f2ca50);
+    background: rgba(242, 202, 80, 0.1);
+    border: 1px solid rgba(242, 202, 80, 0.3);
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.comentario-card__delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: rgba(255, 180, 171, 0.08);
+    border: 1px solid rgba(255, 180, 171, 0.25);
+    border-radius: 50%;
+    color: var(--error, #ffb4ab);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.comentario-card__delete .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.comentario-card__delete:hover {
+    background: var(--error, #ffb4ab);
+    color: #000;
+    transform: scale(1.05);
+}
+
+.comentario-card__delete:active {
+    transform: scale(0.95);
+}
+
+/* ---- Cuerpo del comentario ---- */
+.comentario-card__body {
+    padding-left: 46px;
+}
+
+.comentario-card__body p {
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.82);
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ---- Estado vacío ---- */
+.comentarios-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px dashed rgba(242, 202, 80, 0.2);
+    border-radius: 14px;
+    text-align: center;
+}
+
+.comentarios-vacio .material-symbols-outlined {
+    font-size: 48px;
+    color: rgba(242, 202, 80, 0.4);
+}
+
+.comentarios-vacio p {
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+}
+
+/* ---- Footer + botón cargar más ---- */
+.comentarios-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 4px;
+}
+
+.btn-cargar-mas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(242, 202, 80, 0.35);
+    border-radius: var(--radius-full, 30px);
+    color: var(--primary, #f2ca50);
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-cargar-mas .material-symbols-outlined {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.btn-cargar-mas:hover {
+    background: var(--primary, #f2ca50);
+    color: #121212;
+    box-shadow: 0 6px 18px rgba(242, 202, 80, 0.35);
+}
+
+.btn-cargar-mas:hover .material-symbols-outlined {
+    transform: translateY(2px);
+}
+
+.btn-cargar-mas:active {
+    transform: scale(0.98);
+}
+
+.btn-cargar-mas:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   BREAKPOINT · 480px
    ========================================================= */
 @media (min-width: 480px) {
 
@@ -523,7 +834,7 @@
     }
 
     .modal-overlay {
-        align-items: center;           /* Modal centrado a partir de aquí */
+        align-items: center;
         padding: 20px;
     }
 
@@ -538,17 +849,60 @@
     }
 
     .form-grid--2 {
-        grid-template-columns: 1fr 1fr;   /* Dos columnas a partir de aquí */
+        grid-template-columns: 1fr 1fr;
     }
 
     .tabulator .tabulator-cell {
         padding: 12px 14px !important;
         font-size: 0.85rem !important;
     }
+
+    /* Comentarios */
+    .comentarios-titulo {
+        font-size: 1.2rem;
+    }
+
+    .comentarios-subtitulo {
+        font-size: 0.85rem;
+    }
+
+    .comentario-card {
+        padding: 16px;
+    }
+
+    .comentario-card__avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .comentario-card__avatar .material-symbols-outlined {
+        font-size: 20px;
+    }
+
+    .comentario-card__nombre {
+        font-size: 0.95rem;
+    }
+
+    .comentario-card__correo {
+        font-size: 0.8rem;
+    }
+
+    .comentario-card__body p {
+        font-size: 0.9rem;
+    }
+
+    .comentario-card__body {
+        padding-left: 50px;
+    }
+
+    .btn-cargar-mas {
+        width: auto;
+        padding: 12px 28px;
+    }
 }
 
 /* =========================================================
-   BREAKPOINT · 640px  (tablet pequeña)
+   BREAKPOINT · 640px
    ========================================================= */
 @media (min-width: 640px) {
 
@@ -581,10 +935,31 @@
     .tabulator .tabulator-cell {
         font-size: 0.88rem !important;
     }
+
+    /* Comentarios */
+    .comentarios-panel {
+        gap: 20px;
+    }
+
+    .comentarios-lista {
+        gap: 14px;
+    }
+
+    .comentario-card {
+        padding: 18px 20px;
+    }
+
+    .comentario-card__body {
+        padding-left: 56px;
+    }
+
+    .comentario-card__body p {
+        font-size: 0.92rem;
+    }
 }
 
 /* =========================================================
-   BREAKPOINT · 768px  (tablet)
+   BREAKPOINT · 768px
    ========================================================= */
 @media (min-width: 768px) {
 
@@ -618,10 +993,27 @@
         padding: 13px 16px !important;
         font-size: 0.9rem !important;
     }
+
+    /* Comentarios */
+    .comentarios-header {
+        align-items: flex-end;
+    }
+
+    .comentarios-titulo {
+        font-size: 1.35rem;
+    }
+
+    .comentario-card__nombre {
+        font-size: 1rem;
+    }
+
+    .comentario-card__correo {
+        font-size: 0.82rem;
+    }
 }
 
 /* =========================================================
-   BREAKPOINT · 1024px  (desktop)
+   BREAKPOINT · 1024px
    ========================================================= */
 @media (min-width: 1024px) {
 
@@ -659,10 +1051,56 @@
         padding: 14px 18px !important;
         font-size: 0.92rem !important;
     }
+
+    /* Comentarios */
+    .comentarios-panel {
+        gap: 22px;
+    }
+
+    .comentarios-lista {
+        gap: 16px;
+    }
+
+    .comentario-card {
+        padding: 20px 22px;
+        gap: 14px;
+    }
+
+    .comentario-card__avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    .comentario-card__avatar .material-symbols-outlined {
+        font-size: 22px;
+    }
+
+    .comentario-card__body {
+        padding-left: 62px;
+    }
+
+    .comentario-card__body p {
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+
+    .comentario-tag {
+        font-size: 0.72rem;
+        padding: 5px 12px;
+    }
+
+    .comentario-card__delete {
+        width: 32px;
+        height: 32px;
+    }
+
+    .comentario-card__delete .material-symbols-outlined {
+        font-size: 17px;
+    }
 }
 
 /* =========================================================
-   BREAKPOINT · 1280px  (desktop grande)
+   BREAKPOINT · 1280px
    ========================================================= */
 @media (min-width: 1280px) {
 
@@ -681,16 +1119,43 @@
     .admin-tab {
         padding: 14px 26px;
     }
+
+    /* Comentarios */
+    .comentarios-titulo {
+        font-size: 1.45rem;
+    }
+
+    .comentario-card {
+        padding: 22px 24px;
+    }
+
+    .comentario-card__nombre {
+        font-size: 1.05rem;
+    }
+
+    .comentario-card__body {
+        padding-left: 66px;
+    }
 }
 
+/* =========================================================
+   ACCESIBILIDAD · Reduce motion
+   ========================================================= */
 @media (prefers-reduced-motion: reduce) {
     .btn-gold,
     .btn-danger-sm,
     .btn-approve-sm,
+    .btn-cargar-mas,
     .modal-card,
     .modal-overlay,
-    .tab-badge {
+    .tab-badge,
+    .comentario-card,
+    .comentario-card__delete {
         transition: none !important;
         animation: none !important;
+    }
+
+    .comentarios-loading .material-symbols-outlined {
+        animation: none;
     }
 }

@@ -7,7 +7,7 @@ require_once __DIR__ . '/backend/config/auth-check.php';
 
 require("backend/Database/conexion.php");
 
-// 1. Consulta para totales
+// totales
 if (!isset($_SESSION['totales_biblioteca'])) {
     $sql_totales = "SELECT 'libros' as tipo, COUNT(*) as total FROM libros
             UNION ALL
@@ -34,7 +34,7 @@ $cantidad_categorias  = $_SESSION['totales_biblioteca']['categorias'] ?? 0;
 $cantidad_autores     = $_SESSION['totales_biblioteca']['autores'] ?? 0;
 $cantidad_colecciones = $_SESSION['totales_biblioteca']['colecciones'] ?? 0;
 
-// 2. Consulta de Autores Destacados
+// Autores Destacados
 $sql_autores = "SELECT a.id_autor,
                        a.nombre AS nombre_autor,
                        COUNT(DISTINCT l.id_libro) AS obras_disponibles,
@@ -58,7 +58,7 @@ if ($query_autores = $connection->prepare($sql_autores)) {
 }
 $autores_placeholder = max(2 - count($autores_destacados), 0);
 
-// 3. Consulta de Materias (Categorías)
+// Materias (Categorías)
 $sql_materias = "SELECT * FROM materias LIMIT 8";
 $materias = [];
 if ($query_materias = $connection->prepare($sql_materias)) {
@@ -69,7 +69,7 @@ if ($query_materias = $connection->prepare($sql_materias)) {
     }
 }
 
-// 4. Consulta de Colecciones
+// Colecciones
 $sql_colecciones = "SELECT * FROM colecciones LIMIT 6";
 $colecciones = [];
 if ($query_colecciones = $connection->prepare($sql_colecciones)) {
@@ -80,7 +80,6 @@ if ($query_colecciones = $connection->prepare($sql_colecciones)) {
     }
 }
 
-// Función auxiliar: iniciales + gradiente determinista a partir del nombre
 function autor_avatar($nombre) {
     $nombre = trim($nombre);
     $partes = preg_split('/\s+/', $nombre);

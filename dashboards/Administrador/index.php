@@ -5,11 +5,8 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 
-
-
-requiereRol([4])
+requiereRol([4]);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -49,15 +46,18 @@ requiereRol([4])
     <!-- BARRA DE NAVEGACIÓN -->
     <header class="topbar" role="banner">
         <div class="topbar-inner">
-               <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-</a>
+            <a href="../../index.php" class="logo-link">
+                <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+            </a>
             <div class="topbar-search">
                 <input type="text" class="topbar-search-input" placeholder="Buscar en la plataforma..." aria-label="Buscar">
                 <span class="material-symbols-outlined topbar-search-icon">search</span>
             </div>
             <nav class="topbar-nav" aria-label="Navegación principal">
                 <a href="#" class="nav-link active" data-nav="panel">Panel Admin</a>
+            </nav>
+            <nav class="topbar-nav" aria-label="Navegación Comentarios">
+                <a href="comentarios/comentarios.php" class="nav-link" data-nav="panel">Comentarios</a>
             </nav>
             <div class="topbar-actions">
                 <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
@@ -79,104 +79,138 @@ requiereRol([4])
     <main class="config-main">
         <div class="config-container">
             <header class="config-page-header">
-                <h1 class="config-page-title">Gestión de <span>Bibliotecarios</span></h1>
-                <p class="config-page-subtitle">Panel de administración global para añadir y remover personal bibliotecario.</p>
+                <h1 class="config-page-title">Gestión de <span>Usuarios</span></h1>
+                <p class="config-page-subtitle">Administra bibliotecarios, aprueba solicitudes y crea nuevas cuentas.</p>
             </header>
 
             <div class="admin-actions-bar">
                 <button id="btnAbrirModal" class="btn-gold" type="button">
                     <span class="material-symbols-outlined">person_add</span>
-                    Añadir Bibliotecario
+                    Crear Usuario
                 </button>
             </div>
 
-            <!-- TABLA TABULATOR -->
-            <section class="config-section" style="margin-top: var(--sp-lg);">
-                <div class="section-body">
+                        <!-- PESTAÑAS -->
+                        <div class="admin-tabs-wrapper">
+                <nav class="admin-tabs" role="tablist">
+                    <button class="admin-tab is-active" data-tab="bibliotecarios" role="tab">
+                        <span class="material-symbols-outlined">local_library</span>
+                        <span class="tab-label">Bibliotecarios</span>
+                    </button>
+                    <button class="admin-tab" data-tab="pendientes" role="tab">
+                        <span class="material-symbols-outlined">pending_actions</span>
+                        <span class="tab-label">Pendientes</span>
+                        <span id="badge-pendientes" class="tab-badge" hidden>0</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- PANEL: BIBLIOTECARIOS -->
+            <section class="admin-panel is-active" data-panel="bibliotecarios">
+                <div class="table-scroll">
                     <div id="tabla-bibliotecarios"></div>
                 </div>
             </section>
-        </div>
+
+            <!-- PANEL: PENDIENTES -->
+            <section class="admin-panel" data-panel="pendientes">
+                <div class="table-scroll">
+                    <div id="tabla-pendientes"></div>
+                </div>
+            </section>
     </main>
 
-    <!-- MODAL DE REGISTRO DE BIBLIOTECARIO -->
+    <!-- MODAL DE CREACIÓN DE USUARIO -->
     <div class="modal-overlay" id="modalRegistro" aria-hidden="true">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Registrar Nuevo Bibliotecario</h3>
-            <button type="button" class="modal-close" id="btnCerrarModal">&times;</button>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Crear Nuevo Usuario</h3>
+                <button type="button" class="modal-close" id="btnCerrarModal">&times;</button>
+            </div>
+            <form id="formBibliotecario" class="form-grid">
+
+                <!-- Selector de Rol -->
+                <div class="form-group">
+                    <label for="rolInput">Tipo de usuario</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-outlined input-icon">badge</span>
+                        <select id="rolInput" name="rol" required>
+                            <option value="estudiante">Estudiante</option>
+                            <option value="profesor">Profesor</option>
+                            <option value="bibliotecario" selected>Bibliotecario</option>
+                            <option value="administrador">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="docInput">Documento de Identidad</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-outlined input-icon">badge</span>
+                        <input type="text" id="docInput" name="documento" placeholder="Número de documento" required>
+                    </div>
+                </div>
+
+                <div class="form-grid form-grid--2">
+                    <div class="form-group">
+                        <label for="nombreInput">Nombre y Apellido</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">person</span>
+                            <input type="text" id="nombreInput" name="nombre_apellido" placeholder="Nombre completo" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="usuarioInput">Nombre de Usuario</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">account_circle</span>
+                            <input type="text" id="usuarioInput" name="nombre_usuario" placeholder="Ej: juan.perez" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailInput">Correo Institucional</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-outlined input-icon">alternate_email</span>
+                        <input type="email" id="emailInput" name="correo_institucional" placeholder="correo@institucional.edu" required>
+                    </div>
+                </div>
+
+                <div class="form-grid form-grid--2">
+                    <div class="form-group">
+                        <label for="passInput">Contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">lock</span>
+                            <input type="password" id="passInput" name="password" placeholder="Contraseña" required minlength="8">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="passConfirmInput">Confirmar Contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">lock_reset</span>
+                            <input type="password" id="passConfirmInput" name="confirm_password" placeholder="Repite la contraseña" required minlength="8">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 15px;">
+                    <button type="submit" class="btn-gold" style="width: 100%; justify-content: center;">
+                        <span class="material-symbols-outlined">save</span>
+                        Guardar Registro
+                    </button>
+                </div>
+            </form>
         </div>
-        <form id="formBibliotecario" class="form-grid">
-            <div class="form-group">
-                <label for="docInput">Documento de Identidad</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-outlined input-icon">badge</span>
-                    <input type="text" id="docInput" name="documento" placeholder="Número de documento" required>
-                </div>
-            </div>
-            
-            <div class="form-grid form-grid--2">
-                <div class="form-group">
-                    <label for="nombreInput">Nombre y Apellido</label>
-                    <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">person</span>
-                        <input type="text" id="nombreInput" name="nombre_apellido" placeholder="Nombre completo" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="usuarioInput">Nombre de Usuario</label>
-                    <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">account_circle</span>
-                        <input type="text" id="usuarioInput" name="nombre_usuario" placeholder="Ej: bibliotecario_01" required>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="emailInput">Correo Institucional</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-outlined input-icon">alternate_email</span>
-                    <input type="email" id="emailInput" name="correo_institucional" placeholder="correo@institucional.edu" required>
-                </div>
-            </div>
-            
-            <div class="form-grid form-grid--2">
-                <div class="form-group">
-                    <label for="passInput">Contraseña</label>
-                    <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">lock</span>
-                        <input type="password" id="passInput" name="password" placeholder="Contraseña" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="passConfirmInput">Confirmar Contraseña</label>
-                    <div class="input-wrapper">
-                        <span class="material-symbols-outlined input-icon">lock_reset</span>
-                        <input type="password" id="passConfirmInput" name="confirm_password" placeholder="Repite la contraseña" required>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-actions" style="margin-top: 15px;">
-                <button type="submit" class="btn-gold" style="width: 100%; justify-content: center;">
-                    <span class="material-symbols-outlined">save</span>
-                    Guardar Registro
-                </button>
-            </div>
-        </form>
     </div>
-</div>
 
     <!-- FOOTER -->
     <?php include '../../shared/layouts/footer.php'; ?>
 
-    <!-- Scripts compartidos y librerías -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
     <script src="../../shared/js/components/navbar.js"></script>
     <script src="../../shared/js/global.js"></script>
-    
-    <!-- Script del Administrador -->
+
     <script src="administrador.js"></script>
 </body>
 </html>
