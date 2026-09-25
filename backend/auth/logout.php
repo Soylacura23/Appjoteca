@@ -20,6 +20,8 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
+header("Cache-Control: no-cache, no-store, must-revalidate");
+
 header("Location: ../../auth/login/login.php");
 exit();
 ?>

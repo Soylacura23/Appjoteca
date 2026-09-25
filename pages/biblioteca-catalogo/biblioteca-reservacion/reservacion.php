@@ -120,10 +120,9 @@
   ══════════════════════════════════════════════ -->
   <header class="topbar" role="banner">
     <div class="topbar-inner">
-      <a href="#" class="topbar-logo">
-        <div class="logo" aria-hidden="true"></div>
-        <span class="logo-text">AppJoteca</span>
-      </a>
+         <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
 
       <div class="topbar-search">
         <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
@@ -165,7 +164,7 @@
     <div class="mobile-menu-header">
       <a href="#" class="mobile-menu-logo topbar-logo">
         <div class="logo" aria-hidden="true"></div>
-        <span class="logo-text">AppJoteca</span>
+      
       </a>
       <button class="mobile-menu-close" aria-label="Cerrar menú">
         <span class="material-symbols-outlined">close</span>

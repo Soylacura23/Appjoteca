@@ -1,83 +1,82 @@
 // ============================================
-// APPJOTECA - MENÚ MÓVIL
+// APPJOTECA - MENÚ MÓVIL (compartido)
 // ============================================
+document.addEventListener('DOMContentLoaded', function () {
+  const menuBtn = document.querySelector('.mobile-menu-btn');
+  const header = document.querySelector('.main-header');
+  if (!menuBtn || !header) return;
 
-document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    const header = document.querySelector('.main-header');
-    const nav = document.querySelector('.main-nav');
-    const navLinks = document.querySelectorAll('.nav-link');
-  
-    // Crear overlay para el menú móvil
-    const overlay = document.createElement('div');
-    overlay.className = 'mobile-menu-overlay';
-    document.body.appendChild(overlay);
-  
-    // Crear menú móvil expandido
-    const mobileMenu = document.createElement('div');
-    mobileMenu.className = 'mobile-menu';
-    mobileMenu.innerHTML = `
-      <nav class="mobile-nav">
-        <ul class="mobile-nav-list">
-          <li><a href="/Appjoteca/pages/sobre-nosotros/about-us.php" class="mobile-nav-link">Sobre Nosotros</a></li>
-          <li><a href="#" class="mobile-nav-link">Contacto</a></li>
-        </ul>
-        <a href="/Appjoteca/auth/login/login.php" class="btn btn-primary btn-mobile">
-          <span>Iniciar Sesión</span>
-        </a>
-      </nav>
-    `;
-    header.appendChild(mobileMenu);
-  
-    // Toggle menú
-    function toggleMenu() {
-      const isOpen = header.classList.contains('menu-open');
-  
-      if (isOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    }
-  
-    function openMenu() {
+  // Evitar duplicados si el script se carga dos veces
+  if (header.dataset.menuInitialized === 'true') return;
+  header.dataset.menuInitialized = 'true';
+
+  // Overlay
+  let overlay = document.querySelector('.mobile-menu-overlay');
+  if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'mobile-menu-overlay';
+      document.body.appendChild(overlay);
+  }
+
+  // Menú móvil (toma los enlaces del nav-list existente)
+  let mobileMenu = header.querySelector('.mobile-menu');
+  if (!mobileMenu) {
+      mobileMenu = document.createElement('div');
+      mobileMenu.className = 'mobile-menu';
+
+      const navLinksHTML = Array.from(document.querySelectorAll('.main-nav .nav-link'))
+          .map(link => `<li><a href="${link.getAttribute('href')}" class="mobile-nav-link">${link.textContent.trim()}</a></li>`)
+          .join('');
+
+      const loginLink = document.querySelector('.header-actions .btn-header');
+      const loginHref = loginLink ? loginLink.getAttribute('href') : '../../auth/login/login.php';
+
+      mobileMenu.innerHTML = `
+          <nav class="mobile-nav">
+              <ul class="mobile-nav-list">
+                  ${navLinksHTML}
+              </ul>
+              <a href="${loginHref}" class="btn btn-primary btn-mobile">
+                  <span>Iniciar Sesión</span>
+              </a>
+          </nav>
+      `;
+      header.appendChild(mobileMenu);
+  }
+
+  function openMenu() {
       header.classList.add('menu-open');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
       menuBtn.setAttribute('aria-expanded', 'true');
-    }
-  
-    function closeMenu() {
+  }
+  function closeMenu() {
       header.classList.remove('menu-open');
       overlay.classList.remove('active');
       document.body.style.overflow = '';
       menuBtn.setAttribute('aria-expanded', 'false');
-    }
-  
-    // Event listeners
-    menuBtn.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', closeMenu);
-  
-    // Cerrar menú al hacer clic en un enlace
-    navLinks.forEach(link => {
+  }
+  function toggleMenu() {
+      if (header.classList.contains('menu-open')) closeMenu();
+      else openMenu();
+  }
+
+  menuBtn.addEventListener('click', toggleMenu);
+  overlay.addEventListener('click', closeMenu);
+
+  document.querySelectorAll('.mobile-nav-link').forEach(link => {
       link.addEventListener('click', closeMenu);
-    });
-  
-    // Cerrar menú con Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && header.classList.contains('menu-open')) {
-        closeMenu();
-      }
-    });
-  
-    // Cerrar menú al redimensionar ventana
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() {
-        if (window.innerWidth > 768 && header.classList.contains('menu-open')) {
-          closeMenu();
-        }
-      }, 250);
-    });
   });
+
+  document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('menu-open')) closeMenu();
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+          if (window.innerWidth > 900 && header.classList.contains('menu-open')) closeMenu();
+      }, 250);
+  });
+});

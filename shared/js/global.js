@@ -1,12 +1,4 @@
-/* ================================================================
-   global.js — Componentes Globales Reutilizables
-   AppJoteca v2.0
-
-   Maneja: botón de perfil, menú off-canvas, bandeja de
-   notificaciones, sidebar (bibliotecario) y overlay.
-   ================================================================ */
-
-   (() => {
+ (() => {
     'use strict';
 
     /* ════════════════════════════════════════════

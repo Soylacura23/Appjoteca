@@ -1,3 +1,21 @@
+@import url('../../../../pages/settings/configuracion.css');
+
+.config-main#main-content {
+  display: block;
+  margin-top: var(--topbar-h, 80px);
+  margin-left: var(--sidebar-width, 280px);
+  width: calc(100% - var(--sidebar-width, 280px));
+  min-height: calc(100vh - var(--topbar-h, 80px));
+}
+
+@media (max-width: 1024px) {
+  .config-main#main-content {
+    margin-top: var(--topbar-h, 62px);
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 .main-content header {
   margin-bottom: var(--spacing-md);
 }
@@ -353,3 +371,4 @@
     align-items: flex-start;
   }
 }
+

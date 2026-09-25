@@ -35,16 +35,15 @@ requiereRol([1]);
 
     <header class="topbar" role="banner">
         <div class="topbar-inner">
-            <a href="#" class="topbar-logo">
-                <div class="logo" aria-hidden="true"></div>
-                <span class="logo-text">AppJoteca</span>
-            </a>
+                <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
             <div class="topbar-search">
                 <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
                 <span class="material-symbols-outlined topbar-search-icon">search</span>
             </div>
             <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="#" class="nav-link" data-nav="catalogo">Catálogo</a>
+                <a href="../../pages/biblioteca-digital/index.php" class="nav-link" data-nav="catalogo">Catálogo</a>
                 <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
                 <a href="#" class="nav-link activo" data-nav="panel">Panel</a>
             </nav>

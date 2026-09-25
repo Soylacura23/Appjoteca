@@ -5,12 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+require_once __DIR__ . '/../../backend/config/auth-check.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
   <title>Iniciar Sesión en AppJoteca</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,21 +24,19 @@ if (empty($_SESSION['csrf_token'])) {
   <link rel="stylesheet" href="login.css">
 
   <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
-  <link rel="stylesheet" href="../../shared/css/components/footer.css">
 </head>
 
-<body>
+<body class="login-body">
 
   <!-- ════════════════════════════════════════════════════════
-       HEADER FIJO
+       HEADER (compacto, fijo)
        ════════════════════════════════════════════════════════ -->
   <header class="login-header" role="banner">
     <div class="login-header-container">
-      <a href="../../index.php" class="logo-link" aria-label="Ir al inicio de Appjoteca">
-        <img src="../../shared/images/logo-appjoteca.png" alt="Logo Appjoteca" class="logo-img">
-        <span class="logo-text">Appjoteca</span>
-      </a>
-      <a href="../signup/signup.php" class="btn-register">
+          <a href="../../index.php" class="logo-link">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+</a>
+      <a href="../signup/signup.php" class="btn-register" aria-label="Registrarse">
         <span class="material-symbols-outlined" style="font-size:15px;">person_add</span>
         <span>Registrarse</span>
       </a>
@@ -44,103 +44,56 @@ if (empty($_SESSION['csrf_token'])) {
   </header>
 
   <!-- ════════════════════════════════════════════════════════
-       BARRA DE REGRESO (debajo del header fijo)
-       ════════════════════════════════════════════════════════ -->
-  <div class="back-bar">
-    <a href="../../index.php" class="btn-back" aria-label="Volver al inicio">
-      <span class="material-symbols-outlined">arrow_back</span>
-      <span>Volver al inicio</span>
-    </a>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════════
-       SHELL PRINCIPAL — Single global scroll
+       SHELL PRINCIPAL — sin scroll global
        ════════════════════════════════════════════════════════ -->
   <main class="login-shell" role="main">
 
-    <!-- ── Panel del formulario (izquierda en desktop, arriba en móvil) ── -->
+    <!-- ── Panel del formulario ── -->
     <section class="login-form-panel" aria-label="Formulario de inicio de sesión">
-      <div class="login-form-wrapper">
+      <div class="login-card">
 
-        <!-- ── SELECTOR DE ROL ── -->
-        <div class="role-selector" role="group" aria-label="Selecciona tu tipo de acceso">
-          <p class="role-selector-label" id="role-label">¿Quién eres?</p>
-          <div class="role-grid" role="radiogroup" aria-labelledby="role-label">
-
-            <label class="role-card" title="Acceso como Estudiante">
-              <input type="radio" name="rol" value="estudiante" class="role-radio" checked aria-label="Estudiante" form= "login-form">
-              <div class="role-card-inner">
-                <span class="material-symbols-outlined role-icon" aria-hidden="true">school</span>
-                <span class="role-name">Estudiante</span>
-                <span class="role-desc">Accede a tu biblioteca</span>
-              </div>
-            </label>
-
-            <label class="role-card" title="Acceso como Profesor">
-              <input type="radio" name="rol" value="profesor" class="role-radio" aria-label="Profesor" form="login-form">
-              <div class="role-card-inner">
-                <span class="material-symbols-outlined role-icon" aria-hidden="true">history_edu</span>
-                <span class="role-name">Profesor</span>
-                <span class="role-desc">Gestiona tus asignaturas</span>
-              </div>
-            </label>
-
-            <label class="role-card" title="Acceso como Bibliotecario">
-              <input type="radio" name="rol" value="bibliotecario" class="role-radio" aria-label="Bibliotecario" form="login-form">
-              <div class="role-card-inner">
-                <span class="material-symbols-outlined role-icon" aria-hidden="true">local_library</span>
-                <span class="role-name">Bibliotecario</span>
-                <span class="role-desc">Administra la biblioteca</span>
-              </div>
-            </label>
-
-            <label class="role-card" title="Acceso como Administrador">
-              <input type="radio" name="rol" value="Administrador" class="role-radio" aria-label="Administrador" form="login-form">
-              <div class="role-card-inner">
-                <span class="material-symbols-outlined role-icon" aria-hidden="true">settings_account_box
-                </span>
-                <span class="role-name">Administrador</span>
-                <span class="role-desc">Administra la biblioteca</span>
-              </div>
-            </label>
-
-          </div>
+        <!-- Badge de bienvenida (sustituye al stepper) -->
+        <div class="welcome-badge" aria-hidden="true">
+          <span class="material-symbols-outlined welcome-icon">lock_open</span>
         </div>
-        <!-- /role-selector -->
 
-        <!-- ── Encabezado del formulario ── -->
+        <!-- Título -->
         <header class="login-heading">
-          <h3 class="login-title">Bienvenido de Vuelta</h3>
+          <h1 class="login-title">Bienvenido de vuelta</h1>
           <p class="login-subtitle">Ingresa tus credenciales para acceder a la biblioteca.</p>
         </header>
 
-        <!-- ── Formulario ── -->
-        <form id="login-form" class="login-form" novalidate autocomplete="on" action="../../backend/auth/login-send.php" method="POST">
+        <!-- Formulario -->
+        <form id="login-form" class="login-form" novalidate autocomplete="on"
+              action="../../backend/auth/login-send.php" method="POST">
 
           <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-          <!-- Campo: Usuario -->
+
+          <!-- Usuario -->
           <div class="field-group">
-            <label class="field-label" for="usuario">Nombre único</label>
+            <label class="field-label" for="usuario">Usuario o correo <span class="required-mark">*</span></label>
             <div class="field-wrapper">
+              <span class="material-symbols-outlined field-icon">person</span>
               <input
                 type="text"
                 id="usuario"
                 name="usuario"
                 class="field-input"
-                placeholder="nombre de usuario"
+                placeholder="nombre de usuario o correo"
                 autocomplete="username"
                 required
               >
             </div>
           </div>
 
-          <!-- Campo: Contraseña -->
+          <!-- Contraseña -->
           <div class="field-group">
             <div class="field-label-row">
-              <label class="field-label" for="contrasena">Contraseña</label>
+              <label class="field-label" for="contrasena">Contraseña <span class="required-mark">*</span></label>
               <a href="../recover/recover.php" class="field-forgot" tabindex="0">¿Olvidaste tu contraseña?</a>
             </div>
             <div class="field-wrapper field-wrapper--password">
+              <span class="material-symbols-outlined field-icon">lock</span>
               <input
                 type="password"
                 id="contrasena"
@@ -161,89 +114,77 @@ if (empty($_SESSION['csrf_token'])) {
             </div>
           </div>
 
-          <!-- Mensaje de error -->
-          <div
-            id="login-error"
-            class="login-error"
-            role="alert"
-            aria-live="polite"
-            hidden
-          >
+          <!-- Recordarme -->
+          <label class="remember-row" for="remember">
+            <input type="checkbox" id="remember" name="remember" class="remember-input">
+            <span class="remember-box" aria-hidden="true">
+              <span class="material-symbols-outlined remember-check">check</span>
+            </span>
+            <span class="remember-text">Mantener sesión iniciada</span>
+          </label>
+
+          <!-- Mensajes -->
+          <div id="login-error" class="login-error" role="alert" aria-live="polite" hidden>
             <span class="material-symbols-outlined" aria-hidden="true">error</span>
             <span id="login-error-text">Credenciales incorrectas.</span>
           </div>
 
-          <!-- Mensaje de éxito (para futuras integraciones) -->
-          <div
-            id="login-success"
-            class="login-success"
-            role="status"
-            aria-live="polite"
-            hidden
-          >
+          <div id="login-success" class="login-success" role="status" aria-live="polite" hidden>
             <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
             <span id="login-success-text">Acceso correcto. Redirigiendo…</span>
           </div>
 
-          <!-- Botón de submit -->
+          <!-- Botón principal -->
           <button type="submit" class="btn-login">
-            <span id="btn-login-text">Autenticar Acceso</span>
+            <span id="btn-login-text">Iniciar sesión</span>
             <span class="btn-login-shine" aria-hidden="true"></span>
           </button>
 
         </form>
-        <!-- /login-form -->
 
-        <!-- Enlace de registro -->
+        <!-- Enlace a registro -->
         <div class="login-register-link">
-          <p>¿No tienes cuenta institucional? <a href="../signup/signup.php">Crea una</a></p>
+          <p>¿No tienes cuenta? <a href="../signup/signup.php">Crea una aquí</a></p>
         </div>
 
       </div>
-      <!-- /login-form-wrapper -->
-
-      <!-- Footer simplificado -->
-      <footer class="login-footer-simple" role="contentinfo">
-        <p class="footer-copyright">© 2024 AppJoteca · Sistema de Biblioteca Institucional</p>
-        <nav class="login-footer-links" aria-label="Enlaces legales">
-          <a href="#">Política de Privacidad</a>
-          <a href="#">Términos de Uso</a>
-        </nav>
-      </footer>
-
     </section>
-    <!-- /login-form-panel -->
 
-    <!-- ── Panel visual (imagen de biblioteca) — oculto en móvil, visible en desktop (DERECHA, STICKY) ── -->
-    <section class="login-visual" aria-hidden="true">
+    <!-- ── Panel visual ── -->
+    <aside class="login-visual" aria-hidden="true">
       <div class="login-visual-overlay"></div>
       <img
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh90-d0HDfPWjO0zWZSjQ37GedrEaIhx7jonR6q6mbV7J8HIq_-ZVZtBVC630JozQkh5qqcwdxpcoek36JrW2hs-rGgvXudQRN4T3cToBlyemRpSTd5ZNcxDn7Sr7nX6qD6oZGxXi3uEFa3dd9wgceURUteG5XPQiC93aQ1i4vwsN8kBvshVOYsz6ult6OvyPPe9YaUsVDzmEBplHHrVbv3av82bb-VHpDcvEaO7j3CNba79tbCVsbxYakDTBaqdUknb1XKqaBRtrw"
-        alt="Biblioteca clásica con estanterías de madera y luz cálida dorada"
+        src="../../assets/images/headers/auth.png"
+        alt=""
         class="login-visual-img"
         loading="eager"
       >
       <div class="login-visual-content">
-        <div>
-          <h1 class="login-brand-name">Appjoteca</h1>
+        <div class="login-visual-top">
+          <h2 class="login-brand-name">Appjoteca</h2>
         </div>
-        <div>
-          <h2 class="login-visual-title">La puerta a los archivos de la institución.</h2>
+        <div class="login-visual-mid">
+          <h3 class="login-visual-title">La puerta a los<br><span class="italic">archivos</span> de la institución.</h3>
           <p class="login-visual-subtitle">
-            Entra al espacio curado donde siglos de conocimiento se encuentran con la accesibilidad moderna. Tu legado digital comienza aquí.
+            Entra al espacio curado donde el conocimiento institucional se encuentra con la accesibilidad moderna.
           </p>
+          <ul class="login-visual-features">
+            <li><span class="material-symbols-outlined">bolt</span> Acceso inmediato</li>
+            <li><span class="material-symbols-outlined">auto_stories</span> Catálogo completo</li>
+            <li><span class="material-symbols-outlined">shield_lock</span> Sesión cifrada</li>
+          </ul>
         </div>
-        <div class="login-visual-meta" aria-hidden="true">
-          <span>Experiencia Curada</span>
+        <div class="login-visual-meta">
+          <span>Acceso institucional</span>
           <span class="login-visual-sep"></span>
-          <span>Grado Institucional</span>
+          <span>Sesión segura</span>
         </div>
       </div>
-    </section>
+    </aside>
 
   </main>
-  <!-- /login-shell -->
 
   <script src="login.js"></script>
+  
 </body>
 </html>
