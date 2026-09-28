@@ -1,93 +1,85 @@
 <?php
+// back.php - Endpoint del catálogo público
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 0);
+ini_set('display_errors', 0);          // No mostrar errores en pantalla (rompe el JSON)
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../config/auth.php';
-require_once __DIR__ . '/../Database/conexion.php';
+try {
+    // Cambia estas rutas si tu estructura es distinta
+    require_once __DIR__ . '/../../../backend/config/auth.php';
+    require_once __DIR__ . '/../../../backend/Database/conexion.php';
+    require_once __DIR__ . '/../../../backend/models/libro.php';
 
-// Verificar autenticación del usuario
-$mi_id = $_SESSION['usuario_id'] ?? null;
+    // Verificar sesión
+    $mi_id = $_SESSION['usuario_id'] ?? null;
 
-if (!$mi_id) {
+    if (!$mi_id) {
+        echo json_encode([
+            'exito'   => false,
+            'mensaje' => 'Sesión no autorizada'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!isset($connection) || !$connection) {
+        throw new Exception('No se pudo establecer la conexión a la base de datos');
+    }
+
+    $modelo = new libro($connection);
+
+    // Parámetros
+    $page      = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $materiaId = isset($_GET['materia']) ? (int)$_GET['materia'] : 0;
+    $busqueda  = trim($_GET['query'] ?? '');
+    $limite    = 10;
+
+    // Listado paginado del modelo
+    $resultado = $modelo->listarLibrosPaginado(
+        $page,
+        $limite,
+        '',             
+        $materiaId,
+        'date-desc',
+        $busqueda
+    );
+
+    // Materias (categorías)
+    $catalogos = $modelo->obtenerCatalogos();
+    $materias  = $catalogos['materias'] ?? [];
+
+    // Formatear libros para el frontend
+    $librosFormateados = [];
+    foreach ($resultado['libros'] as $libro) {
+        $librosFormateados[] = [
+            'id'          => (int) $libro['id_libro'],
+            'titulo'      => $libro['titulo'] ?? '',
+            'autor'       => $libro['autores'] ?? 'Sin autor',
+            'portada'     => $libro['portada'] ?? '',
+            'categoria'   => $libro['materia'] ?? 'Sin materia',
+            'isbn'        => $libro['isbn'] ?? '',
+            'disponibles' => (int) ($libro['disponibles'] ?? 0),
+            'total'       => (int) ($libro['total_ejemplares'] ?? 0),
+        ];
+    }
+
     echo json_encode([
-        'exito' => false,
-        'mensaje' => 'Sesión no autorizada'
-    ]);
-    exit;
+        'exito'        => true,
+        'paginaActual' => $resultado['pagina'],
+        'totalPaginas' => $resultado['total_paginas'],
+        'totalLibros'  => $resultado['total'],
+        'libros'       => $librosFormateados,
+        'materias'     => $materias
+    ], JSON_UNESCAPED_UNICODE);
+
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'exito'   => false,
+        'mensaje' => 'Error en el servidor: ' . $e->getMessage(),
+        'archivo' => $e->getFile(),
+        'linea'   => $e->getLine()
+    ], JSON_UNESCAPED_UNICODE);
 }
-
-// Lectura de parámetros GET
-$page      = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$categoria = trim($_GET['categoria'] ?? 'General');
-$busqueda  = trim($_GET['query'] ?? '');
-$limite    = 10;
-$offset    = ($page - 1) * $limite;
-
-// Construcción de condiciones SQL dinámicas
-$condiciones = [];
-$tipos       = "";
-$valores     = [];
-
-if (!empty($categoria) && strcasecmp($categoria, 'General') !== 0) {
-    $condiciones[] = "categoria = ?";
-    $tipos        .= "s";
-    $valores[]     = $categoria;
-}
-
-if (!empty($busqueda)) {
-    $condiciones[] = "(titulo LIKE ? OR autor LIKE ? OR isbn LIKE ?)";
-    $tipos        .= "sss";
-    $termino       = "%{$busqueda}%";
-    $valores[]     = $termino;
-    $valores[]     = $termino;
-    $valores[]     = $termino;
-}
-
-$whereSql = !empty($condiciones) ? "WHERE " . implode(" AND ", $condiciones) : "";
-
-// 1. Obtener el total de libros para la paginación
-$sqlCount = "SELECT COUNT(*) AS total FROM libros {$whereSql}";
-$stmtCount = $connection->prepare($sqlCount);
-
-if (!empty($valores)) {
-    $stmtCount->bind_param($tipos, ...$valores);
-}
-
-$stmtCount->execute();
-$resCount    = $stmtCount->get_result()->fetch_assoc();
-$totalLibros = (int)($resCount['total'] ?? 0);
-$totalPaginas = max(1, (int)ceil($totalLibros / $limite));
-
-// 2. Consulta de libros paginados
-$sqlLibros = "SELECT id, titulo, autor, portada, categoria, isbn 
-              FROM libros 
-              {$whereSql} 
-              ORDER BY id DESC 
-              LIMIT ? OFFSET ?";
-
-$stmtLibros = $connection->prepare($sqlLibros);
-
-$tiposPaginados   = $tipos . "ii";
-$valoresPaginados = array_merge($valores, [$limite, $offset]);
-
-$stmtLibros->bind_param($tiposPaginados, ...$valoresPaginados);
-$stmtLibros->execute();
-$resultado = $stmtLibros->get_result();
-
-$libros = [];
-while ($row = $resultado->fetch_assoc()) {
-    $libros[] = $row;
-}
-
-echo json_encode([
-    'exito'        => true,
-    'paginaActual' => $page,
-    'totalPaginas' => $totalPaginas,
-    'totalLibros'  => $totalLibros,
-    'libros'       => $libros
-], JSON_UNESCAPED_UNICODE);
-exit;

@@ -1,83 +1,168 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Estado global del catálogo
     const estado = {
         paginaActual: 1,
-        categoriaActual: 'General',
+        materiaId: 0,          // 0 = todas las materias
+        materiaNombre: 'General',
         busqueda: '',
         debounceTimer: null
     };
 
-    const gridContainer = document.getElementById('bookshelf-grid');
-    const paginationContainer = document.querySelector('.pagination-container');
-    const searchInputs = document.querySelectorAll('.catalog-search-input');
-    const filterChips = document.querySelectorAll('.filter-chip');
+    // 2. Referencias DOM
+    const gridContainer = document.getElementById('bookshelf-grid') || document.querySelector('main section.grid, main .bookshelf-grid');
+    const paginationContainer = document.querySelector('.pagination-container') || document.querySelector('footer');
+    const searchInputs = document.querySelectorAll('.catalog-search-input, input[placeholder*="Buscar"]');
+    const filterContainer = document.querySelector('.filter-categories') || document.querySelector('section.filter-categories');
 
     inicializar();
 
     function inicializar() {
+        if (!gridContainer) {
+            console.error('No se encontró el contenedor de la cuadrícula de libros (#bookshelf-grid).');
+            return;
+        }
         cargarLibros();
         registrarEventos();
     }
 
+    // 3. Petición al backend
     async function cargarLibros() {
         mostrarCargando();
 
         try {
             const params = new URLSearchParams({
                 page: estado.paginaActual,
-                categoria: estado.categoriaActual,
+                materia: estado.materiaId,
                 query: estado.busqueda
             });
 
             const response = await fetch(`back.php?${params.toString()}`);
+
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+
             const data = await response.json();
 
             if (data.exito) {
+                if (data.materias && Array.isArray(data.materias)) {
+                    renderizarMaterias(data.materias);
+                }
                 renderizarTarjetas(data.libros);
                 renderizarPaginacion(data.totalPaginas, data.paginaActual);
             } else {
-                mostrarError(data.mensaje || 'Error al obtener los datos.');
+                mostrarMensajeVacio(data.mensaje || 'No se encontraron libros.');
             }
         } catch (error) {
-            console.error('Error:', error);
-            mostrarError('No se pudo conectar con el servidor.');
+            console.error('Error al cargar libros:', error);
+            mostrarMensajeVacio('No se pudo conectar con el servidor. Inténtalo de nuevo más tarde.');
         }
     }
 
+    // 4. Chips de materias (categorías) desde la BD
+    function renderizarMaterias(materias) {
+        if (!filterContainer) return;
+        if (filterContainer.dataset.loaded === 'true') return;
+
+        filterContainer.innerHTML = '';
+
+        // Chip "General" (todas)
+        const btnGeneral = crearChipMateria(0, 'General');
+        filterContainer.appendChild(btnGeneral);
+
+        materias.forEach(m => {
+            const btn = crearChipMateria(m.id, m.nombre);
+            filterContainer.appendChild(btn);
+        });
+
+        filterContainer.dataset.loaded = 'true';
+    }
+
+    function crearChipMateria(id, nombre) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filter-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all';
+        btn.dataset.id = id;
+        btn.textContent = nombre;
+
+        if (Number(id) === Number(estado.materiaId)) {
+            btn.classList.add('active', 'bg-primary', 'text-on-primary');
+        } else {
+            btn.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+        }
+
+        btn.addEventListener('click', () => {
+            // Quitar activo de todos
+            filterContainer.querySelectorAll('button').forEach(c => {
+                c.classList.remove('active', 'bg-primary', 'text-on-primary');
+                c.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+            });
+
+            btn.classList.add('active', 'bg-primary', 'text-on-primary');
+            btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+
+            estado.materiaId = Number(id);
+            estado.materiaNombre = nombre;
+            estado.paginaActual = 1;
+            cargarLibros();
+        });
+
+        return btn;
+    }
+
+    // 5. Tarjetas de libros
     function renderizarTarjetas(libros) {
         gridContainer.innerHTML = '';
 
         if (!libros || libros.length === 0) {
-            gridContainer.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #888;">
-                    <p style="font-size: 1.125rem;">No se encontraron libros disponibles.</p>
-                </div>`;
+            mostrarMensajeVacio('No hay libros disponibles en esta categoría.');
             return;
         }
 
         const fragmento = document.createDocumentFragment();
 
         libros.forEach(libro => {
-            const card = document.createElement('article');
-            card.className = 'catalog-book-card';
+            const card = document.createElement('div');
+            card.className = 'group cursor-pointer catalog-book-card flex flex-col';
             card.dataset.id = libro.id;
 
-            const rutaPortada = libro.portada && libro.portada.trim() !== ''
-                ? `../../${libro.portada}`
-                : '../../assets/images/default-cover.jpg';
+            // Ruta de portada (compatible con tu estructura de uploads)
+            let rutaPortada = '../../assets/images/default-cover.jpg';
+            if (libro.portada && libro.portada.trim() !== '') {
+                if (libro.portada.startsWith('http')) {
+                    rutaPortada = libro.portada;
+                } else if (libro.portada.startsWith('uploads/')) {
+                    rutaPortada = '../../' + libro.portada;
+                } else if (libro.portada.startsWith('assets/')) {
+                    rutaPortada = '../../' + libro.portada;
+                } else {
+                    rutaPortada = '../../' + libro.portada;
+                }
+            }
 
             card.innerHTML = `
-                <div class="book-cover-wrap">
-                    <img src="${escapar(rutaPortada)}" alt="${escapar(libro.titulo)}" loading="lazy">
-                    <div class="book-hover-overlay">
-                        <span class="overlay-action">Ver Detalles</span>
+                <div class="relative aspect-[2/3] mb-4 overflow-hidden rounded-lg book-glow book-cover-wrap">
+                    <img 
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        src="${escaparHTML(rutaPortada)}" 
+                        alt="${escaparHTML(libro.titulo)}" 
+                        loading="lazy"
+                        onerror="this.onerror=null; this.src='../../assets/images/default-cover.jpg';"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 book-hover-overlay">
+                        <span class="text-primary font-bold text-xs tracking-widest uppercase overlay-action">Ver Detalles</span>
                     </div>
                 </div>
-                <h3 class="book-title">${escapar(libro.titulo)}</h3>
-                <p class="book-author">${escapar(libro.autor)}</p>
+                <h3 class="font-headline text-lg font-bold text-on-surface group-hover:text-primary transition-colors book-title line-clamp-2">
+                    ${escaparHTML(libro.titulo)}
+                </h3>
+                <p class="font-body text-xs text-neutral-500 mt-1 uppercase tracking-tighter book-author">
+                    ${escaparHTML(libro.autor)}
+                </p>
             `;
 
             card.addEventListener('click', () => {
-                window.location.href = `../detalle-libro/index.php?id=${libro.id}`;
+                window.location.href = `../vista-libro/book-view.php?id=${libro.id}`;
             });
 
             fragmento.appendChild(card);
@@ -86,37 +171,46 @@ document.addEventListener('DOMContentLoaded', () => {
         gridContainer.appendChild(fragmento);
     }
 
+    // 6. Paginación
     function renderizarPaginacion(totalPaginas, paginaActual) {
-        if (!paginationContainer || totalPaginas <= 1) {
-            if (paginationContainer) paginationContainer.innerHTML = '';
+        if (!paginationContainer) return;
+
+        if (totalPaginas <= 1) {
+            paginationContainer.innerHTML = '';
             return;
         }
 
         let html = `
-            <button class="page-btn page-nav" id="btn-prev" ${paginaActual === 1 ? 'disabled' : ''}>
-                <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-            <div class="page-numbers">`;
+            <div class="flex items-center justify-center gap-2 mt-12 w-full">
+                <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface hover:bg-primary/10 hover:border-primary/50 transition-all ${paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}" id="btn-prev" ${paginaActual === 1 ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="flex gap-2 page-numbers">`;
 
         for (let i = 1; i <= totalPaginas; i++) {
             if (i === 1 || i === totalPaginas || (i >= paginaActual - 1 && i <= paginaActual + 1)) {
-                html += `<button class="page-btn ${i === paginaActual ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                const esActiva = i === paginaActual;
+                html += `
+                    <button class="w-10 h-10 flex items-center justify-center rounded-lg ${esActiva ? 'bg-primary text-on-primary font-bold' : 'border border-outline-variant/20 text-on-surface hover:bg-surface-container'} transition-all" data-page="${i}">
+                        ${i}
+                    </button>`;
             } else if (i === paginaActual - 2 || i === paginaActual + 2) {
-                html += `<span class="page-ellipsis">...</span>`;
+                html += `<span class="w-8 h-10 flex items-center justify-center text-neutral-500">...</span>`;
             }
         }
 
         html += `
-            </div>
-            <button class="page-btn page-nav" id="btn-next" ${paginaActual === totalPaginas ? 'disabled' : ''}>
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>`;
+                </div>
+                <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface hover:bg-primary/10 hover:border-primary/50 transition-all ${paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}" id="btn-next" ${paginaActual === totalPaginas ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>`;
 
         paginationContainer.innerHTML = html;
 
-        paginationContainer.querySelectorAll('.page-numbers .page-btn').forEach(btn => {
+        paginationContainer.querySelectorAll('.page-numbers button[data-page]').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                estado.paginaActual = parseInt(e.target.dataset.page);
+                estado.paginaActual = parseInt(e.currentTarget.dataset.page);
                 cargarLibros();
             });
         });
@@ -139,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // 7. Eventos de búsqueda
     function registrarEventos() {
         searchInputs.forEach(input => {
             input.addEventListener('input', (e) => {
@@ -150,39 +245,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             });
         });
-
-        filterChips.forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                filterChips.forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-
-                estado.categoriaActual = e.target.textContent.trim();
-                estado.paginaActual = 1;
-                cargarLibros();
-            });
-        });
     }
 
+    // 8. UI estados
     function mostrarCargando() {
         gridContainer.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 0;">
-                <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--primary);">progress_activity</span>
+            <div class="col-span-full flex justify-center items-center py-20 text-primary">
+                <span class="material-symbols-outlined animate-spin text-5xl">progress_activity</span>
             </div>`;
     }
 
-    function mostrarError(msg) {
+    function mostrarMensajeVacio(mensaje) {
         gridContainer.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #ff6b6b;">
-                <p>${escapar(msg)}</p>
+            <div class="col-span-full text-center py-16 text-neutral-400">
+                <span class="material-symbols-outlined text-4xl mb-2 opacity-60">menu_book</span>
+                <p class="text-base font-medium">${escaparHTML(mensaje)}</p>
             </div>`;
     }
 
-    function escapar(cadena) {
+    // 9. Sanitización XSS
+    function escaparHTML(cadena) {
         if (!cadena) return '';
         return String(cadena)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
-            .replace/>/g, '&gt;')
+            .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }

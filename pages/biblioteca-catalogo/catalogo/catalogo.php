@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../backend/config/auth.php';
-require_once __DIR__ . '/../../backend/config/user_context.php';
+require_once __DIR__ . '/../../../backend/config/auth.php';
+require_once __DIR__ . '/../../../backend/config/user_context.php';
 
 requiereRol([1, 2]);
 ?>
@@ -19,10 +19,10 @@ requiereRol([1, 2]);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Estilos compartidos y de componentes -->
-    <link rel="stylesheet" href="../../shared/css/theme.css">
-    <link rel="stylesheet" href="../../shared/css/components/notifications.css">
-    <link rel="stylesheet" href="../../shared/css/components/navbar.css">
-    <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../../shared/css/theme.css">
+    <link rel="stylesheet" href="../../../shared/css/components/notifications.css">
+    <link rel="stylesheet" href="../../../shared/css/components/navbar.css">
+    <link rel="stylesheet" href="../../../shared/css/components/footer.css">
     <link rel="stylesheet" href="../../shared/css/components/book-card.css">
 
     <!-- Estilos específicos de la página -->
@@ -34,8 +34,8 @@ requiereRol([1, 2]);
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
     <!-- NOTIFICACIONES Y MENÚS SHARED -->
-    <?php include '../../shared/layouts/notifications.php'; ?>
-    <?php include '../../shared/layouts/menu-off-canvas.php'; ?>
+    <?php include '../../../shared/layouts/notifications.php'; ?>
+    <?php include '../../../shared/layouts/menu-off-canvas.php'; ?>
 
     <!-- BARRA DE NAVEGACIÓN PRINCIPAL -->
     <header class="topbar" role="banner">
@@ -72,7 +72,7 @@ requiereRol([1, 2]);
     </header>
 
     <!-- MENÚ MÓVIL -->
-    <?php include '../../shared/layouts/menu-movil.php'; ?>
+    <?php include '../../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL DEL CATÁLOGO -->
     <main class="catalog-main">
@@ -111,12 +111,12 @@ requiereRol([1, 2]);
     </main>
 
     <!-- FOOTER -->
-    <?php include '../../shared/layouts/footer.php'; ?>
+    <?php include '../../../shared/layouts/footer.php'; ?>
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../../shared/js/components/navbar.js"></script>
-    <script src="../../shared/js/global.js"></script>
+    <script src="../../../shared/js/components/navbar.js"></script>
+    <script src="../../../shared/js/global.js"></script>
     <script src="catalogo.js"></script>
 </body>
 </html>
