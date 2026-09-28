@@ -11,18 +11,13 @@ require_once __DIR__ . '/../config/verify-csrf.php';
 
 header('Content-Type: application/json');
 
-$rol_recibido = $_POST['rol'] ?? '';
+$rol_recibido = 1;
 
 $tabla_roles = [
     'estudiante'    => 1,
     'profesor'      => 2,
     'bibliotecario' => 3
 ];
-
-if (!array_key_exists($rol_recibido, $tabla_roles)) {
-    echo json_encode(['status' => 'error', 'message' => 'El rol seleccionado no es válido.']);
-    exit;
-}
 
 $id_rol = $tabla_roles[$rol_recibido];
 

@@ -40,6 +40,10 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
     </div>
   </header>
 
+  <a href="../../index.php" class="fab-home" aria-label="Volver al inicio" title="Inicio">
+  <span class="material-symbols-outlined">home</span>
+  </a>
+
   <main class="signup-shell" role="main">
 
     <!-- ══ PANEL FORMULARIO ══ -->
@@ -124,40 +128,6 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
           <!-- ══ PASO 2 ══ -->
           <fieldset class="step-panel" data-step="2">
 
-            <div class="role-selector" role="group" aria-labelledby="role-label">
-              <p class="role-selector-label" id="role-label">Tipo de acceso</p>
-              <div class="role-grid" role="radiogroup" aria-labelledby="role-label">
-
-                <label class="role-card" title="Estudiante">
-                  <input type="radio" name="rol" value="estudiante" class="role-radio"
-                         checked aria-label="Estudiante" form="signup-form">
-                  <div class="role-card-inner">
-                    <span class="material-symbols-outlined role-icon">school</span>
-                    <span class="role-name">Estudiante</span>
-                  </div>
-                </label>
-
-                <label class="role-card" title="Profesor">
-                  <input type="radio" name="rol" value="profesor" class="role-radio"
-                         aria-label="Profesor" form="signup-form">
-                  <div class="role-card-inner">
-                    <span class="material-symbols-outlined role-icon">history_edu</span>
-                    <span class="role-name">Profesor</span>
-                  </div>
-                </label>
-
-                <label class="role-card" title="Bibliotecario">
-                  <input type="radio" name="rol" value="bibliotecario" class="role-radio"
-                         aria-label="Bibliotecario" form="signup-form">
-                  <div class="role-card-inner">
-                    <span class="material-symbols-outlined role-icon">local_library</span>
-                    <span class="role-name">Bibliotecario</span>
-                  </div>
-                </label>
-
-              </div>
-            </div>
-
             <div class="field-group">
               <label class="field-label" for="usuario">Nombre de usuario <span class="required-mark">*</span></label>
               <div class="field-wrapper">
@@ -165,7 +135,12 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
                 <input type="text" id="usuario" name="usuario" class="field-input"
                        placeholder="juan.perez" autocomplete="username"
                        required minlength="3" maxlength="30" pattern="[a-zA-Z0-9._\-]+"">
+              
               </div>
+                                    <!-- Bajo el input de usuario -->
+                                    <p class="field-hint">
+                Solo letras, números, punto (.), guión (-) y guión bajo (_). Mínimo 3 caracteres.
+              </p>
             </div>
 
             <div class="field-group">
@@ -174,7 +149,13 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
                 <span class="material-symbols-outlined field-icon">mail</span>
                 <input type="email" id="email" name="email" class="field-input"
                        placeholder="juan.perez@institucion.edu" autocomplete="email" required>
+
+                
               </div>
+              <p class="field-hint">
+                Debe ser un correo institucional (.edu, .edu.co, .ac, .gob…).
+              </p>
+              
             </div>
 
             <div class="field-group">
@@ -183,11 +164,28 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
                 <span class="material-symbols-outlined field-icon">lock</span>
                 <input type="password" id="contrasena" name="contrasena" class="field-input"
                        placeholder="••••••••" autocomplete="new-password" required minlength="8">
+
+                       
                 <button type="button" class="field-toggle-pass" id="toggle-pass" aria-label="Mostrar u ocultar contraseña">
                   <span class="material-symbols-outlined" id="toggle-pass-icon">visibility</span>
                 </button>
+
+                
+                
               </div>
+                              <!-- Después del input de contraseña -->
+                              <div class="password-strength" id="passwordStrength">
+                  <div class="strength-track">
+                    <div class="strength-bar" id="strengthBar"></div>
+                  </div>
+                  <span class="strength-text" id="strengthText">Fortaleza: <em>Débil</em></span>
+                </div>
+              <p class="field-hint">
+                  Mínimo 8 caracteres, al menos una mayúscula y un número. Un símbolo la hace más fuerte.
+                </p>
             </div>
+
+            
 
             <div class="field-group">
               <label class="field-label" for="contrasena2">Confirmar contraseña <span class="required-mark">*</span></label>
@@ -198,7 +196,10 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
                 <button type="button" class="field-toggle-pass" id="toggle-pass2" aria-label="Mostrar u ocultar contraseña">
                   <span class="material-symbols-outlined" id="toggle-pass2-icon">visibility</span>
                 </button>
+
+                
               </div>
+              <span class="match-hint" id="matchHint"></span>
             </div>
 
           </fieldset>

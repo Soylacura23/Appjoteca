@@ -2,31 +2,36 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
     // ── Referencias ──
-    const avatarInput    = document.getElementById('avatarInput');
-    const avatarEditBtn  = document.getElementById('avatarEditBtn');
-    const avatarImg      = document.getElementById('profileAvatarImg');
+    const avatarInput       = document.getElementById('avatarInput');
+    const avatarEditBtn     = document.getElementById('avatarEditBtn');
+    const avatarImg         = document.getElementById('profileAvatarImg');
+    const previewConfirmBtn = document.getElementById('previewConfirmBtn');
+    const deletePhotoBtn    = document.getElementById('deletePhotoBtn');
 
-    const usernameInput  = document.getElementById('usernameInput');
-    const saveUserBtn    = document.getElementById('saveUsernameBtn');
+    const usernameInput   = document.getElementById('usernameInput');
+    const saveUsernameBtn = document.getElementById('saveUsernameBtn');
 
     const idPreview      = document.getElementById('idDocPreview');
-    const idImg          = document.getElementById('idDocImage');
     const idOverlay      = document.getElementById('idDocOverlay');
-    const idOverlayImg   = document.getElementById('idDocOverlayImg');
     const idOverlayClose = document.getElementById('idDocOverlayClose');
-    const idInput        = document.getElementById('idDocInput');
 
-    const newPass        = document.getElementById('newPassword');
-    const confirmPass    = document.getElementById('confirmPassword');
-    const strengthBar    = document.getElementById('strengthBar');
-    const strengthText   = document.getElementById('strengthText');
-    const matchHint      = document.getElementById('matchHint');
-    const updatePassBtn  = document.getElementById('updatePasswordBtn');
+    const currentPass   = document.getElementById('currentPassword');
+    const newPass       = document.getElementById('newPassword');
+    const confirmPass   = document.getElementById('confirmPassword');
+    const strengthBar   = document.getElementById('strengthBar');
+    const strengthText  = document.getElementById('strengthText');
+    const matchHint     = document.getElementById('matchHint');
+    const updatePassBtn = document.getElementById('updatePasswordBtn');
 
-    const requestBtns    = document.querySelectorAll('[data-request]');
-    const deleteBtn      = document.getElementById('deleteAccountBtn');
+    const requestBtns      = document.querySelectorAll('[data-request]');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 
-    // Helper para alertas
+    let fotoOriginal = avatarImg ? avatarImg.src : '';
+    let archivoPendiente = null;
+
+    const ENDPOINT = '../../backend/settings/configuracion-back.php';
+
+    // ── Helpers ──
     function alerta(icon, title, text) {
         Swal.fire({
             icon: icon,
@@ -38,298 +43,432 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════════════
-    // 1. Cambiar foto de perfil
-    // ════════════════════════════════════════════
-    avatarEditBtn.addEventListener('click', () => avatarInput.click());
-
-    avatarInput.addEventListener('change', function () {
-        const archivo = this.files[0];
-        if (!archivo) return;
-
-        avatarImg.src = URL.createObjectURL(archivo);
-
-        const datos = new FormData();
-        datos.append('accion', 'cambiar_foto');
-        datos.append('nueva_foto', archivo);
-        datos.append('csrf_token', window.getCSRFToken());
-
-        fetch('../../backend/settings/configuracion-back.php', {
-            method: 'POST',
-            body: datos
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alerta('success', 'Foto de perfil cambiada', data.message);
-            } else {
-                alerta('error', 'Error', data.message);
-            }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alerta('error', 'Error del servidor', 'No se pudo procesar la respuesta');
-        });
-    });
-
-
-    // ════════════════════════════════════════════
-    // 2. Guardar nombre de usuario
-    // ════════════════════════════════════════════
-    saveUserBtn.addEventListener('click', function () {
-        const nuevo = usernameInput.value.trim();
-
-        if (!nuevo) {
-            alerta('warning', 'Campo vacío', 'El nombre de usuario no puede estar vacío');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('update_username', '1');
-        formData.append('username', nuevo);
-        formData.append('csrf_token', window.getCSRFToken());
-
-        fetch('../../backend/settings/configuracion-back.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alerta('success', 'Nombre actualizado', data.message);
-                document.getElementById('displayUsername').textContent = nuevo;
-            } else {
-                alerta('error', 'Error', data.message);
-            }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alerta('error', 'Error de red', 'No se pudo actualizar el nombre');
-        });
-    });
-
-
-    // ════════════════════════════════════════════
-    // 3. Documento ID — modal y overlay
-    // ════════════════════════════════════════════
-    idPreview.addEventListener('click', function (e) {
-        if (e.target.closest('#idDocChangeBtn')) return;
-
-        Swal.fire({
-            title: '¿Visualizar documento?',
-            text: '¿Estás seguro de que deseas visualizar tu foto de documento de identidad? Es información personal privada.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Visualizar',
-            cancelButtonText: 'Volver',
-            reverseButtons: true,
-            background: '#121212',
-            color: '#e2e2e2',
-            iconColor: '#f2ca50',
-            confirmButtonColor: '#f2ca50',
-            cancelButtonColor: 'rgba(255,255,255,0.1)'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                idOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        });
-    });
-
-    function closeOverlay() {
-        idOverlay.classList.remove('active');
-        document.body.style.overflow = '';
+    function getToken() {
+        return window.getCSRFToken
+            ? window.getCSRFToken()
+            : (document.querySelector('meta[name="csrf-token"]')?.content || '');
     }
 
-    idOverlayClose.addEventListener('click', closeOverlay);
-    idOverlay.addEventListener('click', e => { if (e.target === idOverlay) closeOverlay(); });
+    // ════════════════════════════════════
+    // 1. Foto de perfil (preview + confirmar + eliminar)
+    // ════════════════════════════════════
+    if (avatarEditBtn && avatarInput) {
+        avatarEditBtn.addEventListener('click', function () {
+            avatarInput.click();
+        });
 
-    idInput.addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-            idImg.src = e.target.result;
-            idOverlayImg.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
+        avatarInput.addEventListener('change', function () {
+            const archivo = this.files[0];
+            if (!archivo) return;
 
+            archivoPendiente = archivo;
+            avatarImg.src = URL.createObjectURL(archivo);
 
-    // ════════════════════════════════════════════
+            if (previewConfirmBtn) {
+                previewConfirmBtn.style.display = 'inline-flex';
+            }
+        });
+    }
+
+    if (previewConfirmBtn) {
+        previewConfirmBtn.addEventListener('click', function () {
+            if (!archivoPendiente) return;
+
+            const datos = new FormData();
+            datos.append('accion', 'cambiar_foto');
+            datos.append('nueva_foto', archivoPendiente);
+            datos.append('csrf_token', getToken());
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                body: datos
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    alerta('success', 'Foto actualizada', data.message);
+                    fotoOriginal = avatarImg.src;
+                    archivoPendiente = null;
+                    previewConfirmBtn.style.display = 'none';
+                    if (avatarInput) avatarInput.value = '';
+                } else {
+                    alerta('error', 'Error', data.message);
+                    avatarImg.src = fotoOriginal;
+                    archivoPendiente = null;
+                    previewConfirmBtn.style.display = 'none';
+                }
+            })
+            .catch(function (err) {
+                console.error(err);
+                alerta('error', 'Error de red', 'No se pudo subir la foto');
+                avatarImg.src = fotoOriginal;
+                archivoPendiente = null;
+                previewConfirmBtn.style.display = 'none';
+            });
+        });
+    }
+
+    if (deletePhotoBtn) {
+        deletePhotoBtn.addEventListener('click', function () {
+            Swal.fire({
+                title: '¿Eliminar foto?',
+                text: 'Se quitará tu foto de perfil y volverá a la predeterminada.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                background: '#121212',
+                color: '#e2e2e2',
+                confirmButtonColor: '#ffb4ab',
+                cancelButtonColor: 'rgba(255,255,255,0.1)'
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+
+                const datos = new FormData();
+                datos.append('accion', 'eliminar_foto');
+                datos.append('csrf_token', getToken());
+
+                fetch(ENDPOINT, {
+                    method: 'POST',
+                    body: datos
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        alerta('success', 'Listo', data.message);
+                        avatarImg.src = '/Appjoteca/assets/images/default-avatar.png';
+                        fotoOriginal = avatarImg.src;
+                    } else {
+                        alerta('error', 'Error', data.message);
+                    }
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    alerta('error', 'Error de red', 'No se pudo eliminar la foto');
+                });
+            });
+        });
+    }
+
+    // ════════════════════════════════════
+    // 2. Guardar nombre de usuario
+    // ════════════════════════════════════
+    if (saveUsernameBtn) {
+        saveUsernameBtn.addEventListener('click', function () {
+            const nuevo = usernameInput.value.trim();
+
+            if (!nuevo) {
+                alerta('warning', 'Campo vacío', 'El nombre de usuario no puede estar vacío');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('accion', 'update_username');
+            formData.append('username', nuevo);
+            formData.append('csrf_token', getToken());
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    alerta('success', 'Nombre actualizado', data.message);
+                    const display = document.getElementById('displayUsername');
+                    if (display) display.textContent = nuevo;
+                } else {
+                    alerta('error', 'Error', data.message);
+                }
+            })
+            .catch(function (err) {
+                console.error(err);
+                alerta('error', 'Error de red', 'No se pudo actualizar el nombre');
+            });
+        });
+    }
+
+    // ════════════════════════════════════
+    // 3. Documento ID — overlay
+    // ════════════════════════════════════
+    if (idPreview && idOverlay) {
+        idPreview.addEventListener('click', function () {
+            Swal.fire({
+                title: '¿Visualizar documento?',
+                text: '¿Estás seguro de que deseas visualizar tu foto de documento de identidad? Es información personal privada.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Visualizar',
+                cancelButtonText: 'Volver',
+                reverseButtons: true,
+                background: '#121212',
+                color: '#e2e2e2',
+                iconColor: '#f2ca50',
+                confirmButtonColor: '#f2ca50',
+                cancelButtonColor: 'rgba(255,255,255,0.1)'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    idOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+        });
+
+        function closeOverlay() {
+            idOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (idOverlayClose) {
+            idOverlayClose.addEventListener('click', closeOverlay);
+        }
+
+        idOverlay.addEventListener('click', function (e) {
+            if (e.target === idOverlay) closeOverlay();
+        });
+    }
+
+    // ════════════════════════════════════
     // 4. Mostrar / ocultar contraseñas
-    // ════════════════════════════════════════════
-    document.querySelectorAll('.toggle-password').forEach(btn => {
+    // ════════════════════════════════════
+    document.querySelectorAll('.toggle-password').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const input = document.getElementById(this.dataset.target);
             const icon  = this.querySelector('.material-symbols-outlined');
-            input.type  = input.type === 'password' ? 'text' : 'password';
-            icon.textContent = input.type === 'password' ? 'visibility_off' : 'visibility';
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
         });
     });
 
+    // ════════════════════════════════════
+    // 5. Fortaleza de contraseña
+    // ════════════════════════════════════
+    if (newPass) {
+        newPass.addEventListener('input', function () {
+            const v = this.value;
+            let puntos = 0;
 
-    // ════════════════════════════
-    // 5. Fortaleza de contraseña 
-    // ════════════════════════════
-    newPass.addEventListener('input', function () {
-        const v = this.value;
-        let s = 0;
-        if (v.length >= 8) s++;
-        if (/[A-Z]/.test(v)) s++;
-        if (/[0-9]/.test(v)) s++;
-        if (/[^A-Za-z0-9]/.test(v)) s++;
+            if (v.length >= 8) puntos++;
+            if (/[A-Z]/.test(v)) puntos++;
+            if (/[0-9]/.test(v)) puntos++;
+            if (/[^A-Za-z0-9]/.test(v)) puntos++;
 
-        if (v.length === 0) {
-            strengthBar.style.width = '0%';
-            strengthBar.className = 'strength-bar';
-            strengthText.innerHTML = 'Fortaleza: <em>Débil</em>';
-            return;
-        }
-
-        let label = 'Débil', color = '#ffb4ab', cls = 'weak';
-        if (s >= 4)       { label = 'Fuerte'; color = '#4ade80'; cls = 'strong'; }
-        else if (s >= 2)  { label = 'Media';  color = '#f2ca50'; cls = 'medium'; }
-
-        strengthBar.className = 'strength-bar ' + cls;
-        strengthText.innerHTML = `Fortaleza: <em style="color:${color}">${label}</em>`;
-    });
-
-
-    // ════════════════════════════════════════════
-    // 6. Coincidencia de contraseñas
-    // ════════════════════════════════════════════
-    confirmPass.addEventListener('input', function () {
-        if (!newPass.value || !this.value) {
-            matchHint.textContent = '';
-            return;
-        }
-        if (this.value === newPass.value) {
-            matchHint.textContent = 'Las contraseñas coinciden';
-            matchHint.style.color = '#4ade80';
-        } else {
-            matchHint.textContent = 'Las contraseñas no coinciden';
-            matchHint.style.color = '#ffb4ab';
-        }
-    });
-
-
-    // ════════════════════════════════════════════
-    // 7. Actualizar contraseña
-    // ════════════════════════════════════════════
-    updatePassBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        const currentPass = document.getElementById('currentPassword').value;
-        const newPassVal  = newPass.value;
-        const confirmVal  = confirmPass.value;
-
-        if (!currentPass || !newPassVal || !confirmVal) {
-            alerta('warning', 'Campos incompletos', 'Complete todos los campos');
-            return;
-        }
-        if (newPassVal !== confirmVal) {
-            alerta('error', 'No coinciden', 'Las contraseñas nuevas no coinciden');
-            return;
-        }
-        if (newPassVal.length < 8) {
-            alerta('warning', 'Muy corta', 'Mínimo 8 caracteres');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('update_password', '1');
-        formData.append('current_password', currentPass);
-        formData.append('new_password', newPassVal);
-        formData.append('confirm_password', confirmVal);
-        formData.append('csrf_token', window.getCSRFToken());
-
-        fetch('../../backend/settings/configuracion-back.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alerta('success', 'Contraseña actualizada', data.message);
-                document.getElementById('currentPassword').value = '';
-                newPass.value = '';
-                confirmPass.value = '';
-                strengthBar.style.width = '0%';
+            if (v.length === 0) {
                 strengthBar.className = 'strength-bar';
                 strengthText.innerHTML = 'Fortaleza: <em>Débil</em>';
-                matchHint.textContent = '';
-            } else {
-                alerta('warning', 'Error', data.message);
+                return;
             }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alerta('error', 'Error de red', 'No se pudo actualizar la contraseña');
+
+            let label = 'Débil';
+            let color = '#ffb4ab';
+            let cls   = 'weak';
+
+            if (puntos >= 4) {
+                label = 'Fuerte';
+                color = '#4ade80';
+                cls   = 'strong';
+            } else if (puntos >= 2) {
+                label = 'Media';
+                color = '#f2ca50';
+                cls   = 'medium';
+            }
+
+            strengthBar.className = 'strength-bar ' + cls;
+            strengthText.innerHTML = 'Fortaleza: <em style="color:' + color + '">' + label + '</em>';
         });
-    });
+    }
 
+    // ════════════════════════════════════
+    // 6. Coincidencia de contraseñas
+    // ════════════════════════════════════
+    if (confirmPass) {
+        confirmPass.addEventListener('input', function () {
+            if (!newPass.value || !this.value) {
+                matchHint.textContent = '';
+                return;
+            }
 
-    // ════════════════════════════════════════════
+            if (this.value === newPass.value) {
+                matchHint.textContent = 'Las contraseñas coinciden';
+                matchHint.style.color = '#4ade80';
+            } else {
+                matchHint.textContent = 'Las contraseñas no coinciden';
+                matchHint.style.color = '#ffb4ab';
+            }
+        });
+    }
+
+    // ════════════════════════════════════
+    // 7. Actualizar contraseña
+    // ════════════════════════════════════
+    if (updatePassBtn) {
+        updatePassBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const actual  = currentPass.value;
+            const nueva   = newPass.value;
+            const confirm = confirmPass.value;
+
+            if (!actual || !nueva || !confirm) {
+                alerta('warning', 'Campos incompletos', 'Complete todos los campos');
+                return;
+            }
+
+            if (nueva !== confirm) {
+                alerta('error', 'No coinciden', 'Las contraseñas nuevas no coinciden');
+                return;
+            }
+
+            if (nueva.length < 8) {
+                alerta('warning', 'Muy corta', 'Mínimo 8 caracteres');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('accion', 'update_password');
+            formData.append('current_password', actual);
+            formData.append('new_password', nueva);
+            formData.append('confirm_password', confirm);
+            formData.append('csrf_token', getToken());
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    alerta('success', 'Contraseña actualizada', data.message);
+                    currentPass.value = '';
+                    newPass.value = '';
+                    confirmPass.value = '';
+                    strengthBar.className = 'strength-bar';
+                    strengthText.innerHTML = 'Fortaleza: <em>Débil</em>';
+                    matchHint.textContent = '';
+                } else {
+                    alerta('warning', 'Error', data.message);
+                }
+            })
+            .catch(function (err) {
+                console.error(err);
+                alerta('error', 'Error de red', 'No se pudo actualizar la contraseña');
+            });
+        });
+    }
+
+    // ════════════════════════════════════
     // 8. Solicitudes al bibliotecario
-    // ════════════════════════════════════════════
-    requestBtns.forEach(btn => {
+    // ════════════════════════════════════
+    requestBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             const tipo = this.dataset.request;
+
             const titulos = {
                 email: 'Cambio de Correo Institucional',
-                name: 'Cambio de Nombre y Apellidos',
-                document: 'Cambio de Documento y Foto'
+                nombre: 'Cambio de Nombre y Apellidos',
+                documento: 'Cambio de Documento'
             };
 
             Swal.fire({
-                title: '¿Enviar solicitud?',
-                text: `¿Desea solicitar ${titulos[tipo] || 'este cambio'} al bibliotecario?`,
-                icon: 'question',
+                title: 'Solicitar ' + (titulos[tipo] || 'cambio'),
+                input: 'text',
+                inputLabel: 'Escribe el nuevo valor',
+                inputPlaceholder: 'Nuevo valor...',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar solicitud',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                background: '#121212',
+                color: '#e2e2e2',
+                confirmButtonColor: '#f2ca50',
+                cancelButtonColor: 'rgba(255,255,255,0.1)',
+                inputValidator: function (value) {
+                    if (!value || !value.trim()) {
+                        return 'Debes escribir un valor';
+                    }
+                }
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+
+                const formData = new FormData();
+                formData.append('accion', 'solicitar_cambio');
+                formData.append('tipo', tipo);
+                formData.append('valor_nuevo', result.value.trim());
+                formData.append('csrf_token', getToken());
+
+                fetch(ENDPOINT, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        alerta('success', 'Solicitud enviada', data.message);
+                    } else {
+                        alerta('error', 'Error', data.message);
+                    }
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    alerta('error', 'Error de red', 'No se pudo enviar la solicitud');
+                });
+            });
+        });
+    });
+
+    // ════════════════════════════════════
+    // 9. Solicitar eliminación de cuenta
+    // ════════════════════════════════════
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', function () {
+            Swal.fire({
+                title: '¿Solicitar eliminación?',
+                text: 'Se enviará una solicitud de baja definitiva al administrador. ¿Está seguro?',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, solicitar',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
                 background: '#121212',
                 color: '#e2e2e2',
-                confirmButtonColor: '#f2ca50',
+                iconColor: '#ffb4ab',
+                confirmButtonColor: '#ffb4ab',
                 cancelButtonColor: 'rgba(255,255,255,0.1)'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const urls = {
-                        email: 'solicitud-email.php',
-                        name: 'solicitud-nombre.php',
-                        document: 'solicitud-documento.php'
-                    };
-                    window.location.href = urls[tipo] || '#';
-                }
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+
+                const formData = new FormData();
+                formData.append('accion', 'solicitar_cambio');
+                formData.append('tipo', 'eliminacion');
+                formData.append('valor_nuevo', '');
+                formData.append('csrf_token', getToken());
+
+                fetch(ENDPOINT, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        alerta('success', 'Solicitud enviada', data.message);
+                    } else {
+                        alerta('error', 'Error', data.message);
+                    }
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    alerta('error', 'Error de red', 'No se pudo enviar la solicitud');
+                });
             });
         });
-    });
-
-
-    // ════════════════════════════════════════════
-    // 9. Eliminar cuenta
-    // ════════════════════════════════════════════
-    deleteBtn.addEventListener('click', function () {
-        Swal.fire({
-            title: '¿Solicitar eliminación?',
-            text: 'Esta acción enviará una solicitud de baja definitiva al administrador. ¿Está seguro?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, solicitar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true,
-            background: '#121212',
-            color: '#e2e2e2',
-            iconColor: '#ffb4ab',
-            confirmButtonColor: '#ffb4ab',
-            cancelButtonColor: 'rgba(255,255,255,0.1)'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'solicitud-eliminacion.php';
-            }
-        });
-    });
+    }
 
 });

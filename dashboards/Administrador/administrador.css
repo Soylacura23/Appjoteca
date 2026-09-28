@@ -1,15 +1,5 @@
-/* =========================================================
-   APPJOTECA · PANEL ADMINISTRADOR
-   Enfoque: MOBILE FIRST
-   Breakpoints: 480 · 640 · 768 · 900 · 1024 · 1280
-   ========================================================= */
-
-/* ---------------------------------------------------------
-   BASE (móvil < 480px)
-   --------------------------------------------------------- */
-
-   .config-main {
-    padding-top: 80px;                 /* navbar móvil más bajo */
+  .config-main {
+    padding-top: 80px;
     padding-bottom: 32px;
     min-height: 100vh;
     background-color: var(--background, #121212);
@@ -23,10 +13,9 @@
     padding: 0 16px;
 }
 
-/* ---- Cabecera de página ---- */
+/* ---- Cabecera ---- */
 .config-page-header {
     margin-bottom: 20px;
-    text-align: left;
 }
 
 .config-page-title {
@@ -92,7 +81,7 @@
 }
 
 /* ---------------------------------------------------------
-   PESTAÑAS (TABS)
+   PESTAÑAS
    --------------------------------------------------------- */
 
 .admin-tabs-wrapper {
@@ -102,35 +91,28 @@
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;             /* Firefox */
-}
-
-.admin-tabs-wrapper::-webkit-scrollbar {
-    display: none;                     /* Chrome / Safari */
 }
 
 .admin-tabs {
     display: flex;
-    gap: 2px;
+    gap: 4px;
     min-width: max-content;
-    padding: 0 2px;
 }
 
 .admin-tab {
-    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 12px 14px;
+    gap: 8px;
+    padding: 12px 18px;
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-family: var(--font-body, 'Manrope', sans-serif);
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
 }
@@ -140,8 +122,7 @@
 }
 
 .admin-tab:hover {
-    color: #fff;
-    background: rgba(242, 202, 80, 0.05);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .admin-tab.is-active {
@@ -149,29 +130,25 @@
     border-bottom-color: var(--primary, #f2ca50);
 }
 
-/* Badge rojo con número de pendientes */
 .tab-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
     background: #ff5252;
     color: #fff;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 800;
-    border-radius: 10px;
-    box-shadow: 0 0 8px rgba(255, 82, 82, 0.55);
-    animation: pulse-badge 1.8s infinite;
+    border-radius: 100px;
+    line-height: 1;
 }
 
-@keyframes pulse-badge {
-    0%, 100% { box-shadow: 0 0 6px rgba(255, 82, 82, 0.45); }
-    50%      { box-shadow: 0 0 14px rgba(255, 82, 82, 0.9); }
-}
+/* ---------------------------------------------------------
+   PANELES
+   --------------------------------------------------------- */
 
-/* ---- Paneles de pestaña ---- */
 .admin-panel {
     display: none;
 }
@@ -180,16 +157,11 @@
     display: block;
 }
 
-/* ---------------------------------------------------------
-   SCROLL HORIZONTAL DE TABLAS
-   --------------------------------------------------------- */
-
 .table-scroll {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border-radius: 14px;
-    scrollbar-width: thin;
+    border-radius: var(--radius-md, 14px);
 }
 
 .table-scroll::-webkit-scrollbar {
@@ -211,29 +183,38 @@
 }
 
 /* ---------------------------------------------------------
-   BOTONES DE ACCIÓN
+   BOTONES DE ACCIÓN (Aprobar / Rechazar / Eliminar)
    --------------------------------------------------------- */
 
-.btn-danger-sm {
+.acciones-btns {
     display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.btn-danger-sm {
+    display: inline-flex !important;
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
-    background: rgba(255, 180, 171, 0.1);
-    border: 1px solid rgba(255, 180, 171, 0.3);
-    border-radius: var(--radius-full, 100px);
-    color: var(--error, #ffb4ab);
+    background: rgba(255, 180, 171, 0.15) !important;
+    border: 1px solid rgba(255, 180, 171, 0.45) !important;
+    border-radius: 100px;
+    color: #ffb4ab !important;
     font-size: 0.72rem;
     font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
+    opacity: 1 !important;
+    visibility: visible !important;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
 }
 
 .btn-danger-sm:hover {
-    background: var(--error, #ffb4ab);
-    color: #000;
+    background: #ffb4ab !important;
+    color: #121212 !important;
 }
 
 .btn-danger-sm:active {
@@ -241,26 +222,25 @@
 }
 
 .btn-approve-sm {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
-    margin-right: 6px;
-    background: rgba(76, 175, 80, 0.12);
-    border: 1px solid rgba(76, 175, 80, 0.4);
-    border-radius: var(--radius-full, 100px);
-    color: #66bb6a;
+    background: rgba(76, 175, 80, 0.15) !important;
+    border: 1px solid rgba(76, 175, 80, 0.45) !important;
+    border-radius: 100px;
+    color: #66bb6a !important;
     font-size: 0.72rem;
     font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
 }
 
 .btn-approve-sm:hover {
-    background: #4caf50;
-    color: #fff;
+    background: #4caf50 !important;
+    color: #fff !important;
     box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
 }
 
@@ -269,7 +249,7 @@
 }
 
 /* ---------------------------------------------------------
-   MODAL (MOBILE FIRST)
+   MODAL
    --------------------------------------------------------- */
 
 .modal-overlay {
@@ -280,7 +260,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
-    align-items: flex-end;             /* Móvil: modal desde abajo */
+    align-items: flex-end;
     justify-content: center;
     padding: 0;
     opacity: 0;
@@ -345,13 +325,12 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* ---- Formularios dentro del modal ---- */
+/* ---- Formularios del modal ---- */
 .form-grid {
     display: grid;
     gap: 14px;
 }
 
-/* En móvil, todo es una columna */
 .form-grid--2 {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -377,6 +356,7 @@
     color: rgba(255, 255, 255, 0.45);
     font-size: 20px;
     pointer-events: none;
+    z-index: 1;
 }
 
 .input-wrapper input,
@@ -394,28 +374,119 @@
     appearance: none;
 }
 
-.input-wrapper select {
+.input-wrapper input[type="file"] {
+    padding: 10px 12px 10px 42px;
+    font-size: 0.8rem;
     cursor: pointer;
 }
 
-.input-wrapper select option {
-    background: #1e1e1e;
-    color: #fff;
+.input-wrapper select {
+    cursor: pointer;
 }
 
 .input-wrapper input:focus,
 .input-wrapper select:focus {
     outline: none;
-    border-color: var(--primary, #f2ca50);
-    box-shadow: 0 0 0 3px rgba(242, 202, 80, 0.12);
+    border-color: rgba(242, 202, 80, 0.45);
+    box-shadow: 0 0 0 3px rgba(242, 202, 80, 0.08);
 }
 
-.input-wrapper input::placeholder {
-    color: rgba(255, 255, 255, 0.35);
+/* Password wrapper */
+.input-wrapper.password-wrapper input {
+    padding-right: 48px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 6px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 2;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.toggle-password .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Fortaleza de contraseña */
+.password-strength {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.strength-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-bar.weak   { width: 33%;  background: #ffb4ab; }
+.strength-bar.medium { width: 66%;  background: #f2ca50; }
+.strength-bar.strong { width: 100%; background: #4ade80; }
+
+.strength-text {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.strength-text em {
+    font-style: normal;
+    font-weight: 700;
+}
+
+.match-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Preview foto documento */
+.doc-photo-preview {
+    margin-top: 10px;
+    width: 100%;
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+}
+
+.doc-photo-preview.visible {
+    display: block;
+}
+
+.form-actions {
+    margin-top: 8px;
 }
 
 /* ---------------------------------------------------------
-   TABULATOR (INTEGRACIÓN APPJOTECA)
+   TABULATOR
    --------------------------------------------------------- */
 
 .tabulator,
@@ -459,6 +530,27 @@
     vertical-align: middle !important;
     color: #ffffff !important;
     font-size: 0.82rem !important;
+
+}
+
+.tabulator .tabulator-row .tabulator-cell:last-child {
+    white-space: nowrap !important;
+    min-width: 240px;
+}
+
+/* Celdas normales: cortar texto largo */
+.tabulator .tabulator-cell {
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Solo la columna de acciones puede desbordar (botones) */
+.tabulator .tabulator-row .tabulator-cell:last-child {
+    overflow: visible !important;
+    white-space: nowrap !important;
+    min-width: 240px;
+    max-width: none;
 }
 
 .tabulator .tabulator-placeholder,
@@ -487,11 +579,26 @@
     color: var(--on-primary-fixed, #241a00) !important;
 }
 
-/* =========================================================
-   BREAKPOINT · 480px  (móvil grande)
-   ========================================================= */
-@media (min-width: 480px) {
+/* Badge de tipo de solicitud */
+.tipo-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
 
+.tipo-badge.email      { background: rgba(191, 205, 255, 0.15); color: #bfcdff; }
+.tipo-badge.nombre     { background: rgba(200, 180, 255, 0.15); color: #c8b4ff; }
+.tipo-badge.documento  { background: rgba(120, 220, 180, 0.15); color: #78dcb4; }
+.tipo-badge.eliminacion { background: rgba(255, 180, 171, 0.15); color: #ffb4ab; }
+
+/* ---------------------------------------------------------
+   480px
+   --------------------------------------------------------- */
+@media (min-width: 480px) {
     .config-container {
         padding: 0 20px;
     }
@@ -499,9 +606,18 @@
     .config-page-title {
         font-size: 1.7rem;
     }
+}
 
-    .config-page-subtitle {
-        font-size: 0.9rem;
+/* ---------------------------------------------------------
+   640px
+   --------------------------------------------------------- */
+@media (min-width: 640px) {
+    .config-page-title {
+        font-size: 1.9rem;
+    }
+
+    .form-grid--2 {
+        grid-template-columns: 1fr 1fr;
     }
 
     .admin-actions-bar {
@@ -510,172 +626,74 @@
 
     .btn-gold {
         width: auto;
-        font-size: 1rem;
-    }
-
-    .admin-tab {
-        padding: 12px 18px;
-        font-size: 0.9rem;
-    }
-
-    .admin-tab .material-symbols-outlined {
-        font-size: 20px;
-    }
-
-    .modal-overlay {
-        align-items: center;           /* Modal centrado a partir de aquí */
-        padding: 20px;
-    }
-
-    .modal-card {
-        border-radius: 14px;
-        padding: 22px 22px 26px;
-        max-width: 520px;
-    }
-
-    .modal-header h3 {
-        font-size: 1.2rem;
-    }
-
-    .form-grid--2 {
-        grid-template-columns: 1fr 1fr;   /* Dos columnas a partir de aquí */
-    }
-
-    .tabulator .tabulator-cell {
-        padding: 12px 14px !important;
-        font-size: 0.85rem !important;
+        min-width: 200px;
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 640px  (tablet pequeña)
-   ========================================================= */
-@media (min-width: 640px) {
-
+/* ---------------------------------------------------------
+   768px
+   --------------------------------------------------------- */
+@media (min-width: 768px) {
     .config-main {
         padding-top: 90px;
-        padding-bottom: 40px;
-    }
-
-    .config-container {
-        padding: 0 24px;
-    }
-
-    .config-page-header {
-        margin-bottom: 26px;
-    }
-
-    .config-page-title {
-        font-size: 2rem;
-    }
-
-    .admin-tabs-wrapper {
-        margin-bottom: 20px;
-    }
-
-    .modal-card {
-        max-width: 560px;
-        padding: 26px 26px 30px;
-    }
-
-    .tabulator .tabulator-cell {
-        font-size: 0.88rem !important;
-    }
-}
-
-/* =========================================================
-   BREAKPOINT · 768px  (tablet)
-   ========================================================= */
-@media (min-width: 768px) {
-
-    .config-container {
-        padding: 0 28px;
+        padding-bottom: 48px;
     }
 
     .config-page-title {
         font-size: 2.1rem;
     }
 
-    .config-page-subtitle {
-        font-size: 1rem;
-    }
-
-    .admin-tabs {
-        gap: 4px;
-    }
-
     .admin-tab {
         padding: 14px 22px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-overlay {
+        align-items: center;
+        padding: 24px;
     }
 
     .modal-card {
-        max-width: 580px;
-        padding: 28px 28px 32px;
+        border-radius: 16px;
+        max-width: 560px;
+        max-height: 90vh;
+        padding: 24px 28px 32px;
+        transform: scale(0.96);
     }
 
-    .tabulator .tabulator-cell {
-        padding: 13px 16px !important;
-        font-size: 0.9rem !important;
+    .modal-overlay.active .modal-card {
+        transform: scale(1);
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 1024px  (desktop)
-   ========================================================= */
+/* ---------------------------------------------------------
+   900px
+   --------------------------------------------------------- */
+@media (min-width: 900px) {
+    .config-container {
+        padding: 0 28px;
+    }
+
+    .config-page-title {
+        font-size: 2.3rem;
+    }
+
+    .tabulator .tabulator-cell {
+        font-size: 0.85rem !important;
+        padding: 12px 14px !important;
+    }
+}
+
+/* ---------------------------------------------------------
+   1024px
+   --------------------------------------------------------- */
 @media (min-width: 1024px) {
-
     .config-main {
-        padding-top: 100px;
-        padding-bottom: 50px;
-    }
-
-    .config-container {
-        padding: 0 32px;
-    }
-
-    .config-page-header {
-        margin-bottom: 32px;
+        padding-top: 96px;
     }
 
     .config-page-title {
-        font-size: 2.2rem;
-    }
-
-    .admin-actions-bar {
-        margin-bottom: 18px;
-    }
-
-    .admin-tabs-wrapper {
-        margin-bottom: 22px;
-    }
-
-    .modal-card {
-        max-width: 600px;
-        padding: 30px 30px 34px;
-    }
-
-    .tabulator .tabulator-cell {
-        padding: 14px 18px !important;
-        font-size: 0.92rem !important;
-    }
-}
-
-/* =========================================================
-   BREAKPOINT · 1280px  (desktop grande)
-   ========================================================= */
-@media (min-width: 1280px) {
-
-    .config-container {
-        padding: 0 40px;
-    }
-
-    .config-page-title {
-        font-size: 2.35rem;
-    }
-
-    .modal-card {
-        max-width: 640px;
+        font-size: 2.5rem;
     }
 
     .admin-tab {
@@ -683,13 +701,26 @@
     }
 }
 
+/* ---------------------------------------------------------
+   1280px
+   --------------------------------------------------------- */
+@media (min-width: 1280px) {
+    .config-container {
+        padding: 0 32px;
+    }
+}
+
+/* ---------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
     .btn-gold,
     .btn-danger-sm,
     .btn-approve-sm,
     .modal-card,
     .modal-overlay,
-    .tab-badge {
+    .tab-badge,
+    .strength-bar {
         transition: none !important;
         animation: none !important;
     }

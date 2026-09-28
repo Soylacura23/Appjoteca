@@ -896,6 +896,32 @@
     display: block;
 }
 
+/* ── Acciones de foto de perfil ── */
+.avatar-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.avatar-actions .btn-outline {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 0.65rem;
+}
+
+.btn-delete-photo {
+    border-color: rgba(255, 180, 171, 0.3) !important;
+    color: var(--error, #ffb4ab) !important;
+}
+
+.btn-delete-photo:hover {
+    background: rgba(255, 180, 171, 0.1) !important;
+    border-color: var(--error, #ffb4ab) !important;
+    color: var(--error, #ffb4ab) !important;
+}
+
 /* ────────────────────────────────────────────────
    Animaciones
    ──────────────────────────────────────────────── */

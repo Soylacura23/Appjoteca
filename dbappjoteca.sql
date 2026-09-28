@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 21-09-2026 a las 19:21:53
+-- Tiempo de generación: 28-09-2026 a las 04:41:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ USE `appjoteca`;
 --
 -- Estructura de tabla para la tabla `autores`
 --
--- Creación: 30-08-2026 a las 23:33:38
+-- Creación: 26-09-2026 a las 23:59:32
 --
 
 CREATE TABLE `autores` (
@@ -37,8 +37,11 @@ CREATE TABLE `autores` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `autores`:
+-- Volcado de datos para la tabla `autores`
 --
+
+INSERT INTO `autores` (`id_autor`, `nombre`) VALUES
+(1, 'Gabriel García Márquez');
 
 -- --------------------------------------------------------
 
@@ -52,10 +55,6 @@ CREATE TABLE `bibliotecas` (
   `id_biblioteca` int(11) NOT NULL,
   `nombre` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- RELACIONES PARA LA TABLA `bibliotecas`:
---
 
 --
 -- Volcado de datos para la tabla `bibliotecas`
@@ -79,30 +78,27 @@ CREATE TABLE `colecciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `colecciones`:
---   `id_biblioteca`
---       `bibliotecas` -> `id_biblioteca`
+-- Volcado de datos para la tabla `colecciones`
 --
+
+INSERT INTO `colecciones` (`id_coleccion`, `nombre`, `id_biblioteca`) VALUES
+(2, 'Colección General', 1);
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `comentarios`
 --
--- Creación: 14-09-2026 a las 03:52:02
+-- Creación: 25-09-2026 a las 18:14:24
 --
 
 CREATE TABLE `comentarios` (
   `id_comentario` int(11) NOT NULL,
   `nombre` varchar(50) DEFAULT NULL,
   `tipo_comentario` varchar(50) DEFAULT NULL,
-  `comentario` varchar(1000) DEFAULT NULL,
+  `comentario` text DEFAULT NULL,
   `correo` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- RELACIONES PARA LA TABLA `comentarios`:
---
 
 -- --------------------------------------------------------
 
@@ -119,10 +115,6 @@ CREATE TABLE `dewey` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `dewey`:
---
-
---
 -- Volcado de datos para la tabla `dewey`
 --
 
@@ -134,7 +126,7 @@ INSERT INTO `dewey` (`id_dewey`, `nombre`, `codigo`) VALUES
 --
 -- Estructura de tabla para la tabla `editoriales`
 --
--- Creación: 30-08-2026 a las 23:20:48
+-- Creación: 26-09-2026 a las 23:56:41
 --
 
 CREATE TABLE `editoriales` (
@@ -143,8 +135,11 @@ CREATE TABLE `editoriales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `editoriales`:
+-- Volcado de datos para la tabla `editoriales`
 --
+
+INSERT INTO `editoriales` (`id_editorial`, `nombre`) VALUES
+(1, 'Penguin');
 
 -- --------------------------------------------------------
 
@@ -162,12 +157,12 @@ CREATE TABLE `ejemplares` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `ejemplares`:
---   `fk_id_libro_ejemplar`
---       `libros` -> `id_libro`
---   `id_coleccion`
---       `colecciones` -> `id_coleccion`
+-- Volcado de datos para la tabla `ejemplares`
 --
+
+INSERT INTO `ejemplares` (`id_ejemplar`, `fk_id_libro_ejemplar`, `estado`, `id_coleccion`) VALUES
+(1, 5, 'Disponible', 2),
+(2, 5, 'Disponible', 2);
 
 -- --------------------------------------------------------
 
@@ -187,18 +182,32 @@ CREATE TABLE `historial` (
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+-- --------------------------------------------------------
+
 --
--- RELACIONES PARA LA TABLA `historial`:
---   `id_usuario`
---       `usuarios` -> `id_usuario`
+-- Estructura de tabla para la tabla `idioma`
 --
+-- Creación: 26-09-2026 a las 22:24:53
+--
+
+CREATE TABLE `idioma` (
+  `id_idioma` int(11) NOT NULL,
+  `nombre_idioma` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Volcado de datos para la tabla `idioma`
+--
+
+INSERT INTO `idioma` (`id_idioma`, `nombre_idioma`) VALUES
+(1, 'Español');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `libros`
 --
--- Creación: 18-09-2026 a las 19:01:01
+-- Creación: 26-09-2026 a las 21:04:08
 --
 
 CREATE TABLE `libros` (
@@ -213,33 +222,29 @@ CREATE TABLE `libros` (
   `publicacion_year` year(4) DEFAULT NULL,
   `serie` varchar(20) DEFAULT NULL,
   `volumen` int(8) DEFAULT NULL,
-  `portada` varchar(120) DEFAULT NULL
+  `portada` varchar(120) DEFAULT NULL,
+  `sinopsis` text DEFAULT NULL,
+  `idioma` int(11) DEFAULT NULL,
+  `numero_paginas` int(11) DEFAULT NULL,
+  `fecha_registro_libro` datetime DEFAULT NULL,
+  `fecha_eliminacion_libro` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- RELACIONES PARA LA TABLA `libros`:
---   `id_editorial`
---       `editoriales` -> `id_editorial`
---   `id_materia`
---       `materias` -> `id_materia`
---   `id_tipo_material`
---       `tipos_materiales` -> `id_tipo_material`
---
 
 --
 -- Volcado de datos para la tabla `libros`
 --
 
-INSERT INTO `libros` (`id_libro`, `id_editorial`, `id_materia`, `id_tipo_material`, `isbn`, `titulo`, `edicion`, `ciudad`, `publicacion_year`, `serie`, `volumen`, `portada`) VALUES
-(1, NULL, NULL, NULL, '1142424', 'Cien años de soledad', 'liter', 'Medellín', '2026', '1', 2, NULL),
-(2, NULL, NULL, NULL, '1313141', 'Veinte años sin tí', 'po', 'medellín', '2005', '2', 3, NULL);
+INSERT INTO `libros` (`id_libro`, `id_editorial`, `id_materia`, `id_tipo_material`, `isbn`, `titulo`, `edicion`, `ciudad`, `publicacion_year`, `serie`, `volumen`, `portada`, `sinopsis`, `idioma`, `numero_paginas`, `fecha_registro_libro`, `fecha_eliminacion_libro`) VALUES
+(1, NULL, NULL, NULL, '1142424', 'Cien años de soledad', 'liter', 'Medellín', '2026', '1', 2, NULL, NULL, NULL, NULL, NULL, '2026-09-26 19:06:35'),
+(2, NULL, NULL, NULL, '1313141', 'Veinte años sin tí', 'po', 'medellín', '2005', '2', 3, NULL, NULL, NULL, NULL, NULL, '2026-09-26 19:06:42'),
+(5, 1, 2, 1, '93573987593', 'El amor en los tiempos del cólera', '1', 'Medellín', '2009', '1', 1, 'uploads/books/portadas/portada_6ab85e9bd6b3e9.86719671.jpg', 'Era inevitable el olor de las almendras amargas le recordaba siempre el destino de los amores contrarios. El doctor Juvenal Urbino lo percibió desde que entro en la casa todavía en penumbras, adonde había acudido de urgencia a ocuparse de un caso que para el había dejado de ser urgente desde hacia hace muchos años.', 1, 520, '2026-09-26 19:08:59', NULL);
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `libro_autor`
 --
--- Creación: 30-08-2026 a las 23:34:36
+-- Creación: 26-09-2026 a las 23:59:49
 --
 
 CREATE TABLE `libro_autor` (
@@ -249,12 +254,11 @@ CREATE TABLE `libro_autor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `libro_autor`:
---   `id_autor`
---       `autores` -> `id_autor`
---   `id_libro`
---       `libros` -> `id_libro`
+-- Volcado de datos para la tabla `libro_autor`
 --
+
+INSERT INTO `libro_autor` (`id_detalle`, `id_libro`, `id_autor`) VALUES
+(2, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -269,12 +273,6 @@ CREATE TABLE `materias` (
   `nombre` varchar(50) DEFAULT NULL,
   `id_dewey` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- RELACIONES PARA LA TABLA `materias`:
---   `id_dewey`
---       `dewey` -> `id_dewey`
---
 
 --
 -- Volcado de datos para la tabla `materias`
@@ -300,10 +298,6 @@ CREATE TABLE `notificaciones` (
   `fecha_creacion` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- RELACIONES PARA LA TABLA `notificaciones`:
---
-
 -- --------------------------------------------------------
 
 --
@@ -318,20 +312,12 @@ CREATE TABLE `notificacion_usuario` (
   `id_usuario` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- RELACIONES PARA LA TABLA `notificacion_usuario`:
---   `id_notificacion`
---       `notificaciones` -> `id_notificacion`
---   `id_usuario`
---       `usuarios` -> `id_usuario`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `prestamos`
 --
--- Creación: 30-08-2026 a las 23:46:40
+-- Creación: 27-09-2026 a las 01:04:38
 --
 
 CREATE TABLE `prestamos` (
@@ -345,20 +331,12 @@ CREATE TABLE `prestamos` (
   `observaciones` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- RELACIONES PARA LA TABLA `prestamos`:
---   `id_ejemplar`
---       `ejemplares` -> `id_ejemplar`
---   `id_reserva`
---       `reservas` -> `id_reserva`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `reservas`
 --
--- Creación: 30-08-2026 a las 23:43:42
+-- Creación: 27-09-2026 a las 01:04:45
 --
 
 CREATE TABLE `reservas` (
@@ -371,14 +349,6 @@ CREATE TABLE `reservas` (
   `estado` varchar(20) DEFAULT NULL,
   `observacion` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- RELACIONES PARA LA TABLA `reservas`:
---   `fk_id_libro_reserva`
---       `libros` -> `id_libro`
---   `fk_id_usuario_reserva`
---       `usuarios` -> `id_usuario`
---
 
 -- --------------------------------------------------------
 
@@ -394,10 +364,6 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `roles`:
---
-
---
 -- Volcado de datos para la tabla `roles`
 --
 
@@ -406,6 +372,27 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 (2, 'profesor'),
 (3, 'bibliotecario'),
 (4, 'administrador');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `solicitudes_cambio`
+--
+-- Creación: 27-09-2026 a las 18:42:44
+--
+
+CREATE TABLE `solicitudes_cambio` (
+  `id_solicitud` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `tipo` enum('email','nombre','documento','eliminacion') NOT NULL,
+  `valor_actual` varchar(255) DEFAULT NULL,
+  `valor_nuevo` varchar(255) DEFAULT NULL,
+  `estado` enum('pendiente','aprobada','rechazada') NOT NULL DEFAULT 'pendiente',
+  `fecha_solicitud` datetime NOT NULL DEFAULT current_timestamp(),
+  `fecha_resolucion` datetime DEFAULT NULL,
+  `id_admin_resuelve` int(11) DEFAULT NULL,
+  `comentario` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -421,10 +408,6 @@ CREATE TABLE `tipos_materiales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `tipos_materiales`:
---
-
---
 -- Volcado de datos para la tabla `tipos_materiales`
 --
 
@@ -436,7 +419,7 @@ INSERT INTO `tipos_materiales` (`id_tipo_material`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 21-09-2026 a las 00:52:42
+-- Creación: 27-09-2026 a las 18:43:47
 --
 
 CREATE TABLE `usuarios` (
@@ -444,6 +427,8 @@ CREATE TABLE `usuarios` (
   `id_rol` int(11) DEFAULT NULL,
   `nombre_apellido` varchar(100) DEFAULT NULL,
   `nombre_usuario` varchar(30) DEFAULT NULL,
+  `nombre_usuario_anterior` varchar(30) DEFAULT NULL,
+  `fecha_liberacion_nombre` datetime DEFAULT NULL,
   `correo_institucional` varchar(60) DEFAULT NULL,
   `documento` varchar(25) DEFAULT NULL,
   `foto_documento` varchar(512) DEFAULT NULL,
@@ -457,21 +442,17 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- RELACIONES PARA LA TABLA `usuarios`:
---   `id_rol`
---       `roles` -> `id_rol`
---
-
---
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`, `ultimo_cambio_nombre`, `remember_token`) VALUES
-(4, 1, 'Simón Montoya Soto', 'simon.ms', 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$10$eBMwcJQfbGzWtqPWl8Eh0O3cPioBvrjb579/pBmeaZ0x8jRi769lq', NULL, NULL, '1', '2026-08-30', NULL, NULL),
-(5, 1, 'simoncito', 'simon.mo', 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, NULL, '2026-08-30', '2026-09-06 21:44:13', NULL),
-(7, 3, 'simonmontoya', 'simon.bibliotecario', 'simon.biblioteca@iemanueljbetancur.edu.co', '11864630345', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', NULL, NULL, '1', '2026-09-04', NULL, NULL),
-(8, 2, 'simon profesor', 'simon.profesor', 'simon.profesor@iemanueljbetancur.edu.co', '1187472934', 'uploads/profiles/doc_82034dc7cf179fa01ae324707a3ff48e.pdf', '$2y$10$Fugnc824oVYRylQVb8Xjhu6Jqsqo9nFUeixxOW4sUWnz8y4uOr862', NULL, NULL, '1', '2026-09-11', NULL, NULL),
-(10, 1, 'afaasda', 'adad', 'simon@manueljbetancur.edu.co', '12947242424242', 'uploads/profiles/documents/doc_9a559adefe006b7034675051afe5ffd6.png', '$2y$10$7EwuK6BqkpoR8bhJceFuIuXU1iatFAhq9C2gZzc8nzliHG9riejZS', NULL, NULL, '1', '2026-09-14', NULL, NULL);
+INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `nombre_usuario_anterior`, `fecha_liberacion_nombre`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`, `ultimo_cambio_nombre`, `remember_token`) VALUES
+(4, 1, 'Simón Montoya Soto', 'simon.ms', NULL, NULL, 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$10$eBMwcJQfbGzWtqPWl8Eh0O3cPioBvrjb579/pBmeaZ0x8jRi769lq', NULL, NULL, '1', '2026-08-30', NULL, NULL),
+(5, 1, 'simoncito', 'simon.mo', NULL, NULL, 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, NULL, '2026-08-30', '2026-09-06 21:44:13', NULL),
+(7, 3, 'simonmontoya', 'simon.bibliotecario', NULL, NULL, 'simon.biblioteca@iemanueljbetancur.edu.co', '11864630345', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', NULL, NULL, '1', '2026-09-04', NULL, NULL),
+(8, 2, 'simon profesor', 'simon.profesor', NULL, NULL, 'simon.profesor@iemanueljbetancur.edu.co', '1187472934', 'uploads/profiles/doc_82034dc7cf179fa01ae324707a3ff48e.pdf', '$2y$10$Fugnc824oVYRylQVb8Xjhu6Jqsqo9nFUeixxOW4sUWnz8y4uOr862', NULL, NULL, '1', '2026-09-11', NULL, NULL),
+(10, 1, 'afaasda', 'adad', NULL, NULL, 'simon@manueljbetancur.edu.co', '12947242424242', 'uploads/profiles/documents/doc_9a559adefe006b7034675051afe5ffd6.png', '$2y$10$7EwuK6BqkpoR8bhJceFuIuXU1iatFAhq9C2gZzc8nzliHG9riejZS', NULL, NULL, '1', '2026-09-14', NULL, NULL),
+(11, 1, 'nemesis', 'si2009mon', NULL, NULL, 'simon.sada@iemanueljbetancur.edu.co', '1186463934', 'uploads/profiles/documents/doc_f2f6e37bf2bfdb5016d80ee4d4e80b56.jpg', '$2y$10$eQKNEGyQu90oV4uRhxF.1eIucesyzRYwy4dZJTOc7QSelSivQpIEe', NULL, NULL, 'pendiente', '2026-09-21', NULL, NULL),
+(12, 4, 'simon admin', 'simon.admin', NULL, NULL, 'simon.admin@iemanueljbetancur.edu.co', '11864343434', NULL, '$2y$10$eQKNEGyQu90oV4uRhxF.1eIucesyzRYwy4dZJTOc7QSelSivQpIEe', NULL, NULL, '1', '2026-09-21', NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -530,13 +511,20 @@ ALTER TABLE `historial`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
+-- Indices de la tabla `idioma`
+--
+ALTER TABLE `idioma`
+  ADD PRIMARY KEY (`id_idioma`);
+
+--
 -- Indices de la tabla `libros`
 --
 ALTER TABLE `libros`
   ADD PRIMARY KEY (`id_libro`),
   ADD KEY `id_editorial` (`id_editorial`),
   ADD KEY `id_materia` (`id_materia`),
-  ADD KEY `id_tipo_material` (`id_tipo_material`);
+  ADD KEY `id_tipo_material` (`id_tipo_material`),
+  ADD KEY `id_idioma_libro` (`idioma`);
 
 --
 -- Indices de la tabla `libro_autor`
@@ -590,6 +578,15 @@ ALTER TABLE `roles`
   ADD PRIMARY KEY (`id_rol`);
 
 --
+-- Indices de la tabla `solicitudes_cambio`
+--
+ALTER TABLE `solicitudes_cambio`
+  ADD PRIMARY KEY (`id_solicitud`),
+  ADD KEY `idx_usuario` (`id_usuario`),
+  ADD KEY `idx_estado` (`estado`),
+  ADD KEY `fk_solicitud_admin` (`id_admin_resuelve`);
+
+--
 -- Indices de la tabla `tipos_materiales`
 --
 ALTER TABLE `tipos_materiales`
@@ -607,6 +604,12 @@ ALTER TABLE `usuarios`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `autores`
+--
+ALTER TABLE `autores`
+  MODIFY `id_autor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `bibliotecas`
 --
 ALTER TABLE `bibliotecas`
@@ -616,13 +619,13 @@ ALTER TABLE `bibliotecas`
 -- AUTO_INCREMENT de la tabla `colecciones`
 --
 ALTER TABLE `colecciones`
-  MODIFY `id_coleccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_coleccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `comentarios`
 --
 ALTER TABLE `comentarios`
-  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `dewey`
@@ -631,10 +634,16 @@ ALTER TABLE `dewey`
   MODIFY `id_dewey` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `editoriales`
+--
+ALTER TABLE `editoriales`
+  MODIFY `id_editorial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `ejemplares`
 --
 ALTER TABLE `ejemplares`
-  MODIFY `id_ejemplar` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_ejemplar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `historial`
@@ -643,10 +652,22 @@ ALTER TABLE `historial`
   MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `idioma`
+--
+ALTER TABLE `idioma`
+  MODIFY `id_idioma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `libros`
 --
 ALTER TABLE `libros`
-  MODIFY `id_libro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_libro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `libro_autor`
+--
+ALTER TABLE `libro_autor`
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `materias`
@@ -667,10 +688,28 @@ ALTER TABLE `notificacion_usuario`
   MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `prestamos`
+--
+ALTER TABLE `prestamos`
+  MODIFY `id_prestamo` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `reservas`
+--
+ALTER TABLE `reservas`
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
   MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `solicitudes_cambio`
+--
+ALTER TABLE `solicitudes_cambio`
+  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_materiales`
@@ -682,7 +721,7 @@ ALTER TABLE `tipos_materiales`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Restricciones para tablas volcadas
@@ -712,6 +751,7 @@ ALTER TABLE `historial`
 --
 ALTER TABLE `libros`
   ADD CONSTRAINT `id_editorial` FOREIGN KEY (`id_editorial`) REFERENCES `editoriales` (`id_editorial`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `id_idioma_libro` FOREIGN KEY (`idioma`) REFERENCES `idioma` (`id_idioma`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `id_materia` FOREIGN KEY (`id_materia`) REFERENCES `materias` (`id_materia`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `id_tipo_material` FOREIGN KEY (`id_tipo_material`) REFERENCES `tipos_materiales` (`id_tipo_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -748,6 +788,13 @@ ALTER TABLE `prestamos`
 ALTER TABLE `reservas`
   ADD CONSTRAINT `fk_id_libro_reserva` FOREIGN KEY (`fk_id_libro_reserva`) REFERENCES `libros` (`id_libro`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_id_usuario_reserva` FOREIGN KEY (`fk_id_usuario_reserva`) REFERENCES `usuarios` (`id_usuario`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `solicitudes_cambio`
+--
+ALTER TABLE `solicitudes_cambio`
+  ADD CONSTRAINT `fk_solicitud_admin` FOREIGN KEY (`id_admin_resuelve`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_solicitud_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `usuarios`

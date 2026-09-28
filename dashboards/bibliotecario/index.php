@@ -178,7 +178,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
     <section class="actions">
         <div class="one-column-grid">
             <div class="featured-card">
-                <img src="<?= $featured['portada'] ? htmlspecialchars($featured['portada']) : 'images/libro.png' ?>" class="featured-image" alt="Libro Destacado">
+                <img src="<?= $featured['portada'] ? '/Appjoteca/' . htmlspecialchars($featured['portada']) : 'images/libro.png' ?>" class="featured-image" alt="Libro Destacado">
                 <div class="featured-overlay">
                     <p class="text-xs text-primary">RESERVACIÓN DESTACADA</p>
                     <h5 class="headline-md white-text"><?= htmlspecialchars($featured['titulo'] ?? 'Ninguno') ?></h5>

@@ -172,6 +172,47 @@
       alerta('error', 'Error de conexión', 'No se pudo obtener la lista de usuarios.');
       console.error(error);
     });
+
+  function abrirDesdeUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var idUrl = params.get('id');
+    if (!idUrl) return;
+
+    
+    var datos = tabla.getData();
+    for (var i = 0; i < datos.length; i++) {
+      if (String(datos[i].id) === String(idUrl)) {
+        abrirOverlay(datos[i]);
+        if (window.history && window.history.replaceState) {
+          var urlLimpia = window.location.pathname;
+          window.history.replaceState({}, '', urlLimpia);
+        }
+        return;
+      }
+    }
+  }
+
+  // Llamarlo cuando ya estén cargados los datos
+  fetch('usuarios-listar.php')
+    .then(function (respuesta) {
+      if (!respuesta.ok) {
+        throw new Error('El servidor respondió con un error.');
+      }
+      return respuesta.json();
+    })
+    .then(function (data) {
+      if (data.ok) {
+        tabla.setData(data.usuarios);
+        actualizarStats(data.usuarios);
+        abrirDesdeUrl();          // ← aquí
+      } else {
+        alerta('error', 'No se cargaron los usuarios', (data.error || 'Error desconocido'));
+      }
+    })
+    .catch(function (error) {
+      alerta('error', 'Error de conexión', 'No se pudo obtener la lista de usuarios.');
+      console.error(error);
+    });
   
     /* ── Click en una fila: abrir overlay con los datos ────────── */
   

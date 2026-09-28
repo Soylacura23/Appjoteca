@@ -1,6 +1,11 @@
 <?php
+/**
+ * Modelo Reserva — Appjoteca
+ * Gestión de reservas de libros
+ */
 
-class Reserva {
+class Reserva
+{
     private $db;
 
     public function __construct($connection)
@@ -9,24 +14,27 @@ class Reserva {
     }
 
     /**
- * Devuelve el id del usuario dueño de la reserva.
- */
-public function obtenerUsuarioDeReserva($id_reserva)
-{
-    $sql = "SELECT fk_id_usuario_reserva FROM reservas WHERE id_reserva = ?";
-    $query = $this->db->prepare($sql);
-    $query->bind_param("i", $id_reserva);
-    $query->execute();
-    $fila = $query->get_result()->fetch_assoc();
-    $query->close();
+     * Devuelve el id del usuario dueño de la reserva.
+     */
+    public function obtenerUsuarioDeReserva($id_reserva)
+    {
+        $sql = "SELECT fk_id_usuario_reserva FROM reservas WHERE id_reserva = ?";
+        $query = $this->db->prepare($sql);
+        $query->bind_param("i", $id_reserva);
+        $query->execute();
+        $fila = $query->get_result()->fetch_assoc();
+        $query->close();
 
-    return $fila ? (int)$fila['fk_id_usuario_reserva'] : 0;
-}
+        return $fila ? (int) $fila['fk_id_usuario_reserva'] : 0;
+    }
 
+    /**
+     * Crea una reserva activa (fecha_limite = +2 días).
+     */
     public function crearReserva($id_usuario, $id_libro, $cantidad = 1)
     {
         try {
-            $sql = "INSERT INTO reservas 
+            $sql = "INSERT INTO reservas
                     (fk_id_usuario_reserva, fk_id_libro_reserva, cantidad, fecha_reserva, fecha_limite, estado)
                     VALUES (?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'activa')";
 
@@ -38,7 +46,6 @@ public function obtenerUsuarioDeReserva($id_reserva)
             $query->close();
 
             return $id_reserva;
-
         } catch (Exception $e) {
             error_log("Error en crearReserva: " . $e->getMessage());
             return false;
@@ -50,7 +57,7 @@ public function obtenerUsuarioDeReserva($id_reserva)
         try {
             $this->db->begin_transaction();
 
-            $sqlReserva = "SELECT fk_id_libro_reserva, fk_id_usuario_reserva 
+            $sqlReserva = "SELECT fk_id_libro_reserva, fk_id_usuario_reserva
                            FROM reservas WHERE id_reserva = ? AND estado = 'activa'";
             $qReserva = $this->db->prepare($sqlReserva);
             $qReserva->bind_param("i", $id_reserva);
@@ -64,8 +71,9 @@ public function obtenerUsuarioDeReserva($id_reserva)
 
             $id_libro = $res['fk_id_libro_reserva'];
 
-            $sqlEjemplar = "SELECT id_ejemplar FROM ejemplares 
-                            WHERE fk_id_libro_ejemplar = ? AND estado = 'Disponible' 
+            // Buscar un ejemplar disponible
+            $sqlEjemplar = "SELECT id_ejemplar FROM ejemplares
+                            WHERE fk_id_libro_ejemplar = ? AND estado = 'Disponible'
                             LIMIT 1";
             $qEjemplar = $this->db->prepare($sqlEjemplar);
             $qEjemplar->bind_param("i", $id_libro);
@@ -79,19 +87,22 @@ public function obtenerUsuarioDeReserva($id_reserva)
 
             $id_ejemplar = $ejemplar['id_ejemplar'];
 
+            // Marcar ejemplar como Prestado
             $sqlUpdEj = "UPDATE ejemplares SET estado = 'Prestado' WHERE id_ejemplar = ?";
             $qUpdEj = $this->db->prepare($sqlUpdEj);
             $qUpdEj->bind_param("i", $id_ejemplar);
             $qUpdEj->execute();
             $qUpdEj->close();
 
+            // Actualizar reserva
             $sqlUpdRes = "UPDATE reservas SET estado = 'aceptada' WHERE id_reserva = ?";
             $qUpdRes = $this->db->prepare($sqlUpdRes);
             $qUpdRes->bind_param("i", $id_reserva);
             $qUpdRes->execute();
             $qUpdRes->close();
 
-            $sqlPrestamo = "INSERT INTO prestamos 
+            // Crear préstamo (15 días)
+            $sqlPrestamo = "INSERT INTO prestamos
                             (id_ejemplar, id_reserva, fecha_prestamo, fecha_devolucion_prevista, estado)
                             VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 15 DAY), 'activo')";
             $qPrestamo = $this->db->prepare($sqlPrestamo);
@@ -102,7 +113,6 @@ public function obtenerUsuarioDeReserva($id_reserva)
 
             $this->db->commit();
             return $id_prestamo;
-
         } catch (Exception $e) {
             $this->db->rollback();
             error_log("Error en aceptarReserva: " . $e->getMessage());
@@ -110,10 +120,13 @@ public function obtenerUsuarioDeReserva($id_reserva)
         }
     }
 
+    /**
+     * Rechaza una reserva activa.
+     */
     public function rechazarReserva($id_reserva, $observacion = null)
     {
         try {
-            $sql = "UPDATE reservas SET estado = 'rechazada', observacion = ? 
+            $sql = "UPDATE reservas SET estado = 'rechazada', observacion = ?
                     WHERE id_reserva = ? AND estado = 'activa'";
             $query = $this->db->prepare($sql);
             $query->bind_param("si", $observacion, $id_reserva);
@@ -123,37 +136,73 @@ public function obtenerUsuarioDeReserva($id_reserva)
             $query->close();
 
             return $filas > 0;
-
         } catch (Exception $e) {
             error_log("Error en rechazarReserva: " . $e->getMessage());
             return false;
         }
     }
 
-    public function listarReservasActivas()
+    /**
+     * Lista reservas activas con datos enriquecidos para la UI.
+     * Incluye título, autor(es), portada, edición, usuario, fechas, cantidad.
+     */
+    public function listarReservasActivas($offset = 0, $limit = 30)
     {
-        $sql = "SELECT r.id_reserva, 
-                       r.fk_id_libro_reserva AS id_libro,
-                       u.nombre_apellido AS usuario,
-                       l.titulo AS libro,
-                       r.fecha_reserva,
-                       r.cantidad
+        $sql = "SELECT
+                    r.id_reserva,
+                    r.fk_id_libro_reserva AS id_libro,
+                    r.fk_id_usuario_reserva AS id_usuario,
+                    r.cantidad,
+                    r.fecha_reserva,
+                    r.fecha_limite,
+                    u.nombre_apellido AS usuario,
+                    l.titulo AS libro,
+                    l.edicion,
+                    l.portada,
+                    COALESCE(
+                        (SELECT GROUP_CONCAT(a.nombre SEPARATOR ', ')
+                         FROM libro_autor la
+                         JOIN autores a ON la.id_autor = a.id_autor
+                         WHERE la.id_libro = l.id_libro),
+                        'Autor desconocido'
+                    ) AS autor,
+                    COALESCE(
+                        (SELECT c.nombre
+                         FROM ejemplares e
+                         JOIN colecciones c ON e.id_coleccion = c.id_coleccion
+                         WHERE e.fk_id_libro_ejemplar = l.id_libro
+                         LIMIT 1),
+                        'General'
+                    ) AS coleccion
                 FROM reservas r
                 JOIN usuarios u ON r.fk_id_usuario_reserva = u.id_usuario
                 JOIN libros l ON r.fk_id_libro_reserva = l.id_libro
                 WHERE r.estado = 'activa'
-                ORDER BY r.fecha_reserva ASC";
+                ORDER BY r.fecha_reserva ASC
+                LIMIT ? OFFSET ?";
 
-        $resultado = $this->db->query($sql);
+        $query = $this->db->prepare($sql);
+        $query->bind_param("ii", $limit, $offset);
+        $query->execute();
+        $resultado = $query->get_result();
 
         $reservas = [];
-        if ($resultado) {
-            while ($fila = $resultado->fetch_assoc()) {
-                $reservas[] = $fila;
-            }
+        while ($fila = $resultado->fetch_assoc()) {
+            $reservas[] = $fila;
         }
+        $query->close();
+
         return $reservas;
     }
-}
 
-?>
+    /**
+     * Cuenta total de reservas activas.
+     */
+    public function contarReservasActivas()
+    {
+        $sql = "SELECT COUNT(*) AS total FROM reservas WHERE estado = 'activa'";
+        $resultado = $this->db->query($sql);
+        $fila = $resultado->fetch_assoc();
+        return (int) ($fila['total'] ?? 0);
+    }
+}

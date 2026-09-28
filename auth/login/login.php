@@ -43,6 +43,10 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
     </div>
   </header>
 
+  <a href="../../index.php" class="fab-home" aria-label="Volver al inicio" title="Inicio">
+  <span class="material-symbols-outlined">home</span>
+  </a>
+
   <!-- ════════════════════════════════════════════════════════
        SHELL PRINCIPAL — sin scroll global
        ════════════════════════════════════════════════════════ -->
