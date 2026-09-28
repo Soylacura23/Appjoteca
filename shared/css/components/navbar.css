@@ -706,3 +706,27 @@ body.menu-open {
     text-transform: uppercase;
     letter-spacing: 0.2em;
 }
+/* Unificar el color de los textos del menú lateral */
+aside a,
+.sidebar a,
+.off-canvas a,
+.nav-link {
+    color: #E0E0E0 !important; /* Gris claro/blanco para elementos inactivos */
+    text-decoration: none !important;
+}
+
+/* Color al pasar el cursor (Hover) */
+aside a:hover,
+.sidebar a:hover,
+.off-canvas a:hover,
+.nav-link:hover {
+    color: #FFD700 !important; /* Dorado */
+}
+
+/* Color de la página seleccionada (Activa) */
+aside a.active,
+.sidebar a.active,
+.off-canvas a.active,
+.nav-link.active {
+    color: #FFD700 !important; /* Dorado */
+}

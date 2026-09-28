@@ -14,7 +14,7 @@ $periodosValidos = ['7', '30', '90', '365', 'todo'];
 if (!in_array($periodo, $periodosValidos, true)) {
     $periodo = '30';
 }
-
+      
 function unaFila($db, $sql)
 {
     $res = $db->query($sql);
@@ -309,8 +309,10 @@ try {
 
     $frase = obtenerFraseSemanal();
 
+   
     echo json_encode([
-        'ok' => true,
+        'ok'   => true,
+        'logo' => '/shared/images/logo-appjoteca.svg',
         'metricas' => [
             'trafico_total'        => $traficoTotal,
             'reservas_diarias'     => $reservasDiarias,
