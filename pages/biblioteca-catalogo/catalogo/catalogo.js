@@ -127,16 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = libro.id;
 
             // Ruta de portada (compatible con tu estructura de uploads)
-            let rutaPortada = '../../assets/images/default-cover.jpg';
+            let rutaPortada = '../../../assets/images/default-cover.jpg';
             if (libro.portada && libro.portada.trim() !== '') {
                 if (libro.portada.startsWith('http')) {
                     rutaPortada = libro.portada;
                 } else if (libro.portada.startsWith('uploads/')) {
-                    rutaPortada = '../../' + libro.portada;
+                    rutaPortada = '../../../' + libro.portada;
                 } else if (libro.portada.startsWith('assets/')) {
-                    rutaPortada = '../../' + libro.portada;
+                    rutaPortada = '../../../' + libro.portada;
                 } else {
-                    rutaPortada = '../../' + libro.portada;
+                    rutaPortada = '../../../' + libro.portada;
                 }
             }
 
