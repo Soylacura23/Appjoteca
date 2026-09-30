@@ -48,9 +48,8 @@ requiereRol([2]);
 
             <nav class="topbar-nav" aria-label="Navegación principal">
                 <a href="#" class="nav-link activo" data-nav="dashboard">Dashboard</a>
-                <a href="../../pages/catalogo/index.php" class="nav-link" data-nav="catalogo">Catálogo</a>
-                <a href="../../pages/prestamos/index.php" class="nav-link" data-nav="prestamos">Préstamos</a>
-                <a href="../../pages/reservas/index.php" class="nav-link" data-nav="reservas">Reservas</a>
+                <a href="" class="nav-link" data-nav="catalogo">Catálogo</a>
+                <a href="../../pages/prestamos/index.php" class="nav-link" data-nav="prestamos">Mi historial</a>
             </nav>
 
             <div class="topbar-actions">
