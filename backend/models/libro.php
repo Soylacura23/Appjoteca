@@ -191,6 +191,86 @@ class libro
         return $libro;
     }
 
+    /**
+     * Libros de la misma materia o del mismo autor.
+     */
+    public function obtenerRelacionados($id_libro, $limite = 4)
+    {
+        $id_libro = (int) $id_libro;
+        $limite   = max(1, (int) $limite);
+
+        $sql = "SELECT l.id_libro, l.titulo, l.portada, l.id_materia,
+                       m.nombre AS materia,
+                       GROUP_CONCAT(DISTINCT a.nombre ORDER BY a.nombre SEPARATOR ', ') AS autores
+                FROM libros l
+                LEFT JOIN materias m     ON m.id_materia = l.id_materia
+                LEFT JOIN libro_autor la ON la.id_libro  = l.id_libro
+                LEFT JOIN autores a      ON a.id_autor   = la.id_autor
+                WHERE l.fecha_eliminacion_libro IS NULL
+                  AND l.id_libro != ?
+                  AND (
+                        l.id_materia = (SELECT id_materia FROM libros WHERE id_libro = ?)
+                        OR l.id_libro IN (
+                            SELECT la2.id_libro
+                            FROM libro_autor la2
+                            WHERE la2.id_autor IN (
+                                SELECT la3.id_autor FROM libro_autor la3 WHERE la3.id_libro = ?
+                            )
+                        )
+                  )
+                GROUP BY l.id_libro
+                ORDER BY (l.id_materia = (SELECT id_materia FROM libros WHERE id_libro = ?)) DESC,
+                         l.id_libro DESC
+                LIMIT ?";
+
+        $query = $this->db->prepare($sql);
+        $query->bind_param("iiiii", $id_libro, $id_libro, $id_libro, $id_libro, $limite);
+        $query->execute();
+        $res = $query->get_result();
+
+        $libros = [];
+        while ($fila = $res->fetch_assoc()) {
+            $libros[] = $fila;
+        }
+        $query->close();
+
+        if (count($libros) >= $limite) {
+            return $libros;
+        }
+
+        $faltan = $limite - count($libros);
+        $excluidos = array_merge([$id_libro], array_column($libros, 'id_libro'));
+        $placeholders = implode(',', array_fill(0, count($excluidos), '?'));
+        $types = str_repeat('i', count($excluidos)) . 'i';
+
+        $sqlExtra = "SELECT l.id_libro, l.titulo, l.portada, l.id_materia,
+                            m.nombre AS materia,
+                            GROUP_CONCAT(DISTINCT a.nombre ORDER BY a.nombre SEPARATOR ', ') AS autores
+                     FROM libros l
+                     LEFT JOIN materias m     ON m.id_materia = l.id_materia
+                     LEFT JOIN libro_autor la ON la.id_libro  = l.id_libro
+                     LEFT JOIN autores a      ON a.id_autor   = la.id_autor
+                     WHERE l.fecha_eliminacion_libro IS NULL
+                       AND l.id_libro NOT IN ($placeholders)
+                     GROUP BY l.id_libro
+                     ORDER BY l.id_libro DESC
+                     LIMIT ?";
+
+        $params = array_map('intval', $excluidos);
+        $params[] = $faltan;
+
+        $qExtra = $this->db->prepare($sqlExtra);
+        $qExtra->bind_param($types, ...$params);
+        $qExtra->execute();
+        $resExtra = $qExtra->get_result();
+        while ($fila = $resExtra->fetch_assoc()) {
+            $libros[] = $fila;
+        }
+        $qExtra->close();
+
+        return $libros;
+    }
+
     /* ── Catálogos ── */
     public function obtenerCatalogos()
     {

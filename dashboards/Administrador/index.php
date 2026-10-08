@@ -22,39 +22,18 @@ requiereRol([4]);
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
     <link rel="stylesheet" href="administrador.css">
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
 <div id="overlay" class="overlay" aria-hidden="true"></div>
 
 <?php include '../../shared/layouts/notifications.php'; ?>
-<?php include '../../shared/layouts/menu-off-canvas.php'; ?>
+<?php include '../../shared/layouts/menu-off-canvas.php'; ?> 
 
-<header class="topbar" role="banner">
-    <div class="topbar-inner">
-        <a href="../../index.php" class="logo-link">
-            <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-        </a>
-        <div class="topbar-search">
-            <input type="text" class="topbar-search-input" placeholder="Buscar en la plataforma..." aria-label="Buscar">
-            <span class="material-symbols-outlined topbar-search-icon">search</span>
-        </div>
-        <nav class="topbar-nav" aria-label="Navegación principal">
-            <a href="#" class="nav-link active" data-nav="panel">Panel Admin</a>
-            <a href="comentarios/comentarios.php" class="nav-link" data-nav="comentarios">Comentarios</a>
-        </nav>
-        <div class="topbar-actions">
-            <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-                <span class="material-symbols-outlined">notifications</span>
-                <span class="notification-badge"></span>
-            </button>
-            <div id="profile-button-topbar"></div>
-            <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-        </div>
-    </div>
-</header>
+<?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
 <?php include '../../shared/layouts/menu-movil.php'; ?>
 
@@ -227,6 +206,7 @@ requiereRol([4]);
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
 <script src="../../shared/js/components/navbar.js"></script>
+<script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../shared/js/global.js"></script>
 <script src="administrador.js"></script>
 

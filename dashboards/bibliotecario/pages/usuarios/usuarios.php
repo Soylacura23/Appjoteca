@@ -37,6 +37,10 @@ requiereRol([3]);
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+
     <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
 <base target="_self">
 </head>
@@ -296,6 +300,7 @@ requiereRol([3]);
     <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../../../shared/js/components/alert.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../../../shared/js/global.js"></script>
     <script src="usuarios.js"></script>
 </body>

@@ -1179,6 +1179,12 @@
   font-family: var(--font-body, "Manrope", sans-serif);
   color: #e2e2e2;
 }
+/* El tableholder pinta el fondo blanco por defecto: lo hacemos transparente
+   para que se vea el fondo oscuro del contenedor */
+.history-table-wrap .tabulator .tabulator-tableholder .tabulator-table {
+  background: transparent !important;
+  color: #e2e2e2;
+}
 .history-table-wrap .tabulator-header {
   background: rgba(255,255,255,0.02);
   border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -1202,6 +1208,12 @@
 .history-table-wrap .tabulator-row:hover {
   background: rgba(255,255,255,0.015) !important;
 }
+.history-table-wrap .tabulator-row:nth-child(even) {
+  background: rgba(255,255,255,0.018) !important;
+}
+.history-table-wrap .tabulator-row:nth-child(even):hover {
+  background: rgba(255,255,255,0.03) !important;
+}
 .history-table-wrap .tabulator-cell {
   border-right: none !important;
   padding: 14px 16px !important;
@@ -1213,6 +1225,29 @@
   border-top: 1px solid rgba(255,255,255,0.04);
   color: rgba(255,255,255,0.4);
   font-size: 0.75rem;
+}
+.history-table-wrap .tabulator-paginator {
+  color: rgba(255,255,255,0.4);
+}
+.history-table-wrap .tabulator-page-counter {
+  color: rgba(255,255,255,0.4);
+}
+/* Selector de página por tamaño (viene claro por defecto) */
+.history-table-wrap .tabulator-page-size {
+  background: rgba(255,255,255,0.05) !important;
+  color: rgba(255,255,255,0.65) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 5px !important;
+  padding: 4px 8px !important;
+  margin: 0 4px !important;
+  font-family: var(--font-body, "Manrope", sans-serif);
+  font-size: 0.75rem !important;
+  outline: none !important;
+  cursor: pointer;
+}
+.history-table-wrap .tabulator-page-size option {
+  background: #141414;
+  color: #e2e2e2;
 }
 .history-table-wrap .tabulator-page {
   background: transparent !important;
@@ -1237,6 +1272,49 @@
   gap: 4px;
   flex-wrap: wrap;
   padding: 12px;
+}
+
+/* Mensaje de "sin datos" y alertas (vienen sobre fondo claro) */
+.history-table-wrap .tabulator-placeholder-contents {
+  color: rgba(255,255,255,0.3) !important;
+}
+.history-table-wrap .tabulator-alert .tabulator-alert-msg {
+  background: #1a1a1a !important;
+  color: #e2e2e2 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+.history-table-wrap .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-error {
+  color: #ff9b93 !important;
+}
+
+/* Menús contextuales y popups de columnas */
+.history-table-wrap .tabulator-menu {
+  background: #141414 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #e2e2e2 !important;
+}
+.history-table-wrap .tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--primary, #c9a84c) !important;
+}
+.history-table-wrap .tabulator-popup-container {
+  background: #141414 !important;
+  color: #e2e2e2 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Columnas colapsadas (responsiveLayout: collapse) */
+.history-table-wrap .tabulator-responsive-collapse {
+  border-top: 1px solid rgba(255,255,255,0.08) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+.history-table-wrap .tabulator-responsive-collapse-toggle {
+  background: rgba(201,168,76,0.22) !important;
+  color: var(--primary, #c9a84c) !important;
+  border: 1px solid rgba(201,168,76,0.35) !important;
+}
+.history-table-wrap .tabulator-responsive-collapse-toggle svg {
+  stroke: var(--primary, #c9a84c) !important;
 }
 
 /* Responsive Tabulator */
@@ -1264,6 +1342,10 @@
     letter-spacing: 0.14em;
     color: var(--primary, #c9a84c);
     margin-right: 12px;
+  }
+  /* La primera celda contiene el toggle de columnas colapsadas */
+  .history-table-wrap .tabulator-cell.tabulator-first-cell {
+    padding-top: 2px !important;
   }
 }
 

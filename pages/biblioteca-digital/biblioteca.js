@@ -93,8 +93,7 @@
     var verTodoBtn = document.querySelector('.btn-ver-todo');
     if (verTodoBtn) {
         verTodoBtn.addEventListener('click', function () {
-            console.log('[AppJoteca] Ver todo el catálogo');
-            // TODO: mostrar todos los libros o navegar a la página de catálogo completo
+            window.location.href = '/Appjoteca/pages/biblioteca-catalogo/catalogo/catalogo.php';
         });
     }
 

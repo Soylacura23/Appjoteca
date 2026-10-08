@@ -24,50 +24,22 @@ requiereRol([1]);
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
 
     <link rel="stylesheet" href="estudiante.css">
+    
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-    <?php include '../../shared/layouts/notifications.php'; ?>
+    <?php include __DIR__ . '/../../shared/layouts/notifications.php'; ?>
 
-    <?php include '../../shared/layouts/menu-off-canvas.php'; ?>
+    <?php include __DIR__ . '/../../shared/layouts/menu-off-canvas.php'; ?>
 
-    <header class="topbar" role="banner">
-        <div class="topbar-inner">
-                <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-</a>
-            <div class="topbar-search">
-                <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
-                <span class="material-symbols-outlined topbar-search-icon">search</span>
-            </div>
-            <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="../../pages/biblioteca-digital/index.php" class="nav-link" data-nav="catalogo">Catálogo</a>
-                <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
-                <a href="#" class="nav-link activo" data-nav="panel">Panel</a>
-            </nav>
-            <div class="topbar-actions">
-                <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-                <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
-                </button>
-                <div id="profile-button-topbar"></div>
+    <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-                <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </div>
-        <div class="topbar-search-mobile" aria-hidden="true">
-            <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
-        </div>
-    </header>
-
-    <?php include '../../shared/layouts/menu-movil.php'; ?>
+    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
     <main class="dashboard-main">
         <div class="dashboard-container">
@@ -273,6 +245,7 @@ requiereRol([1]);
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../shared/js/components/navbar.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../shared/js/global.js"></script>
     <script src="estudiante.js"></script>
 </body>

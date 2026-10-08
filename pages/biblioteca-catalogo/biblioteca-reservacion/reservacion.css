@@ -413,6 +413,54 @@
     color: #ef5350;
 }
 
+/* Contador de ejemplares */
+.qty-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    height: 44px;
+}
+
+.qty-btn {
+    width: 42px;
+    height: 100%;
+    border: none;
+    background: transparent;
+    color: var(--primary, #f2ca50);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.qty-btn:hover {
+    background: rgba(242, 202, 80, 0.12);
+}
+
+.qty-input {
+    width: 52px;
+    height: 100%;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: #e2e2e2;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
 /* ════════════════════════════════════════════════
    RESPONSIVE

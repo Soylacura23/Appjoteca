@@ -150,30 +150,24 @@
   }
 }
 
-@media (max-width: 640px) {
-  .fab-home {
-    top: auto;
-    bottom: 20px;
-    left: 16px;
-  }
-}
-   
-   /* ────────────────────────────────────────────────────────────
-      PANEL FORMULARIO
-      ──────────────────────────────────────────────────────────── */
-   .signup-form-panel {
-     min-height: 0;
-     display: flex;
-     align-items: center;       /* centrado vertical */
-     justify-content: center;
-     padding: 0;
-   }
-   
-   /* Aquí vive el scroll — SOLO si el contenido no cabe */
-   .signup-card {
-     position: relative;
-     width: 100%;
-     max-width: 520px;
+ /* ────────────────────────────────────────────────────────────
+    PANEL FORMULARIO
+    ──────────────────────────────────────────────────────────── */
+    .signup-form-panel {
+      min-width: 0;                 /* evita que el grid se desborde en anchos pequeños */
+      min-height: 0;
+      display: flex;
+      align-items: center;       /* centrado vertical */
+      justify-content: center;
+      padding: 0;
+    }
+    
+    /* Aquí vive el scroll — SOLO si el contenido no cabe */
+    .signup-card {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      max-width: 520px;
      max-height: 100%;
      overflow-y: auto;
      overscroll-behavior: contain;
@@ -1025,10 +1019,53 @@
      background: rgba(255, 255, 255, 0.28);
    }
    
-   /* ────────────────────────────────────────────────────────────
-      RESPONSIVE — por ancho
-      ──────────────────────────────────────────────────────────── */
-   @media (min-width: 480px) {
+    /* ────────────────────────────────────────────────────────────
+       RESPONSIVE — por ancho
+       ──────────────────────────────────────────────────────────── */
+
+    /* ── Móviles pequeños (<400px): compactamos todo ── */
+    @media (max-width: 400px) {
+      .signup-header-container { padding: 0 14px; }
+      .signup-shell { padding: 12px; }
+      .signup-card {
+        padding: 20px 16px 22px;
+        border-radius: 18px;
+        scrollbar-gutter: auto;
+      }
+      .stepper { margin-bottom: 14px; padding: 0 2px; }
+      .stepper-track { left: 22px; right: 22px; }
+      .step-bullet { width: 34px; height: 34px; }
+      .step-icon { font-size: 15px; }
+      .step-label { font-size: 0.55rem; letter-spacing: 0.08em; }
+      .signup-title { font-size: 1.15rem; }
+      .signup-subtitle { font-size: 0.75rem; }
+      .signup-form { gap: 12px; }
+      .step-panel { gap: 11px; }
+      .field-group { gap: 3px; }
+      .field-label { font-size: 0.5625rem; letter-spacing: 0.1em; }
+      .field-input { padding: 10px 12px 10px 38px; font-size: 0.8125rem; }
+      .field-icon { left: 10px; font-size: 16px; }
+      .field-wrapper--password .field-input { padding-right: 38px; }
+      .file-upload-label { padding: 12px 10px; gap: 10px; }
+      .file-upload-icon { font-size: 22px; }
+      .file-upload-text strong { font-size: 0.75rem; }
+      .file-upload-text span { font-size: 0.625rem; }
+      .btn-signup { padding: 12px 14px; font-size: 0.75rem; }
+      .btn-ghost { padding: 12px 12px; font-size: 0.6875rem; }
+      .signup-login-link p { font-size: 0.75rem; }
+    }
+
+    @media (max-width: 340px) {
+      .signup-shell { padding: 8px; }
+      .signup-card { padding: 16px 12px 18px; }
+      .signup-title { font-size: 1.05rem; }
+      .step-label { display: none; }
+      .field-input { font-size: 0.75rem; }
+      .btn-ghost span { display: none; }
+      .btn-ghost { padding: 12px; }
+    }
+
+    @media (min-width: 480px) {
      .signup-header-container { padding: 0 24px; }
      .signup-shell { padding: 20px 24px; }
      .signup-card { padding: 28px 26px 30px; }

@@ -19,10 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Menú móvil (toma los enlaces del nav-list existente)
-  let mobileMenu = header.querySelector('.mobile-menu');
+  let mobileMenu = document.querySelector('.mobile-menu[data-menu="landing"]');
   if (!mobileMenu) {
       mobileMenu = document.createElement('div');
       mobileMenu.className = 'mobile-menu';
+      mobileMenu.dataset.menu = 'landing';
 
       const navLinksHTML = Array.from(document.querySelectorAll('.main-nav .nav-link'))
           .map(link => `<li><a href="${link.getAttribute('href')}" class="mobile-nav-link">${link.textContent.trim()}</a></li>`)
@@ -41,17 +42,21 @@ document.addEventListener('DOMContentLoaded', function () {
               </a>
           </nav>
       `;
-      header.appendChild(mobileMenu);
+      // Se adjunta al <body> para escapar del contexto de apilamiento del
+      // header (z-index 1000) y quedar por encima del overlay (z-index 1050).
+      document.body.appendChild(mobileMenu);
   }
 
   function openMenu() {
       header.classList.add('menu-open');
+      mobileMenu.classList.add('open');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
       menuBtn.setAttribute('aria-expanded', 'true');
   }
   function closeMenu() {
       header.classList.remove('menu-open');
+      mobileMenu.classList.remove('open');
       overlay.classList.remove('active');
       document.body.style.overflow = '';
       menuBtn.setAttribute('aria-expanded', 'false');

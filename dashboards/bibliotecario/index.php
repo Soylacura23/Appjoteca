@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../backend/models/historial.php';
 requiereRol([3]);
 
 $queryStats = "SELECT 
-    (SELECT COUNT(*) FROM libros) as total_libros,
-    (SELECT COUNT(*) FROM reservas WHERE estado = 'activa') as reservas_pendientes,
+    (SELECT COUNT(*) FROM libros WHERE fecha_eliminacion_libro IS NULL) as total_libros,
+    (SELECT COUNT(*) FROM reservas WHERE estado IN ('pendiente', 'activa')) as reservas_pendientes,
     (SELECT COUNT(*) FROM prestamos WHERE estado = 'activo') as prestamos_activos,
     (SELECT COUNT(*) FROM prestamos WHERE estado = 'activo' AND fecha_devolucion_prevista < CURDATE()) as prestamos_vencidos";
 $stats = $connection->query($queryStats)->fetch_assoc();
@@ -47,6 +47,10 @@ $historial = $modeloHistorial->obtenerRecientes(5);
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/typography.css">
+
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
     
     <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
 </head>
@@ -220,6 +224,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
 </main>
 
 <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
+<script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../shared/js/global.js"></script>
 <script src="js/dashboard.js"></script>
 </body>

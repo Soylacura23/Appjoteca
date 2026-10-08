@@ -456,10 +456,12 @@ img.hero-background{
     /*end table grid*/
     /* start second grid column */
 
-.one-column-grid{
+ .one-column-grid{
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 230px 200px auto;
+  /* La tarjeta destacada (1fr) absorbe el espacio extra y el historial
+     se mantiene con altura tope + scroll interno */
+  grid-template-rows: minmax(230px, 1fr) auto;
   gap: 25px;
 }
 
@@ -472,6 +474,8 @@ img.hero-background{
   border-radius: var(--border-radius-sm);
 }
 img.featured-image{
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -579,13 +583,44 @@ img.featured-image{
         /*end social networks row */
         /*start history row */
 
-.history{
+ .history{
   background: var(--surface);
   border: 1px solid rgba(153, 144, 124, 0.12);
   border-radius: var(--border-radius-sm);
   min-height: 170px;
+  max-height: 360px;
   padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(242, 202, 80, 0.35) rgba(255, 255, 255, 0.03);
 }
+/* Scrollbar interna discreta y elegante */
+.history::-webkit-scrollbar { width: 8px; }
+.history::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin: 4px 0;
+}
+.history::-webkit-scrollbar-thumb {
+  background: rgba(242, 202, 80, 0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.history::-webkit-scrollbar-thumb:hover { background: rgba(242, 202, 80, 0.55); }
+.history::-webkit-scrollbar-corner { background: transparent; }
+
+/* En móvil el historial es más bajo pero conserva su scroll interno */
+@media (max-width: 600px){
+  .history{
+    max-height: 300px;
+  }
+  .one-column-grid{
+    grid-template-rows: 200px auto;
+  }
+}
+
 .history p{
   font-size: 0.85rem;
   letter-spacing: 1.2px;

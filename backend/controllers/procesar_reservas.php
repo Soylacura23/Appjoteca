@@ -41,12 +41,24 @@ if ($accion === 'aceptar') {
         exit();
     }
 
-    $id_usuario = $modeloReserva->obtenerUsuarioDeReserva($id_reserva);
-    $id_prestamo = $modeloReserva->aceptarReserva($id_reserva);
+    $detalle = $modeloReserva->obtenerDetalleReserva($id_reserva);
+    if (!$detalle) {
+        echo json_encode(['ok' => false, 'error' => 'Reserva no encontrada']);
+        exit();
+    }
 
-    if ($id_prestamo) {
+    $id_usuario = (int) $detalle['id_usuario'];
+    $tituloLibro = $detalle['libro'] ?? 'el libro';
+    $cantidadSolicitada = max(1, (int) ($detalle['cantidad'] ?? 1));
+    $ids_prestamo = $modeloReserva->aceptarReserva($id_reserva);
+
+    if ($ids_prestamo && is_array($ids_prestamo) && count($ids_prestamo) > 0) {
+        $n = count($ids_prestamo);
+        $ejemplaresTxt = $n === 1 ? '1 ejemplar' : "{$n} ejemplares";
+        $idsTxt = implode(', #', $ids_prestamo);
+
         $modeloNotif->crear(
-            "Tu reserva #$id_reserva fue aceptada. Ya puedes reclamar el libro.",
+            "Tu reserva #$id_reserva del libro «{$tituloLibro}» fue aceptada ({$ejemplaresTxt}). Ya puedes reclamarlo.",
             "/Appjoteca/pages/history/historial.php",
             $id_usuario
         );
@@ -55,10 +67,16 @@ if ($accion === 'aceptar') {
             $id_usuario,
             'reserva',
             'Reserva aceptada',
-            "Reserva #$id_reserva · Préstamo #$id_prestamo generado"
+            "Reserva #$id_reserva · «{$tituloLibro}» · {$ejemplaresTxt} · Préstamo(s) #{$idsTxt}"
         );
 
-        echo json_encode(['ok' => true, 'id_prestamo' => $id_prestamo]);
+        echo json_encode([
+            'ok'           => true,
+            'id_prestamo'  => $ids_prestamo[0],
+            'id_prestamos' => $ids_prestamo,
+            'cantidad'     => $n,
+            'solicitados'  => $cantidadSolicitada
+        ]);
     } else {
         echo json_encode(['ok' => false, 'error' => 'No se pudo aceptar la reserva. Verifica disponibilidad.']);
     }
@@ -72,12 +90,19 @@ if ($accion === 'rechazar') {
         exit();
     }
 
-    $id_usuario = $modeloReserva->obtenerUsuarioDeReserva($id_reserva);
+    $detalle = $modeloReserva->obtenerDetalleReserva($id_reserva);
+    if (!$detalle) {
+        echo json_encode(['ok' => false, 'error' => 'Reserva no encontrada']);
+        exit();
+    }
+
+    $id_usuario = (int) $detalle['id_usuario'];
+    $tituloLibro = $detalle['libro'] ?? 'el libro';
     $ok = $modeloReserva->rechazarReserva($id_reserva, $observacion ?: 'Rechazada por bibliotecario');
 
     if ($ok) {
         $modeloNotif->crear(
-            "Tu reserva #$id_reserva fue rechazada.",
+            "Tu reserva #$id_reserva del libro «{$tituloLibro}» fue rechazada.",
             "/Appjoteca/pages/history/historial.php",
             $id_usuario
         );
@@ -86,7 +111,7 @@ if ($accion === 'rechazar') {
             $id_usuario,
             'reserva',
             'Reserva rechazada',
-            "Reserva #$id_reserva · Rechazada por bibliotecario"
+            "Reserva #$id_reserva · «{$tituloLibro}» · Rechazada por bibliotecario"
         );
 
         echo json_encode(['ok' => true]);
@@ -95,7 +120,6 @@ if ($accion === 'rechazar') {
     }
     exit();
 }
-
 // ── DEVOLVER PRÉSTAMO ────────────────────────────────────
 if ($accion === 'devolver') {
     if ($id_prestamo <= 0) {

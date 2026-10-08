@@ -18,25 +18,29 @@ requiereRol([3]);
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
 
-    <!-- SweetAlert2 (requerido por alert.js) -->
+    <!-- SweetAlert2-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Tabulator -->
     <link href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.1/dist/css/tabulator_midnight.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
 
-    <!-- 1. THEME GLOBAL -->
+    <!-- THEME GLOBAL -->
     <link rel="stylesheet" href="../../../../shared/css/theme.css">
 
-    <!-- 2. Componentes Compartidos -->
+    <!-- Componentes Compartidos -->
     <link rel="stylesheet" href="../../../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../../../shared/css/components/footer.css">
 
-    <!-- 3. Estilos Locales del Dashboard -->
+    <!-- Estilos Locales del Dashboard -->
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="configuracion-catalogo.css">
     <link rel="stylesheet" href="../../css/typography.css">
+
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 
     <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
 <base target="_self">
@@ -373,7 +377,9 @@ requiereRol([3]);
 
     <!-- Componente de alertas (define window.alerta con SweetAlert2) -->
     <script src="../../../../shared/js/components/alert.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../../../shared/js/global.js"></script>
+
     <script src="configuracion-catalogo.js"></script>
 </body>
 </html>

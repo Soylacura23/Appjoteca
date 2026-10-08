@@ -1,4 +1,46 @@
+<?php
+require_once __DIR__ . '/../../../backend/config/auth.php';
+require_once __DIR__ . '/../../../backend/config/user_context.php';
+require_once __DIR__ . '/../../../backend/Database/conexion.php';
+require_once __DIR__ . '/../../../backend/models/libro.php';
+require_once __DIR__ . '/../../../backend/models/reserva.php';
+require_once __DIR__ . '/../../../backend/helpers/libros.php';
 
+$idLibro = (int) ($_GET['id'] ?? 0);
+if ($idLibro <= 0) {
+    header('Location: ../vista-libro/book-view.php');
+    exit();
+}
+
+$modeloLibro = new libro($connection);
+$libro = $modeloLibro->obtenerLibro($idLibro);
+
+if (!$libro) {
+    header('Location: ../../biblioteca-digital/index.php');
+    exit();
+}
+
+$librosRelacionados = $modeloLibro->obtenerRelacionados($idLibro, 4);
+$reservaPendiente = (new Reserva($connection))->obtenerPendienteDeUsuario((int) $_SESSION['usuario_id'], $idLibro);
+$disp = disponibilidadLibro($libro);
+
+$maxCantidad = max(1, (int) $disp['cantidad']);
+$cantidadInicial = (int) ($_GET['cantidad'] ?? 1);
+
+if ($cantidadInicial < 1) $cantidadInicial = 1;
+if ($cantidadInicial > $maxCantidad) $cantidadInicial = $maxCantidad;
+
+$portada = urlPortada($libro['portada'] ?? '');
+$portadaDefault = __DIR__ . '/../../../assets/images/books/default-cover.jpg';
+
+$titulo  = $libro['titulo'] ?? 'Sin título';
+$autores = $libro['autores'] ?: 'Autor desconocido';
+$materia = $libro['materia'] ?? 'General';
+$idioma  = $libro['idioma_nombre'] ?? ($libro['nombre_idioma'] ?? 'Español');
+$edicion = $libro['edicion'] ?? '';
+$anio    = $libro['publicacion_year'] ?? '';
+$edicionLabel = trim(($edicion !== '' ? $edicion : 'Edición') . ($anio ? ' · ' . $anio : ''));
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,7 +62,9 @@
 
   <!-- Estilo propio -->
   <link rel="stylesheet" href="reservacion.css">
-<base target="_self">
+  <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
@@ -28,132 +72,10 @@
        OVERLAY GLOBAL
   ══════════════════════════════════════════════ -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
+  <?php include __DIR__ . '/../../../shared/layouts/notifications.php'; ?>
+  <?php include __DIR__ . '/../../../shared/layouts/menu-off-canvas.php'; ?>
 
-
-  <!-- ══════════════════════════════════════════
-       BANDEJA DE NOTIFICACIONES
-  ══════════════════════════════════════════════ -->
-  <div class="notification-container" id="notification-container" role="dialog" aria-label="Notificaciones" aria-hidden="true">
-    <div class="notification-header">
-      <h3 class="notification-header-title">
-        Notificaciones
-        <span class="count-pill">3</span>
-      </h3>
-      <button class="notification-mark-all" id="mark-all-read">Marcar leídas</button>
-    </div>
-
-    <div class="notification-list">
-      <div class="notification-item unread">
-        <span class="notification-dot"></span>
-        <div class="notification-icon">
-          <span class="material-symbols-outlined">auto_stories</span>
-        </div>
-        <div class="notification-body">
-          <p class="notification-title">Reserva confirmada</p>
-          <p class="notification-desc">Tu reserva fue aprobada. Disponible para recoger hoy.</p>
-        </div>
-        <span class="notification-time">2m</span>
-      </div>
-      <div class="notification-item unread">
-        <span class="notification-dot"></span>
-        <div class="notification-icon">
-          <span class="material-symbols-outlined">schedule</span>
-        </div>
-        <div class="notification-body">
-          <p class="notification-title">Préstamo por vencer</p>
-          <p class="notification-desc">"Ética a Nicómaco" vence en 2 días. Renueva para evitar cargos.</p>
-        </div>
-        <span class="notification-time">1h</span>
-      </div>
-      <div class="notification-item unread">
-        <span class="notification-dot"></span>
-        <div class="notification-icon">
-          <span class="material-symbols-outlined">new_releases</span>
-        </div>
-        <div class="notification-body">
-          <p class="notification-title">Nuevos ingresos</p>
-          <p class="notification-desc">Se agregaron 14 títulos nuevos al catálogo esta semana.</p>
-        </div>
-        <span class="notification-time">3h</span>
-      </div>
-      <div class="notification-item">
-        <span class="notification-dot"></span>
-        <div class="notification-icon">
-          <span class="material-symbols-outlined">check_circle</span>
-        </div>
-        <div class="notification-body">
-          <p class="notification-title">Devolución registrada</p>
-          <p class="notification-desc">"Constelaciones Doradas" fue devuelto exitosamente el 28 de mayo.</p>
-        </div>
-        <span class="notification-time">2d</span>
-      </div>
-    </div>
-
-    <div class="notification-footer">
-      <button class="notification-see-all">Ver todas las notificaciones</button>
-    </div>
-  </div>
-
-
-  <!-- ══════════════════════════════════════════
-       MENÚ OFF-CANVAS DE PERFIL
-  ══════════════════════════════════════════════ -->
-  <div class="menu-off-canva" role="dialog" aria-modal="true" aria-label="Menú de perfil">
-    <button class="material-symbols-outlined arrow-back" aria-label="Cerrar menú de perfil">arrow_back_ios</button>
-    <div id="profile-button-menu"></div>
-    <div class="menu-off-canva-divider"></div>
-    <div class="menu-buttons">
-      <button class="config" type="button">
-        <span class="material-symbols-outlined">settings</span>
-        Configuración
-      </button>
-      <button class="signout" type="button">
-        <span class="material-symbols-outlined">logout</span>
-        Cerrar Sesión
-      </button>
-    </div>
-  </div>
-
-
-  <!-- ══════════════════════════════════════════
-       BARRA DE NAVEGACIÓN
-  ══════════════════════════════════════════════ -->
-  <header class="topbar" role="banner">
-    <div class="topbar-inner">
-         <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-</a>
-
-      <div class="topbar-search">
-        <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
-        <span class="material-symbols-outlined topbar-search-icon">search</span>
-      </div>
-
-      <nav class="topbar-nav" aria-label="Navegación principal">
-        <a href="../../biblioteca-digital/index.php" class="nav-link" data-nav="catalogo">Catálogo</a>
-        <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
-        <a href="#" class="nav-link" data-nav="panel">Panel</a>
-      </nav>
-
-      <div class="topbar-actions">
-        <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-          <span class="material-symbols-outlined">search</span>
-        </button>
-        <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-          <span class="material-symbols-outlined">notifications</span>
-          <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
-        </button>
-        <div id="profile-button-topbar"></div>
-        <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-          <span class="material-symbols-outlined">menu</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="topbar-search-mobile" aria-hidden="true">
-      <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
-    </div>
-  </header>
+  <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
 
 
   <!-- ══════════════════════════════════════════
@@ -280,15 +202,54 @@
               Solicitud de Reservación
             </h2>
 
-            <form id="reservation-form">
-              <div class="form-group">
-                <label for="reason">RAZÓN DE RESERVA (OPCIONAL)</label>
-                <textarea
-                  id="reason"
-                  name="reason"
-                  placeholder="Describe brevemente el motivo de tu investigación..."
-                ></textarea>
+            <?php if ($reservaPendiente): ?>
+              <p class="pending-note">
+                Ya tienes una solicitud <strong>pendiente</strong> de este libro.
+                El bibliotecario la verá hasta que la apruebe o la rechace. Puedes cancelarla cuando quieras.
+              </p>
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="cancel-reserva-btn"
+                  data-id-reserva="<?php echo (int) $reservaPendiente['id_reserva']; ?>"
+                >
+                  Cancelar solicitud
+                </button>
               </div>
+            <?php else: ?>
+              
+              <form id="reservation-form" data-id-libro="<?php echo $idLibro; ?>" data-max-cantidad="<?php echo $maxCantidad; ?>">
+                <div class="form-group">
+                  <label for="qty-input">CANTIDAD DE EJEMPLARES</label>
+                  <div class="qty-control" aria-label="Cantidad de ejemplares a reservar">
+                    <button type="button" class="qty-btn" id="qty-minus" aria-label="Disminuir cantidad">−</button>
+                    <input
+                      type="number"
+                      id="qty-input"
+                      name="cantidad"
+                      class="qty-input"
+                      value="<?php echo $cantidadInicial; ?>"
+                      min="1"
+                      max="<?php echo $maxCantidad; ?>"
+                      data-max="<?php echo $maxCantidad; ?>"
+                      aria-label="Cantidad"
+                      required
+                    >
+                    <button type="button" class="qty-btn" id="qty-plus" aria-label="Aumentar cantidad">+</button>
+                  </div>
+                  <p class="loan-note">Máximo disponible: <?php echo $maxCantidad; ?> ejemplar<?php echo $maxCantidad === 1 ? '' : 'es'; ?>.</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="reason">RAZÓN DE RESERVA (OPCIONAL)</label>
+                  <textarea
+                    id="reason"
+                    name="reason"
+                    maxlength="100"
+                    placeholder="Describe brevemente el motivo..."
+                  ></textarea>
+                </div>
 
               <div class="date-row">
                 <div class="form-group">
@@ -313,6 +274,8 @@
               </div>
 
               <div id="message" class="message"></div>
+
+              <?php endif; ?>
             </form>
           </div>
         </section>
@@ -434,66 +397,13 @@
   <!-- ══════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════ -->
-  <footer class="footer" role="contentinfo">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">AppJoteca</span>
-        <p class="footer-tagline">
-          Punto de acceso institucional para fomentar la lectura en los estudiantes de la institución.
-        </p>
-        <div class="footer-social">
-          <button class="footer-social-btn" aria-label="Sitio web">
-            <span class="material-symbols-outlined">language</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Compartir">
-            <span class="material-symbols-outlined">share</span>
-          </button>
-          <button class="footer-social-btn" aria-label="Correo electrónico">
-            <span class="material-symbols-outlined">mail</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="footer-nav-cols">
-        <div class="footer-col">
-          <p class="footer-col-title">Explorar</p>
-          <nav>
-            <a href="#">El Catálogo</a>
-            <a href="#">Nuevos Ingresos</a>
-            <a href="#">Mi Biblioteca</a>
-            <a href="#">Mapa Institucional</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Sistema</p>
-          <nav>
-            <a href="#">Términos de Uso</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Soporte</a>
-            <a href="#">Accesibilidad</a>
-          </nav>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Acceso</p>
-          <nav>
-            <a href="#">Acceso Institucional</a>
-            <a href="#">Panel Administrativo</a>
-            <a href="#">Contacto</a>
-          </nav>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        &copy; 2024 AppJoteca &nbsp;·&nbsp; Sistema de Biblioteca Institucional
-      </p>
-    </div>
-  </footer>
-
+  <?php include __DIR__ . '/../../../shared/layouts/footer.php'; ?>
 
   <!-- Scripts compartidos -->
   <script src="../../../shared/js/components/navbar.js"></script>
+  <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+  <script src="../../../shared/js/components/book-cards.js"></script>
+  <script src="../../../shared/js/components/alert.js"></script>
   <script src="../../../shared/js/global.js"></script>
 
   <!-- Script propio -->

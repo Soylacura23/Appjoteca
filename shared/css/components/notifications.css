@@ -341,7 +341,122 @@
     opacity: 1;
 }
 
+.notification-item.expanded .notification-title,
+.notification-item:hover .notification-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
 
+.notification-item.expanded .notification-desc,
+.notification-item:hover .notification-desc {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+}
+
+.notification-item.expanded {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── Eliminar / swipe / expandir (versión corregida) ── */
+
+/* El item no debe pintar fondo rojo a pantalla completa */
+.notification-item {
+    position: relative;
+    overflow: hidden;
+    /* Si tenías padding aquí, déjalo en 0 y usa el del content */
+    padding: 0 !important;
+}
+
+/* Capa del contenido (lo que se mueve al deslizar) */
+.notification-item-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 22px;
+    position: relative;
+    z-index: 1;
+    background: #0a0a0a; /* mismo fondo del panel, tapa el rojo */
+    transition: transform 0.2s ease;
+}
+
+/* Rojo SOLO debajo, se ve al deslizar hacia la izquierda */
+.notification-item::before {
+    content: 'delete';
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    background: #5c1a1a;
+    color: #ffb4ab;
+    font-size: 22px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+/* Solo se nota el rojo cuando estás deslizando */
+.notification-item.swiping::before {
+    opacity: 1;
+}
+
+/* Botón X */
+.notification-delete {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.notification-delete .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.notification-delete:hover {
+    color: #ffb4ab;
+    background: rgba(255, 100, 100, 0.12);
+}
+
+/* Animación al eliminar */
+.notification-item.removing {
+    opacity: 0;
+    max-height: 0;
+    transition: opacity 0.2s ease, max-height 0.22s ease;
+}
+
+/* Texto completo al expandir / hover */
+.notification-item.expanded .notification-title,
+.notification-item:hover .notification-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.notification-item.expanded .notification-desc,
+.notification-item:hover .notification-desc {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+}
+
+.notification-item.expanded .notification-item-content {
+    background: rgba(255, 255, 255, 0.03);
+}
 /* ────────────────────────────────────────────────
    Responsive
    ──────────────────────────────────────────────── */

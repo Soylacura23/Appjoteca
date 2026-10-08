@@ -16,7 +16,10 @@
     <link rel="stylesheet" href="../../../shared/css/components/book-card.css">
     <link rel="stylesheet" href="book-view.css">
     <link rel="stylesheet" href="../../../shared/css/components/footer.css">
-<base target="_self">
+    
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
@@ -24,165 +27,10 @@
          OVERLAY GLOBAL
     ══════════════════════════════════════════════ -->
     <div id="overlay" class="overlay" aria-hidden="true"></div>
+    <?php include __DIR__ . '/../../../shared/layouts/notifications.php'; ?>
+    <?php include __DIR__ . '/../../../shared/layouts/menu-off-canvas.php'; ?>
 
-
-    <!-- ══════════════════════════════════════════
-         BANDEJA DE NOTIFICACIONES
-    ══════════════════════════════════════════════ -->
-    <div class="notification-container" id="notification-container" role="dialog" aria-label="Notificaciones" aria-hidden="true">
-        <div class="notification-header">
-            <h3 class="notification-header-title">
-                Notificaciones
-                <span class="count-pill">3</span>
-            </h3>
-            <button class="notification-mark-all" id="mark-all-read">Marcar leídas</button>
-        </div>
-
-        <div class="notification-list">
-
-            <div class="notification-item unread">
-                <span class="notification-dot"></span>
-                <div class="notification-icon">
-                    <span class="material-symbols-outlined">auto_stories</span>
-                </div>
-                <div class="notification-body">
-                    <p class="notification-title">Reserva confirmada</p>
-                    <p class="notification-desc">Tu reserva de "Cien Años de Soledad" fue aprobada. Disponible para recoger hoy.</p>
-                </div>
-                <span class="notification-time">2m</span>
-            </div>
-
-            <div class="notification-item unread">
-                <span class="notification-dot"></span>
-                <div class="notification-icon">
-                    <span class="material-symbols-outlined">schedule</span>
-                </div>
-                <div class="notification-body">
-                    <p class="notification-title">Préstamo por vencer</p>
-                    <p class="notification-desc">"Ética a Nicómaco" vence en 2 días. Renueva para evitar cargos.</p>
-                </div>
-                <span class="notification-time">1h</span>
-            </div>
-
-            <div class="notification-item unread">
-                <span class="notification-dot"></span>
-                <div class="notification-icon">
-                    <span class="material-symbols-outlined">new_releases</span>
-                </div>
-                <div class="notification-body">
-                    <p class="notification-title">Nuevos ingresos</p>
-                    <p class="notification-desc">Se agregaron 14 títulos nuevos al catálogo esta semana.</p>
-                </div>
-                <span class="notification-time">3h</span>
-            </div>
-
-            <div class="notification-item">
-                <span class="notification-dot"></span>
-                <div class="notification-icon">
-                    <span class="material-symbols-outlined">check_circle</span>
-                </div>
-                <div class="notification-body">
-                    <p class="notification-title">Devolución registrada</p>
-                    <p class="notification-desc">"Constelaciones Doradas" fue devuelto exitosamente el 28 de mayo.</p>
-                </div>
-                <span class="notification-time">2d</span>
-            </div>
-
-        </div>
-
-        <div class="notification-footer">
-            <button class="notification-see-all">Ver todas las notificaciones</button>
-        </div>
-    </div>
-
-
-    <!-- ══════════════════════════════════════════
-         MENÚ OFF-CANVAS DE PERFIL
-    ══════════════════════════════════════════════ -->
-    <div class="menu-off-canva" role="dialog" aria-modal="true" aria-label="Menú de perfil">
-        <button class="material-symbols-outlined arrow-back" aria-label="Cerrar menú de perfil">arrow_back_ios</button>
-
-        <div id="profile-button-menu">
-            
-        </div>
-
-        <div class="menu-off-canva-divider"></div>
-
-        <div class="menu-buttons">
-            <button class="config" type="button">
-                <span class="material-symbols-outlined">settings</span>
-                Configuración
-            </button>
-            <button class="signout" type="button">
-                <span class="material-symbols-outlined">logout</span>
-                Cerrar Sesión
-            </button>
-        </div>
-    </div>
-
-
-    <!-- ══════════════════════════════════════════
-         BARRA DE NAVEGACIÓN
-    ══════════════════════════════════════════════ -->
-    <header class="topbar" role="banner">
-        <div class="topbar-inner">
-
-            <!-- Logo -->
-            <a href="#" class="topbar-logo">
-                <div class="logo" aria-hidden="true"></div>
-                <span class="logo-text">AppJoteca</span>
-            </a>
-
-            <!-- Búsqueda inline (desktop) -->
-            <div class="topbar-search">
-                <input
-                    type="text"
-                    class="topbar-search-input"
-                    placeholder="Buscar título o autor..."
-                    aria-label="Buscar en el catálogo"
-                >
-                <span class="material-symbols-outlined topbar-search-icon">search</span>
-            </div>
-
-            <!-- Links de navegación (desktop) -->
-            <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="/pages/biblioteca-digital/index.html" class="nav-link active" data-nav="catalogo">Catálogo</a>
-                <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
-                <a href="#" class="nav-link" data-nav="panel">Panel</a>
-            </nav>
-
-            <!-- Acciones -->
-            <div class="topbar-actions">
-                <!-- Búsqueda móvil -->
-                <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-
-                <!-- Notificaciones -->
-                <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
-                </button>
-
-                <!-- Perfil -->
-                <div id="profile-button-topbar"></div>
-
-                <!-- Hamburguesa -->
-                <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Búsqueda expandible en móvil -->
-        <div class="topbar-search-mobile" aria-hidden="true">
-            <input
-                type="text"
-                placeholder="Buscar título o autor..."
-                aria-label="Buscar en el catálogo"
-            >
-        </div>
-    </header>
+    <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
 
 
     <!-- ══════════════════════════════════════════
@@ -523,6 +371,7 @@
 
     <!-- Scripts -->
     <script src="../../../shared/js/components/navbar.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../../shared/js/components/book-cards.js"></script>
     <script src="../../../shared/js/global.js"></script>
     <script src="book-view.js"></script>

@@ -23,6 +23,11 @@ requiereRol([3]);
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="reportes.css">
     <link rel="stylesheet" href="../../css/typography.css">
+
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+    
     <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
     <base target="_self">
 </head>
@@ -235,6 +240,7 @@ requiereRol([3]);
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../../../shared/js/global.js"></script>
 <script src="reportes.js"></script>
 </body>

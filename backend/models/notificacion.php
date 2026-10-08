@@ -1,6 +1,6 @@
 <?php
-
-class Notificacion {
+class Notificacion
+{
     private $db;
 
     public function __construct($connection)
@@ -8,111 +8,162 @@ class Notificacion {
         $this->db = $connection;
     }
 
-    /**
- * Devuelve los ids de todos los usuarios con un rol específico.
- * Útil para notificar a todos los bibliotecarios (rol 3) o admins (rol 4).
- */
+    /**  */
     public function obtenerUsuariosPorRol($id_rol)
     {
         $sql = "SELECT id_usuario FROM usuarios WHERE id_rol = ? AND estado = '1'";
-        $query = $this->db->prepare($sql);
-        $query->bind_param("i", $id_rol);
-        $query->execute();
-        $resultado = $query->get_result();
+        $q = $this->db->prepare($sql);
+        $q->bind_param('i', $id_rol);
+        $q->execute();
+        $res = $q->get_result();
 
         $ids = [];
-        while ($fila = $resultado->fetch_assoc()) {
-            $ids[] = (int)$fila['id_usuario'];
+        while ($fila = $res->fetch_assoc()) {
+            $ids[] = (int) $fila['id_usuario'];
         }
-        $query->close();
-
+        $q->close();
         return $ids;
     }
 
     /**
-     * Crea una notificación y la asigna a uno o varios usuarios.
-     * 
-     * @param string $mensaje
+     * @param string     $mensaje
      * @param string|null $url_accion
-     * @param array|int $usuarios  Un id o array de ids
-     * @return int|false  id_notificacion o false
+     * @param int|array  $usuarios  id o lista de ids
+     * @return int|false id_notificacion
      */
     public function crear($mensaje, $url_accion, $usuarios)
     {
         try {
             $this->db->begin_transaction();
 
-            // Crear notificación
             $sqlNoti = "INSERT INTO notificaciones (mensaje, url_accion) VALUES (?, ?)";
             $qNoti = $this->db->prepare($sqlNoti);
-            $qNoti->bind_param("ss", $mensaje, $url_accion);
+            $qNoti->bind_param('ss', $mensaje, $url_accion);
             $qNoti->execute();
-            $id_notificacion = $this->db->insert_id;
+            $id_notificacion = (int) $this->db->insert_id;
             $qNoti->close();
 
-            // Normalizar usuarios
             if (!is_array($usuarios)) {
                 $usuarios = [$usuarios];
             }
 
-            // Asignar a cada usuario
-            $sqlRel = "INSERT INTO notificacion_usuario (id_notificacion, id_usuario) VALUES (?, ?)";
+            $sqlRel = "INSERT INTO notificacion_usuario (id_notificacion, id_usuario, leida) VALUES (?, ?, 0)";
             $qRel = $this->db->prepare($sqlRel);
 
-            $id_user = 0;
-            $qRel->bind_param("ii", $id_notificacion, $id_user);
-
             foreach ($usuarios as $uid) {
-                $id_user = (int)$uid;
-                if ($id_user > 0) {
-                    $qRel->execute();
+                $id_user = (int) $uid;
+                if ($id_user <= 0) {
+                    continue;
                 }
+                $qRel->bind_param('ii', $id_notificacion, $id_user);
+                $qRel->execute();
             }
             $qRel->close();
 
             $this->db->commit();
             return $id_notificacion;
-
         } catch (Exception $e) {
             $this->db->rollback();
-            error_log("Error en crear notificacion: " . $e->getMessage());
+            error_log('Error crear notificacion: ' . $e->getMessage());
             return false;
         }
     }
 
-    public function obtenerNoLeidas($id_usuario)
+    
+    public function listar($id_usuario, $limite = 5, $offset = 0)
     {
-        $sql = "SELECT n.id_notificacion, n.mensaje, n.url_accion, n.fecha_creacion
+        $limite  = max(1, (int) $limite);
+        $offset  = max(0, (int) $offset);
+        $id_usuario = (int) $id_usuario;
+
+        $sql = "SELECT n.id_notificacion, n.mensaje, n.url_accion, n.fecha_creacion,
+                       nu.leida
                 FROM notificaciones n
-                JOIN notificacion_usuario nu ON n.id_notificacion = nu.id_notificacion
-                WHERE nu.id_usuario = ? AND n.leida = 0
-                ORDER BY n.fecha_creacion DESC";
+                INNER JOIN notificacion_usuario nu ON nu.id_notificacion = n.id_notificacion
+                WHERE nu.id_usuario = ?
+                ORDER BY nu.leida ASC, n.fecha_creacion DESC
+                LIMIT ? OFFSET ?";
 
-        $query = $this->db->prepare($sql);
-        $query->bind_param("i", $id_usuario);
-        $query->execute();
-        $resultado = $query->get_result();
+        $q = $this->db->prepare($sql);
+        $q->bind_param('iii', $id_usuario, $limite, $offset);
+        $q->execute();
+        $res = $q->get_result();
 
-        $notificaciones = [];
-        while ($fila = $resultado->fetch_assoc()) {
-            $notificaciones[] = $fila;
+        $lista = [];
+        while ($fila = $res->fetch_assoc()) {
+            $lista[] = [
+                'id'         => (int) $fila['id_notificacion'],
+                'mensaje'    => $fila['mensaje'],
+                'url'        => $fila['url_accion'],
+                'leida'      => (int) $fila['leida'] === 1,
+                'fecha'      => $fila['fecha_creacion'],
+            ];
         }
-        $query->close();
-
-        return $notificaciones;
+        $q->close();
+        return $lista;
     }
 
-    public function marcarLeida($id_notificacion)
+    public function contar($id_usuario)
     {
-        $sql = "UPDATE notificaciones SET leida = 1 WHERE id_notificacion = ?";
-        $query = $this->db->prepare($sql);
-        $query->bind_param("i", $id_notificacion);
-        $query->execute();
+        $sql = "SELECT COUNT(*) AS total
+                FROM notificacion_usuario
+                WHERE id_usuario = ?";
+        $q = $this->db->prepare($sql);
+        $q->bind_param('i', $id_usuario);
+        $q->execute();
+        $total = (int) $q->get_result()->fetch_assoc()['total'];
+        $q->close();
+        return $total;
+    }
 
-        $ok = $query->affected_rows > 0;
-        $query->close();
+    public function contarNoLeidas($id_usuario)
+    {
+        $sql = "SELECT COUNT(*) AS total
+                FROM notificacion_usuario
+                WHERE id_usuario = ? AND leida = 0";
+        $q = $this->db->prepare($sql);
+        $q->bind_param('i', $id_usuario);
+        $q->execute();
+        $total = (int) $q->get_result()->fetch_assoc()['total'];
+        $q->close();
+        return $total;
+    }
+
+    public function marcarLeida($id_notificacion, $id_usuario)
+    {
+        $sql = "UPDATE notificacion_usuario
+                SET leida = 1
+                WHERE id_notificacion = ? AND id_usuario = ?";
+        $q = $this->db->prepare($sql);
+        $q->bind_param('ii', $id_notificacion, $id_usuario);
+        $q->execute();
+        $ok = $q->affected_rows >= 0;
+        $q->close();
+        return $ok;
+    }
+
+    public function marcarTodasLeidas($id_usuario)
+    {
+        $sql = "UPDATE notificacion_usuario
+                SET leida = 1
+                WHERE id_usuario = ? AND leida = 0";
+        $q = $this->db->prepare($sql);
+        $q->bind_param('i', $id_usuario);
+        $q->execute();
+        $ok = $q->affected_rows >= 0;
+        $q->close();
+        return $ok;
+    }
+
+    public function eliminar($id_notificacion, $id_usuario)
+    {
+        $sql = "DELETE FROM notificacion_usuario
+                WHERE id_notificacion = ? AND id_usuario = ?";
+        $q = $this->db->prepare($sql);
+        $q->bind_param('ii', $id_notificacion, $id_usuario);
+        $q->execute();
+        $ok = $q->affected_rows > 0;
+        $q->close();
         return $ok;
     }
 }
-
-?>

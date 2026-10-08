@@ -1,37 +1,26 @@
 <?php
-
-ini_set('display_errors', 1);          
+ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-error_reporting(E_ALL);                 
+error_reporting(E_ALL);
 ini_set('log_errors', 1);
 
+header('Content-Type: application/json; charset=utf-8');
 
-require("../Database/conexion.php");
+require __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
 
-header('Content-Type: application/json');
-
-$rol_recibido = 1;
-
-$tabla_roles = [
-    'estudiante'    => 1,
-    'profesor'      => 2,
-    'bibliotecario' => 3
-];
-
-$id_rol = $tabla_roles[$rol_recibido];
-
-
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
     exit;
 }
 
-$nombre            = trim($_POST["nombre"]  ?? '');
-$usuario           = trim($_POST["usuario"] ?? '');
-$correo            = trim($_POST["email"]   ?? '');
-$documento         = trim($_POST["cedula"]  ?? '');
-$contrasena_plana  = $_POST["contrasena"]   ?? '';
+$id_rol = 1;
+
+$nombre           = trim($_POST['nombre'] ?? '');
+$usuario          = trim($_POST['usuario'] ?? '');
+$correo           = trim($_POST['email'] ?? '');
+$documento        = trim($_POST['cedula'] ?? '');
+$contrasena_plana = $_POST['contrasena'] ?? '';
 
 if ($nombre === '' || $usuario === '' || $correo === '' || $documento === '' || $contrasena_plana === '') {
     echo json_encode(['status' => 'error', 'message' => 'Faltan datos obligatorios.']);
@@ -46,8 +35,7 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
 $contrasena_encriptada = password_hash($contrasena_plana, PASSWORD_BCRYPT);
 
 date_default_timezone_set('America/Bogota');
-$fecha_creacion = date("Y-m-d H:i:s");
-
+$fecha_creacion = date('Y-m-d H:i:s');
 
 $uploadDir = __DIR__ . '/../../uploads/profiles/documents/';
 
@@ -57,7 +45,6 @@ if (!isset($_FILES['cedula_file']) || $_FILES['cedula_file']['error'] !== UPLOAD
 }
 
 $file = $_FILES['cedula_file'];
-
 $maxSizeBytes = 10 * 1024 * 1024;
 
 if ($file['size'] > $maxSizeBytes) {
@@ -73,7 +60,7 @@ $allowedMimeTypes = [
     'image/jpeg'      => 'jpg',
     'image/png'       => 'png',
     'image/webp'      => 'webp',
-    'application/pdf' => 'pdf'
+    'application/pdf' => 'pdf',
 ];
 
 if (!array_key_exists($mimeType, $allowedMimeTypes)) {
@@ -81,10 +68,13 @@ if (!array_key_exists($mimeType, $allowedMimeTypes)) {
     exit;
 }
 
-$extension = $allowedMimeTypes[$mimeType];
+$extension   = $allowedMimeTypes[$mimeType];
+$nuevoNombre = 'doc_' . bin2hex(random_bytes(16)) . '.' . $extension;
+$rutaDestino = $uploadDir . $nuevoNombre;
 
-$nuevoNombre   = 'doc_' . bin2hex(random_bytes(16)) . '.' . $extension;
-$rutaDestino   = $uploadDir . $nuevoNombre;
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
 
 if (!move_uploaded_file($file['tmp_name'], $rutaDestino)) {
     echo json_encode(['status' => 'error', 'message' => 'No se pudo guardar el archivo en el servidor.']);
@@ -92,25 +82,25 @@ if (!move_uploaded_file($file['tmp_name'], $rutaDestino)) {
 }
 
 $rutaRelativaBD = 'uploads/profiles/documents/' . $nuevoNombre;
+$estado         = 'pendiente';
 
-$estado = 'pendiente';
-
-
-$checkSql  = "SELECT id_usuario FROM usuarios
-              WHERE nombre_usuario = ? OR correo_institucional = ? OR documento = ?
-              LIMIT 1";
+// ¿Ya existe usuario / correo / documento?
+$checkSql = "SELECT id_usuario FROM usuarios
+             WHERE nombre_usuario = ? OR correo_institucional = ? OR documento = ?
+             LIMIT 1";
 $checkStmt = $connection->prepare($checkSql);
+
 if ($checkStmt) {
-    $checkStmt->bind_param("sss", $usuario, $correo, $documento);
+    $checkStmt->bind_param('sss', $usuario, $correo, $documento);
     $checkStmt->execute();
     $checkStmt->store_result();
 
     if ($checkStmt->num_rows > 0) {
         $checkStmt->close();
-        @unlink($rutaDestino); 
+        @unlink($rutaDestino);
         echo json_encode([
             'status'  => 'error',
-            'message' => 'Ya existe un usuario con ese nombre, correo o documento.'
+            'message' => 'Ya existe un usuario con ese nombre, correo o documento.',
         ]);
         exit;
     }
@@ -131,7 +121,7 @@ if (!$query) {
 }
 
 $query->bind_param(
-    "issssssss",
+    'issssssss',
     $id_rol,
     $nombre,
     $usuario,
@@ -144,15 +134,28 @@ $query->bind_param(
 );
 
 if ($query->execute()) {
+    
+    require_once __DIR__ . '/../models/notificacion.php';
+    $modeloNotif = new Notificacion($connection);
+    $admins = $modeloNotif->obtenerUsuariosPorRol(4);
+
+    if (!empty($admins)) {
+        $modeloNotif->crear(
+            "Nueva solicitud de cuenta: $nombre ($usuario). Pendiente de aprobación.",
+            '/Appjoteca/dashboards/Administrador/index.php',
+            $admins
+        );
+    }
+
     echo json_encode([
         'status'  => 'success',
-        'message' => "¡Registro exitoso, $nombre! Tu cuenta quedó en estado PENDIENTE hasta que un administrador la apruebe."
+        'message' => "¡Registro exitoso, $nombre! Tu cuenta quedó en estado PENDIENTE hasta que un administrador la apruebe.",
     ]);
 } else {
     @unlink($rutaDestino);
     echo json_encode([
         'status'  => 'error',
-        'message' => "Hubo un error al registrar al usuario $nombre."
+        'message' => "Hubo un error al registrar al usuario $nombre.",
     ]);
 }
 

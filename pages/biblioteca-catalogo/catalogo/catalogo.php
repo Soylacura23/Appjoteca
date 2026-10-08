@@ -23,10 +23,13 @@ requiereRol([1, 2]);
     <link rel="stylesheet" href="../../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../../shared/css/components/footer.css">
-    <link rel="stylesheet" href="../../shared/css/components/book-card.css">
+    <link rel="stylesheet" href="../../../shared/css/components/book-card.css">
 
     <!-- Estilos específicos de la página -->
     <link rel="stylesheet" href="catalogo.css">
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
@@ -34,45 +37,14 @@ requiereRol([1, 2]);
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
     <!-- NOTIFICACIONES Y MENÚS SHARED -->
-    <?php include '../../../shared/layouts/notifications.php'; ?>
-    <?php include '../../../shared/layouts/menu-off-canvas.php'; ?>
+    <?php include __DIR__ . '/../../../shared/layouts/notifications.php'; ?>
+    <?php include __DIR__ . '/../../../shared/layouts/menu-off-canvas.php'; ?>
 
     <!-- BARRA DE NAVEGACIÓN PRINCIPAL -->
-    <header class="topbar" role="banner">
-        <div class="topbar-inner">
-               <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-</a>
-            <div class="topbar-search">
-                <input type="text" class="topbar-search-input catalog-search-input" placeholder="Buscar por título, autor o ISBN..." aria-label="Buscar en el catálogo">
-                <span class="material-symbols-outlined topbar-search-icon">search</span>
-            </div>
-            <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="#" class="nav-link active" data-nav="catalogo">Catálogo</a>
-                <a href="#" class="nav-link" data-nav="biblioteca">Mi Biblioteca</a>
-                <a href="#" class="nav-link" data-nav="panel">Panel</a>
-            </nav>
-            <div class="topbar-actions">
-                <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-                <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge" aria-label="3 notificaciones sin leer"></span>
-                </button>
-                <div id="profile-button-topbar"></div>
-                <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </div>
-        <div class="topbar-search-mobile" aria-hidden="true">
-            <input type="text" class="catalog-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
-        </div>
-    </header>
+    <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
 
     <!-- MENÚ MÓVIL -->
-    <?php include '../../../shared/layouts/menu-movil.php'; ?>
+    <?php include __DIR__ . '/../../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL DEL CATÁLOGO -->
     <main class="catalog-main">
@@ -111,11 +83,12 @@ requiereRol([1, 2]);
     </main>
 
     <!-- FOOTER -->
-    <?php include '../../../shared/layouts/footer.php'; ?>
+    <?php include __DIR__ . '/../../../shared/layouts/footer.php'; ?>
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../../shared/js/components/navbar.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../../shared/js/global.js"></script>
     <script src="catalogo.js"></script>
 </body>

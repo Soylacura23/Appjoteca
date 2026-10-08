@@ -30,6 +30,9 @@ requiereRol([4]);
 
     <!-- Estilos específicos de comentarios -->
     <link rel="stylesheet" href="comentarios.css">
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 </head>
 <body>
 
@@ -43,34 +46,7 @@ requiereRol([4]);
     <?php include '../../../shared/layouts/menu-off-canvas.php'; ?>
 
     <!-- BARRA DE NAVEGACIÓN -->
-    <header class="topbar" role="banner">
-        <div class="topbar-inner">
-            <a href="../../index.php" class="logo-link">
-                <img src="../../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
-            </a>
-            <div class="topbar-search">
-                <input type="text" class="topbar-search-input" placeholder="Buscar en la plataforma..." aria-label="Buscar">
-                <span class="material-symbols-outlined topbar-search-icon">search</span>
-            </div>
-            <nav class="topbar-nav" aria-label="Navegación principal">
-                <a href="../index.php" class="nav-link" data-nav="panel">Panel Admin</a>
-            </nav>
-            <nav class="topbar-nav" aria-label="Navegación Comentarios">
-                <a href="#" class="nav-link active" data-nav="comentarios">Comentarios</a>
-            </nav>
-            <div class="topbar-actions">
-                <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="notification-badge" aria-label="Notificaciones sin leer"></span>
-                </button>
-                <div id="profile-button-topbar"></div>
-                <button class="icon-btn menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
+    <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
     <!-- MENÚ MÓVIL -->
     <?php include '../../../shared/layouts/menu-movil.php'; ?>
 
@@ -129,6 +105,7 @@ requiereRol([4]);
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../../shared/js/components/navbar.js"></script>
+    <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../../shared/js/global.js"></script>
     <script src="comentarios.js"></script>
 </body>

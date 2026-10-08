@@ -33,23 +33,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const isTouchDevice = window.matchMedia("(hover: none)").matches;
 
     if (isTouchDevice) {
-        // En móviles, el libro simplemente flota y el 404 respira suavemente
+
         gsap.to(book, { y: "-=15", rotation: 2, duration: 3, yoyo: true, repeat: -1, ease: "sine.inOut" });
         gsap.to(text404, { scale: 1.02, duration: 4, yoyo: true, repeat: -1, ease: "sine.inOut" });
     } else {
-        // En escritorio, habilitamos el Parallax
+
         window.addEventListener("mousemove", (e) => {
-            // Normalizamos las coordenadas de -1 a 1
+
             const x = (e.clientX / window.innerWidth - 0.5) * 2;
             const y = (e.clientY / window.innerHeight - 0.5) * 2;
 
-            // El 404 se mueve opuesto al mouse (efecto fondo)
             gsap.to(text404, { x: x * -25, y: y * -25, duration: 1, ease: "power2.out" });
             
-            // El libro se mueve hacia el mouse con ligera rotación (efecto frente)
             gsap.to(book, { x: x * 35, y: y * 35, rotation: x * 6, duration: 1, ease: "power2.out" });
 
-            // Las partículas se mueven a distintas velocidades
             particles.forEach((particle, index) => {
                 const speed = (index % 3 + 1) * 12;
                 gsap.to(particle, { x: x * speed, y: y * speed, duration: 1, ease: "power2.out" });
@@ -57,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. Microinteracciones de los botones
     buttons.forEach(btn => {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, { scale: 1.04, y: -2, duration: 0.3, ease: "power2.out" });

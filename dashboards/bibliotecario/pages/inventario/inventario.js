@@ -508,6 +508,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ====================== EVENTOS ======================
+
+    // Búsqueda expandible móvil (mismo comportamiento que las demás páginas)
+    const searchToggle = document.getElementById('search-toggle-btn');
+    const searchMobile = document.getElementById('topbar-search-mobile');
+    if (searchToggle && searchMobile) {
+        searchToggle.addEventListener('click', () => {
+            const isOpen = searchMobile.classList.toggle('open');
+            searchToggle.setAttribute('aria-expanded', isOpen);
+            searchMobile.setAttribute('aria-hidden', !isOpen);
+            if (isOpen) {
+                const input = searchMobile.querySelector('input');
+                if (input) input.focus();
+            }
+        });
+    }
+
     document.getElementById('add-book-btn').addEventListener('click', () => abrirDetalle());
     document.getElementById('empty-add-btn').addEventListener('click', () => abrirDetalle());
     document.getElementById('detail-save-btn').addEventListener('click', guardarLibro);

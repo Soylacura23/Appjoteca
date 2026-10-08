@@ -23,6 +23,11 @@ requiereRol([3]);
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="inventario.css">
     <link rel="stylesheet" href="../../css/typography.css">
+
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+    
     <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
     <base target="_self">
 </head>
@@ -43,7 +48,7 @@ requiereRol([3]);
             <span class="material-symbols-outlined topbar-search-icon">search</span>
         </div>
         <div class="topbar-actions">
-            <button class="icon-btn search-toggle-btn" aria-label="Buscar" aria-expanded="false">
+            <button class="icon-btn search-toggle-btn" id="search-toggle-btn" aria-label="Buscar" aria-expanded="false">
                 <span class="material-symbols-outlined">search</span>
             </button>
             <button class="notification-tray" aria-label="Notificaciones" aria-expanded="false">
@@ -56,7 +61,7 @@ requiereRol([3]);
             </button>
         </div>
     </div>
-    <div class="topbar-search-mobile" aria-hidden="true">
+    <div class="topbar-search-mobile" id="topbar-search-mobile" aria-hidden="true">
         <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
     </div>
 </header>
@@ -553,6 +558,8 @@ requiereRol([3]);
     <?php include '../../../../shared/layouts/footer.php'; ?>
 
 </main>
+
+<script src="/Appjoteca/shared/js/components/notifications.js"></script>
 
 <script src="../../../../shared/js/global.js"></script>
 <script src="inventario.js"></script>

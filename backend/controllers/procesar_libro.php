@@ -91,7 +91,6 @@ function autoresDesdePost()
 
 function datosLibroDesdePost($rutaPortada, $modelo)
 {
-    // Idioma: puede venir por id o por texto libre
     $idiomaId = null;
     if (!empty($_POST['idioma_id'])) {
         $idiomaId = (int) $_POST['idioma_id'];
@@ -182,14 +181,12 @@ switch ($action) {
         if (!$portada && !empty($_POST['portada_url'])) {
             $portada = descargarPortadaUrl(trim($_POST['portada_url']));
         }
-        // Solo si no hay ninguna portada usamos la por defecto
         if (!$portada) {
             $portada = PORTADA_DEFAULT;
         }
 
         $datos = datosLibroDesdePost($portada, $modelo);
 
-        // Validaciones obligatorias
         $errores = [];
         if ($datos['titulo'] === '')          $errores[] = 'El título es obligatorio';
         if (empty(autoresDesdePost()))        $errores[] = 'El autor principal es obligatorio';
@@ -220,12 +217,10 @@ switch ($action) {
             responder('error', 'ID inválido');
         }
 
-        // Solo subimos/descargamos portada si el usuario envió algo nuevo
         $portada = subirPortada();
         if (!$portada && !empty($_POST['portada_url'])) {
             $portada = descargarPortadaUrl(trim($_POST['portada_url']));
         }
-        // Si $portada queda null → el modelo NO toca la columna portada
 
         $datos = datosLibroDesdePost($portada, $modelo);
 
@@ -263,7 +258,6 @@ switch ($action) {
             responder('error', 'Título vacío');
         }
 
-        // Pedimos más resultados para que el usuario elija
         $url  = 'https://openlibrary.org/search.json?title=' . urlencode($titulo) . '&limit=8';
         $json = httpGet($url);
 
@@ -307,7 +301,6 @@ switch ($action) {
             responder('error', 'Falta la clave de Google Books en el .env (GOOGLE_BOOKS_API_KEY)');
         }
 
-        // Primera intento con idioma, si falla se reintenta sin langRestrict
         $q = urlencode($titulo);
         $urls = [
             "https://www.googleapis.com/books/v1/volumes?q=intitle:{$q}&langRestrict={$idioma}&maxResults=3&key={$apiKey}",

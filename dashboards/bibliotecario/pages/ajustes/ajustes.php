@@ -25,6 +25,10 @@ $documento = $mi_documento ?? '';
     <link rel="stylesheet" href="../../css/typography.css">
     <link rel="stylesheet" href="ajustes.css">
 
+    <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+    <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+
     <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
 </head>
 <body>
@@ -378,6 +382,7 @@ $documento = $mi_documento ?? '';
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../../../shared/js/global.js"></script>
 <script src="ajustes.js"></script>
 
