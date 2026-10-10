@@ -1,14 +1,14 @@
 :root {
     
-    --blue-accent: #1e6091; 
-    --blue-glow: rgba(30, 96, 145, 0.4);
-    --neon-green: #00ff66; 
-    --neon-glow: rgba(0, 255, 102, 0.3);
+    --blue-accent: #347fb2;
+    --blue-glow: rgba(52, 127, 178, 0.45);
+    --neon-green: #66f2a2;
+    --neon-glow: rgba(102, 242, 162, 0.35);
 }
 
 body.error-page {
     /* Hereda variables de theme.css */
-    background-color: var(--background);
+    background-color: #111315;
     color: var(--on-surface);
     font-family: var(--font-body);
     
@@ -52,6 +52,7 @@ body.error-page {
 .btn-discreet {
     font-size: 0.875rem;
     color: rgba(226, 226, 226, 0.5);
+    text-decoration: none;
     transition: color var(--ease-fast);
     display: flex;
     align-items: center;
@@ -83,7 +84,7 @@ body.error-page {
     line-height: 1;
     color: transparent;
     /* Texto hueco con borde sutil */
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.13);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -113,7 +114,7 @@ body.error-page {
 .message {
     font-size: 1.125rem;
     font-weight: 300;
-    color: var(--on-surface-variant);
+    color: #d4dce2;
     margin-bottom: 2.5rem;
     max-width: 450px;
     line-height: 1.5;
@@ -127,6 +128,10 @@ body.error-page {
 }
 
 .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     padding: 14px 32px;
     border-radius: var(--radius-full);
     font-family: var(--font-body);
@@ -146,9 +151,10 @@ body.error-page {
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.03);
-    color: var(--on-surface);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.07);
+    color: #e2e8ed;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    text-decoration: none;
 }
 
 /* ── Partículas Ambientales ── */
@@ -164,7 +170,7 @@ body.error-page {
     position: absolute;
     background-color: var(--blue-accent);
     border-radius: 50%;
-    opacity: 0; /* Empiezan invisibles para la animación */
+    opacity: 0.3;
 }
 
 .particle.neon {
@@ -184,4 +190,11 @@ body.error-page {
     .actions { flex-direction: column; width: 100%; max-width: 280px; }
     .btn { width: 100%; text-align: center; }
     .book-wrapper { width: 100px; height: 100px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

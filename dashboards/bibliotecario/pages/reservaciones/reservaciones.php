@@ -29,12 +29,13 @@ requiereRol([3]);
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="reservaciones.css">
     <link rel="stylesheet" href="../../css/typography.css">
+    <link rel="stylesheet" href="../../css/layout.css">
 
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
     
-    <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../../../shared/layouts/favicon.php'; ?>
     <base target="_self">
 </head>
 <body>
@@ -75,6 +76,7 @@ requiereRol([3]);
 </header>
 
 <!-- Sidebar -->
+<div class="dashboard-layout">
 <aside id="sidebar" class="sidebar">
     <nav class="sidebar-navigator">
         <ul class="menu-items">
@@ -237,10 +239,9 @@ requiereRol([3]);
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <?php include '../../../../shared/layouts/footer.php'; ?>
-
 </main>
+</div>
+<?php include '../../../../shared/layouts/footer.php'; ?>
 
 <!-- Overlay detalle de préstamo -->
 <div class="loan-overlay" id="loan-overlay" aria-hidden="true">

@@ -29,7 +29,7 @@ requiereRol([2]);
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
     
-    <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 <body>
 

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../error-context.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,17 +15,18 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 
+    <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 <body class="error-page">
 
     <header class="error-header">
 
-            <a href="../../index.php" class="logo-link">
+            <a href="<?= htmlspecialchars($error_return_url, ENT_QUOTES, 'UTF-8') ?>" class="logo-link">
     <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
 </a>
-        <a href="/" class="btn-discreet">
+        <a href="<?= htmlspecialchars($error_return_url, ENT_QUOTES, 'UTF-8') ?>" class="btn-discreet">
             <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-            Inicio
+            <?= htmlspecialchars($error_return_label, ENT_QUOTES, 'UTF-8') ?>
         </a>
     </header>
 
@@ -56,11 +58,11 @@
         <p class="message">Parece que este recurso se perdió entre los estantes.</p>
 
         <div class="actions">
-            <button class="btn btn-primary" id="inicio" onclick="window.location.href='/'">Volver al inicio</button>
+            <a class="btn btn-primary" href="<?= htmlspecialchars($error_return_url, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($error_return_label, ENT_QUOTES, 'UTF-8') ?></a>
         </div>
     </main>
 
-    <script src="404.js"></script>
+    <script src="404.js" defer></script>
 
 </body>
 </html>

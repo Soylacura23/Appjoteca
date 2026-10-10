@@ -1,6 +1,13 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    session_start([
+        'cookie_lifetime' => 0,                     
+        'cookie_path'     => '/Appjoteca',           
+        'cookie_domain'   => '/',            
+        'cookie_secure'   => false,                  
+        'cookie_httponly' => true,                   
+        'cookie_samesite' => 'Lax'                   
+    ]);
 }
 
 header("Cache-Control: no-cache, no-store, must-revalidate");

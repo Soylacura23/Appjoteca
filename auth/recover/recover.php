@@ -22,7 +22,7 @@ if (empty($_SESSION['csrf_token'])) {
   <link rel="stylesheet" href="../components/theme.css">
   <link rel="stylesheet" href="recover.css">
 
-  <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+  <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
   <link rel="stylesheet" href="../../shared/css/components/footer.css">
 </head>
 

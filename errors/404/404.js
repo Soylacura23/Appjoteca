@@ -1,65 +1,52 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Referencias del DOM
-    const text404 = document.querySelector('.huge-404');
-    const book = document.querySelector('.book-wrapper');
+document.addEventListener('DOMContentLoaded', () => {
+    const text = document.querySelector('.huge-404');
+    const illustration = document.querySelector('.book-wrapper');
     const particles = document.querySelectorAll('.particle');
     const message = document.querySelector('.message');
+    const actions = document.querySelector('.actions');
     const buttons = document.querySelectorAll('.btn');
-   
-    // 1. Animación de Entrada (Timeline)
-    const tl = gsap.timeline();
 
-    tl.fromTo(text404, 
-        { opacity: 0, scale: 0.95 },
-        { opacity: 1, scale: 1, duration: 1.8, ease: "power2.out" }
-    )
-    .fromTo(book,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" },
-        "-=1.2" // Empieza un poco antes de que acabe el anterior
-    )
-    .fromTo(particles,
-        { opacity: 0, scale: 0 },
-        { opacity: 0.4, scale: 1, duration: 1, stagger: 0.1, ease: "back.out(1.5)" },
-        "-=0.8"
-    )
-    .fromTo([message, buttons],
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" },
-        "-=0.5"
-    );
+    if (!window.gsap) return;
 
-    // 2. Interacción de Mouse (Parallax) vs Animación Táctil
-    const isTouchDevice = window.matchMedia("(hover: none)").matches;
+    const timeline = gsap.timeline();
+    timeline.fromTo(text, { opacity: 0, scale: 0.97 }, {
+        opacity: 1, scale: 1, duration: 0.55, ease: 'power2.out'
+    });
+    timeline.fromTo(illustration, { opacity: 0, y: 18 }, {
+        opacity: 1, y: 0, duration: 0.45, ease: 'power2.out'
+    }, '-=0.3');
+    timeline.fromTo([message, actions], { opacity: 0, y: 10 }, {
+        opacity: 1, y: 0, duration: 0.35, stagger: 0.08, ease: 'power2.out'
+    }, '-=0.2');
+    timeline.fromTo(particles, { opacity: 0, scale: 0.7 }, {
+        opacity: 0.35, scale: 1, duration: 0.35, stagger: 0.04, ease: 'power1.out'
+    }, 0);
 
-    if (isTouchDevice) {
-
-        gsap.to(book, { y: "-=15", rotation: 2, duration: 3, yoyo: true, repeat: -1, ease: "sine.inOut" });
-        gsap.to(text404, { scale: 1.02, duration: 4, yoyo: true, repeat: -1, ease: "sine.inOut" });
-    } else {
-
-        window.addEventListener("mousemove", (e) => {
-
-            const x = (e.clientX / window.innerWidth - 0.5) * 2;
-            const y = (e.clientY / window.innerHeight - 0.5) * 2;
-
-            gsap.to(text404, { x: x * -25, y: y * -25, duration: 1, ease: "power2.out" });
-            
-            gsap.to(book, { x: x * 35, y: y * 35, rotation: x * 6, duration: 1, ease: "power2.out" });
-
-            particles.forEach((particle, index) => {
-                const speed = (index % 3 + 1) * 12;
-                gsap.to(particle, { x: x * speed, y: y * speed, duration: 1, ease: "power2.out" });
-            });
-        });
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.globalTimeline.timeScale(4);
+        return;
     }
 
-    buttons.forEach(btn => {
-        btn.addEventListener('mouseenter', () => {
-            gsap.to(btn, { scale: 1.04, y: -2, duration: 0.3, ease: "power2.out" });
+    const touch = window.matchMedia('(hover: none)').matches;
+    if (touch) {
+        gsap.to(illustration, {
+            y: '-=5', duration: 3, yoyo: true, repeat: -1, ease: 'sine.inOut'
         });
-        btn.addEventListener('mouseleave', () => {
-            gsap.to(btn, { scale: 1, y: 0, duration: 0.3, ease: "power2.out" });
+    } else {
+        window.addEventListener('mousemove', (event) => {
+            const x = (event.clientX / window.innerWidth - 0.5) * 2;
+            const y = (event.clientY / window.innerHeight - 0.5) * 2;
+            gsap.to(text, { x: x * -12, y: y * -12, duration: 0.6, ease: 'power2.out' });
+            gsap.to(illustration, { x: x * 15, y: y * 12, duration: 0.6, ease: 'power2.out' });
+        }, { passive: true });
+    }
+
+    buttons.forEach((button) => {
+        button.addEventListener('mouseenter', () => {
+            gsap.to(button, { scale: 1.03, y: -2, duration: 0.18, ease: 'power2.out' });
+        });
+        button.addEventListener('mouseleave', () => {
+            gsap.to(button, { scale: 1, y: 0, duration: 0.18, ease: 'power2.out' });
         });
     });
 });

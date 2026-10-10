@@ -28,7 +28,7 @@ if (empty($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="../../shared/css/components/topbar-landing.css">
 
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
-    <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 <body>
 
@@ -317,7 +317,7 @@ if (empty($_SESSION['csrf_token'])) {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <?php include '../../shared/js/components/alert.js'; ?>
+    <script src="../../shared/js/components/alert.js"></script>
 
     
     <script src="about-us.js"></script>

@@ -26,6 +26,7 @@
   
     var tabla = new Tabulator('#users-table', {
       layout: 'fitColumns',
+      responsiveLayout: false,
       placeholder: 'No hay usuarios para mostrar',
       pagination: true,
       paginationSize: 10,
@@ -38,7 +39,8 @@
         {
           title: 'Perfil',
           field: 'nombre',
-          minWidth: 240,
+          minWidth: 190,
+          responsive: 0,
           formatter: function (cell) {
             var d = cell.getData();
             return '<div class="user-cell">' +
@@ -54,6 +56,7 @@
           title: 'Rol',
           field: 'rol',
           width: 150,
+          responsive: 3,
           formatter: function (cell) {
             var d = cell.getData();
             var clase = '';
@@ -62,11 +65,12 @@
             return '<span class="rol-badge ' + clase + '">' + d.rol + '</span>';
           }
         },
-        { title: 'Documento', field: 'documento', width: 160 },
+        { title: 'Documento', field: 'documento', width: 160, responsive: 5 },
         {
           title: 'Estado',
           field: 'estado',
           width: 130,
+          responsive: 1,
           formatter: function (cell) {
             var valor = cell.getValue();
             var clase = valor === 'activo' ? 'status-active' : 'status-inactive';
@@ -76,13 +80,15 @@
         { 
           title: 'Fecha de creación', 
           field: 'fecha_creacion', 
-          width: 160 
+          width: 160,
+          responsive: 4
         },
   
         {
           title: 'Acciones',
           field: 'acciones',
           width: 200,
+          responsive: 2,
           hozAlign: "center",
           formatter: function(cell) {
             var d = cell.getData();

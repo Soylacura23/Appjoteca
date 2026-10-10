@@ -151,6 +151,57 @@
     gap: 1.5rem;
     flex-shrink: 0;
   }
+
+  .main-header .header-actions .btn-header,
+  .mobile-menu .btn-mobile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.6rem;
+    border: 0;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8962e 50%, #8a6d1e 100%);
+    color: #0a0a0a;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .main-header .header-actions .btn-header:hover,
+  .mobile-menu .btn-mobile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5);
+  }
+
+  .main-header .header-actions .btn-header .material-symbols-outlined,
+  .mobile-menu .btn-mobile .material-symbols-outlined {
+    font-size: 1.1rem;
+  }
+
+  .main-header .header-actions .btn-header::before,
+  .mobile-menu .btn-mobile::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .main-header .header-actions .btn-header:hover::before,
+  .mobile-menu .btn-mobile:hover::before {
+    left: 100%;
+  }
   
   /* ============ BOTÓN MÓVIL ============ */
   .mobile-menu-btn {
@@ -270,6 +321,7 @@
       justify-content: center;
     }
     .header-actions .btn-header { display: none; }
+    .main-header .header-actions .btn-header { display: none; }
   }
   
   @media (max-width: 600px) {

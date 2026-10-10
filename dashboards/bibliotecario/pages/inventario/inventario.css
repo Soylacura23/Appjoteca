@@ -29,7 +29,6 @@
   --transition-slow: 0.5s cubic-bezier(0.32, 0.72, 0, 1);
   --shadow-gold:    0 4px 20px rgba(242,202,80,0.15);
   --shadow-gold-lg: 0 8px 32px rgba(242,202,80,0.28);
-  --topbar-h:  64px;
   --sidebar-w: 280px;
   /* Variables para notifications.css */
   --ease-fast: 0.2s ease;
@@ -115,17 +114,6 @@ input, textarea, select { font-family: inherit; }
 }
 .notification-tray:hover .notification-badge { transform: scale(1.25); }
 .notification-badge.hidden { opacity: 0; transform: scale(0); }
-
-/* Perfil topbar */
-#profile-button-topbar { display: flex; justify-content: center; align-items: center; }
-.profile-button {
-  background-color: #000; border: 0.5px solid rgba(153,144,124,0.15);
-  border-radius: 50%; cursor: pointer; transition: border-color var(--transition-med);
-  position: relative; object-fit: cover; overflow: hidden;
-}
-.profile-button:hover { border-color: var(--primary); }
-.img-profile { object-fit: cover; width: 100%; height: 100%; border-radius: 50%; }
-
 
 /* ────────────────────────────────────────────────────────────
    MAIN CONTENT

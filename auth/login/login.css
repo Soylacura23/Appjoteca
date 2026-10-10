@@ -854,7 +854,7 @@
 /* En móvil, si molesta sobre el form, bájalo un poco */
 @media (max-width: 640px) {
   .fab-home {
-    top: auto;
+    top: 72px;
     bottom: 20px;
     left: 16px;
   }

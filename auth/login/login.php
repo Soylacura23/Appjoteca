@@ -23,14 +23,11 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
   <link rel="stylesheet" href="../../auth/components/theme.css">
   <link rel="stylesheet" href="login.css">
 
-  <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+  <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 
 <body class="login-body">
 
-  <!-- ════════════════════════════════════════════════════════
-       HEADER (compacto, fijo)
-       ════════════════════════════════════════════════════════ -->
   <header class="login-header" role="banner">
     <div class="login-header-container">
           <a href="../../index.php" class="logo-link">
@@ -47,16 +44,14 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
   <span class="material-symbols-outlined">home</span>
   </a>
 
-  <!-- ════════════════════════════════════════════════════════
-       SHELL PRINCIPAL — sin scroll global
-       ════════════════════════════════════════════════════════ -->
+
   <main class="login-shell" role="main">
 
     <!-- ── Panel del formulario ── -->
     <section class="login-form-panel" aria-label="Formulario de inicio de sesión">
       <div class="login-card">
 
-        <!-- Badge de bienvenida (sustituye al stepper) -->
+        <!-- Badge de bienvenida -->
         <div class="welcome-badge" aria-hidden="true">
           <span class="material-symbols-outlined welcome-icon">lock_open</span>
         </div>
@@ -72,6 +67,12 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
               action="../../backend/auth/login-send.php" method="POST">
 
           <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+          <input type="hidden" name="return_to" value="<?php
+            $return_to = $_GET['return_to'] ?? '';
+            echo in_array($return_to, ['catalog', 'history'], true)
+              ? htmlspecialchars($return_to, ENT_QUOTES, 'UTF-8')
+              : '';
+          ?>">
 
           <!-- Usuario -->
           <div class="field-group">

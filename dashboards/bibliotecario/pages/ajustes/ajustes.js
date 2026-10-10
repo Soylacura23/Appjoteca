@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
             avatarImg.src = URL.createObjectURL(archivo);
 
             if (previewConfirmBtn) {
-                previewConfirmBtn.style.display = 'inline-flex';
+                previewConfirmBtn.hidden = false;
             }
         });
     }
@@ -85,13 +85,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     alerta('success', 'Listo', data.message);
                     fotoOriginal = avatarImg.src;
                     archivoPendiente = null;
-                    previewConfirmBtn.style.display = 'none';
+                    previewConfirmBtn.hidden = true;
+                    if (deletePhotoBtn) deletePhotoBtn.hidden = false;
                     if (avatarInput) avatarInput.value = '';
                 } else {
                     alerta('error', 'Error', data.message);
                     avatarImg.src = fotoOriginal;
                     archivoPendiente = null;
-                    previewConfirmBtn.style.display = 'none';
+                    previewConfirmBtn.hidden = true;
                 }
             })
             .catch(function (err) {
@@ -99,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alerta('error', 'Error de red', 'No se pudo subir la foto');
                 avatarImg.src = fotoOriginal;
                 archivoPendiente = null;
-                previewConfirmBtn.style.display = 'none';
+                previewConfirmBtn.hidden = true;
             });
         });
     }
@@ -135,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         alerta('success', 'Listo', data.message);
                         avatarImg.src = '/Appjoteca/assets/images/default-avatar.png';
                         fotoOriginal = avatarImg.src;
+                        deletePhotoBtn.hidden = true;
                     } else {
                         alerta('error', 'Error', data.message);
                     }

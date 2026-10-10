@@ -65,6 +65,7 @@ $edicionLabel = trim(($edicion !== '' ? $edicion : 'Edición') . ($anio ? ' · '
   <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+    <?php require __DIR__ . '/../../../shared/layouts/favicon.php'; ?>
 </head>
 <body>
 

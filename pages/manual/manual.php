@@ -22,7 +22,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="../../shared/css/components/topbar-landing.css">
     
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
-    <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 
     <!-- PDF.js desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

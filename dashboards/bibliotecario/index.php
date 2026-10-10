@@ -47,12 +47,13 @@ $historial = $modeloHistorial->obtenerRecientes(5);
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/typography.css">
+    <link rel="stylesheet" href="css/layout.css">
 
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
     
-    <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 <body>
 
@@ -94,6 +95,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
 
 <?php include '../../shared/layouts/menu-movil.php'; ?>
 
+<div class="dashboard-layout">
 <aside id="sidebar" class="sidebar">
     <nav class="sidebar-navigator">
         <ul class="menu-items">
@@ -220,8 +222,9 @@ $historial = $modeloHistorial->obtenerRecientes(5);
     </section>
 </div>
 
-<?php include '../../shared/layouts/footer.php'; ?>
 </main>
+</div>
+<?php include '../../shared/layouts/footer.php'; ?>
 
 <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>

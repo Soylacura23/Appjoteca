@@ -7,7 +7,14 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../config/verify-csrf.php';
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    session_start([
+        'cookie_lifetime' => 0,                      
+        'cookie_path'     => '/Appjoteca',           
+        'cookie_domain'   => '/',
+        'cookie_secure'   => false,                  
+        'cookie_httponly' => true,                   
+        'cookie_samesite' => 'Lax'                 
+    ]);
 }
 
 require("../Database/conexion.php"); 
@@ -38,7 +45,7 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['remember_me'])) {
         $_SESSION['documento'] = $usuario_db['documento'];
 
     } else {
-        setcookie("remember_me", "", time() - 3600, "/");
+        setcookie("remember_me", "", time() - 3600, "/Appjoteca", "localhost", false, true);
     }
 }
 
@@ -102,15 +109,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $query_update->execute();
 
-            setcookie(
-                "remember_me",       
-                $token,              
-                $expiracion,         
-                "/",              
-                "",                 
-                true,                
-                true                 
-            );
+            setcookie("remember_me", $token, [
+                'expires' => $expiracion,
+                'path' => '/Appjoteca',
+                'domain' => '/',
+                'secure' => true,       
+                'httponly' => true,      
+                'samesite' => 'Lax'
+            ]);
         }
 
         $destinos = [
@@ -120,7 +126,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             4 => '../../dashboards/Administrador/index.php'
         ];
 
-        $url_destino = $destinos[$usuario_db['id_rol']] ?? '../../index.php';
+        $rol = (int) $usuario_db['id_rol'];
+        $url_destino = $destinos[$rol] ?? '../../index.php';
+        $return_to = $_POST['return_to'] ?? '';
+
+        if ($return_to === 'catalog') {
+            $url_destino = $rol === 3
+                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php'
+                : '../../pages/biblioteca-digital/index.php';
+        } elseif ($return_to === 'history' && in_array($rol, [1, 2], true)) {
+            $url_destino = '../../pages/history/historial.php';
+        }
 
         echo json_encode([
             'status' => 'success',

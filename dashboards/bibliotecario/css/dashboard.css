@@ -677,15 +677,6 @@ position: relative;
         /*end history row */
     /*end second grid column */
 /*end two columns grid */
-.notification-container{
-  position: fixed;
-  right: 20px;
-  top: var(--topbar-height);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 .noti{
   background: rgba(225, 225, 225, var(--glass-opacity));
   backdrop-filter: blur(50px);

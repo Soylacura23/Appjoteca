@@ -9,7 +9,7 @@ require("backend/Database/conexion.php");
 
 // totales
 if (!isset($_SESSION['totales_biblioteca'])) {
-    $sql_totales = "SELECT 'libros' as tipo, COUNT(*) as total FROM libros
+    $sql_totales = "SELECT 'libros' as tipo, COUNT(*) as total FROM libros WHERE fecha_eliminacion_libro IS NULL
             UNION ALL
             SELECT 'categorias', COUNT(*) FROM materias
             UNION ALL
@@ -122,7 +122,7 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
     <link rel="stylesheet" href="shared/css/components/topbar-landing.css">
 
     <link rel="stylesheet" href="shared/css/components/footer.css">
-    <link rel="icon" type="image/png" href="shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/shared/layouts/favicon.php'; ?>
 </head>
 
 <body>

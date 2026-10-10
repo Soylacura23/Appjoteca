@@ -69,6 +69,7 @@
 .footer-social-btn {
   width: 42px;
   height: 42px;
+  padding: 0;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -78,6 +79,7 @@
   cursor: pointer;
   transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
   background: none;
+  text-decoration: none;
 }
 
 .footer-social-btn:hover {
@@ -86,8 +88,38 @@
   background: rgba(242, 202, 80, 0.07);
 }
 
+.footer-social-btn:focus-visible {
+  outline: 2px solid var(--primary, #f2ca50);
+  outline-offset: 3px;
+}
+
 .footer-social-btn .material-symbols-outlined {
   font-size: 18px;
+}
+
+.footer-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 2000;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border: 1px solid rgba(242, 202, 80, 0.25);
+  border-radius: 999px;
+  background: #171714;
+  color: var(--on-surface, #e2e2e2);
+  font-family: var(--font-body, "Manrope", sans-serif);
+  font-size: 0.875rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.footer-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 /* ── Columnas de navegación ───────────────────────────── */
@@ -124,6 +156,12 @@
 
 .footer-col nav a:hover {
   color: #e2e2e2;
+}
+
+.footer-col nav a:focus-visible {
+  color: #e2e2e2;
+  outline: 2px solid var(--primary, #f2ca50);
+  outline-offset: 4px;
 }
 
 /* ── Franja inferior ──────────────────────────────────── */

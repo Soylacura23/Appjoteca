@@ -1,38 +1,113 @@
 /* =========================================
    SIDEBAR Y LAYOUT PRINCIPAL
    ========================================= */
-   .sidebar {
+.sidebar {
     position: fixed;
     left: 0;
-    top: var(--topbar-height, 85px); /* Esto lo mantiene físicamente debajo de la barra superior */
+    top: var(--topbar-h, var(--topbar-height, 85px));
     width: var(--sidebar-width, 280px);
-    height: calc(100vh - var(--topbar-height, 64px));
-    background: var(--surface, #141414);
-    z-index: 1000; /* IMPORTANTE: Es menor que el z-index de tu topbar (que suele ser 1100 o más) */
+    height: calc(100vh - var(--topbar-h, var(--topbar-height, 64px)));
+    background:
+      radial-gradient(ellipse at 0 0, rgba(242, 202, 80, 0.09), transparent 58%),
+      linear-gradient(180deg, #11110f 0%, #090909 58%, #070707 100%);
+    z-index: 900;
     overflow-y: auto;
-    border-right: 1px solid rgba(153, 144, 124, 0.1);
-  }
-  
-  .menu-item {
+    border-right: 1px solid rgba(242, 202, 80, 0.13);
+    box-shadow: 12px 0 36px rgba(0, 0, 0, 0.2);
+    scrollbar-color: rgba(242, 202, 80, 0.25) transparent;
+    scrollbar-width: thin;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(242, 202, 80, 0.4), rgba(242, 202, 80, 0.04) 45%, transparent);
+    pointer-events: none;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(242, 202, 80, 0.22);
+    border-radius: 999px;
+}
+
+.sidebar-navigator {
+    padding: 24px 14px;
+}
+
+.menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    list-style: none;
+}
+
+.menu-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 24px;
-    color: var(--tertiary);
+    gap: 13px;
+    min-height: 50px;
+    padding: 10px 14px;
+    color: rgba(226, 226, 226, 0.66);
     text-decoration: none;
-    transition: all 0.2s ease;
-    background-color: var(--surface);
-  }
-  
-  .menu-item:hover,
-  .active {
-    background: #0f0f0f;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 13px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.menu-item .material-symbols-outlined {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.035);
+    color: rgba(226, 226, 226, 0.52);
+    font-size: 19px;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+    color: #f5e6b5;
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(242, 202, 80, 0.12);
+    transform: translateX(2px);
+    outline: none;
+}
+
+.menu-item:hover .material-symbols-outlined,
+.menu-item:focus-visible .material-symbols-outlined {
+    color: var(--primary, #f2ca50);
+    background: rgba(242, 202, 80, 0.1);
+    border-color: rgba(242, 202, 80, 0.18);
+}
+
+.menu-item.active {
+    color: #f7e9bf;
+    background: linear-gradient(100deg, rgba(242, 202, 80, 0.16), rgba(242, 202, 80, 0.055));
+    border-color: rgba(242, 202, 80, 0.2);
+    box-shadow: inset 3px 0 0 var(--primary, #f2ca50), 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.menu-item.active .material-symbols-outlined {
     color: #f2ca50;
-  }
-  
-  .active {
-    border-left: 4px solid #d4af37;
-  }
+    background: rgba(242, 202, 80, 0.15);
+    border-color: rgba(242, 202, 80, 0.25);
+}
   
   /* Ajuste del contenido principal para que respete el ancho del sidebar */
   .main-content {
@@ -57,7 +132,6 @@
       display: block !important; 
       top: 0; 
       height: 100vh;
-      background: var(--surface, #141414); /* Color de fondo sólido para que no sea transparente */
       transform: translateX(-100%);
       transition: transform 0.35s ease;
       z-index: 9999 !important; 

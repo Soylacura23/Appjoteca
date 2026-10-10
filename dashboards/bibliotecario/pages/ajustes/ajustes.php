@@ -4,6 +4,8 @@ require_once __DIR__ . '/../../../../backend/config/user_context.php';
 requiereRol([3]);
 
 $documento = $mi_documento ?? '';
+$tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
+    && strpos($_SESSION['foto_perfil'], 'default-avatar') === false;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,12 +26,13 @@ $documento = $mi_documento ?? '';
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/typography.css">
     <link rel="stylesheet" href="ajustes.css">
+    <link rel="stylesheet" href="../../css/layout.css">
 
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 
-    <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../../../shared/layouts/favicon.php'; ?>
 </head>
 <body>
 
@@ -67,6 +70,7 @@ $documento = $mi_documento ?? '';
     </div>
 </header>
 
+<div class="dashboard-layout">
 <aside id="sidebar" class="sidebar">
     <nav class="sidebar-navigator">
         <ul class="menu-items">
@@ -136,6 +140,9 @@ $documento = $mi_documento ?? '';
                         <button class="avatar-edit" id="avatarEditBtn" type="button" aria-label="Cambiar foto">
                             <span class="material-symbols-outlined">photo_camera</span>
                         </button>
+                        <button class="avatar-delete" id="deletePhotoBtn" type="button" aria-label="Eliminar foto" title="Eliminar foto" <?= $tiene_foto_personalizada ? '' : 'hidden'; ?>>
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                         <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" hidden>
                     </div>
 
@@ -164,12 +171,9 @@ $documento = $mi_documento ?? '';
                         </div>
                     </div>
 
-                    <div class="avatar-actions" style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
-                        <button type="button" class="btn-outline" id="previewConfirmBtn" style="display:none; width:auto; padding: 8px 14px;">
+                    <div class="avatar-actions">
+                        <button type="button" class="btn-outline" id="previewConfirmBtn" hidden>
                             <span class="material-symbols-outlined">check</span> Confirmar foto
-                        </button>
-                        <button type="button" class="btn-outline" id="deletePhotoBtn" style="width:auto; padding: 8px 14px; border-color: rgba(255,180,171,0.3); color: var(--error);">
-                            <span class="material-symbols-outlined">delete</span> Eliminar foto
                         </button>
                     </div>
                 </div>
@@ -378,8 +382,9 @@ $documento = $mi_documento ?? '';
         </div>
     </div>
 
-    <?php include '../../../../shared/layouts/footer.php'; ?>
 </main>
+</div>
+<?php include '../../../../shared/layouts/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>

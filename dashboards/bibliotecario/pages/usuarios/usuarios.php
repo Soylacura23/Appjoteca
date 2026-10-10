@@ -33,6 +33,7 @@ requiereRol([3]);
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="usuarios.css">
     <link rel="stylesheet" href="../../css/typography.css">
+    <link rel="stylesheet" href="../../css/layout.css">
 
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -41,7 +42,7 @@ requiereRol([3]);
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
 
-    <link rel="icon" type="image/png" href="../../../../shared/images/logo-appjoteca.png">
+    <?php require __DIR__ . '/../../../../shared/layouts/favicon.php'; ?>
 <base target="_self">
 </head>
 <body>
@@ -83,6 +84,7 @@ requiereRol([3]);
 </header>
 
     <!-- Nav SIDEBAR -->
+    <div class="dashboard-layout">
     <aside id="sidebar" class="sidebar">
         <nav class="sidebar-navigator">
             <ul class="menu-items">
@@ -189,15 +191,12 @@ requiereRol([3]);
             <span class="material-symbols-outlined search-icon">search</span>
             <input type="text" id="users-search" class="tabulator-search-input" placeholder="Buscar usuario (nombre, correo...)">
         </div>
-                <div id="users-table"></div>
-            </div>
+                <div id="users-table" class="user-tables"></div>
         </section>
 
-          <!-- ══════════════════════════════════════════
-       FOOTER
-  ══════════════════════════════════════════════ -->
-  <?php include '../../../../shared/layouts/footer.php'; ?>
     </main>
+    </div>
+    <?php include '../../../../shared/layouts/footer.php'; ?>
 
     <!-- Overlay detalle de usuario -->
     <div class="user-detail-overlay" id="user-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="user-detail-title" hidden>

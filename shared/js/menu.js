@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
                   ${navLinksHTML}
               </ul>
               <a href="${loginHref}" class="btn btn-primary btn-mobile">
-                  <span>Iniciar Sesión</span>
+                  <span class="material-symbols-outlined">login</span>
+                  <span>Acceder</span>
               </a>
           </nav>
       `;

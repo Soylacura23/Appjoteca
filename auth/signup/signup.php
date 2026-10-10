@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
   <link rel="stylesheet" href="../components/theme.css">
   <link rel="stylesheet" href="signup.css">
 
-  <link rel="icon" type="image/png" href="../../shared/images/logo-appjoteca.png">
+  <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
 
 <body class="signup-body">
