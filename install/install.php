@@ -27,6 +27,9 @@ if ($step === 'composer') {
             pre { background: #f4f4f4; padding: 12px; border-radius: 4px; }
             a { display: inline-block; margin-top: 16px; }
         </style>
+        <?php 
+        include_once __DIR__ . '/../shared/layouts/favicon.php';
+        ?>
     </head>
     <body>
         <h1>Paso 1 - Composer</h1>
@@ -76,6 +79,9 @@ if ($step === 'env') {
             ul { background: #fff3cd; padding: 16px 16px 16px 36px; border-radius: 4px; }
             a { display: inline-block; margin-top: 16px; }
         </style>
+        <?php 
+        include_once __DIR__ . '/../shared/layouts/favicon.php';
+        ?>
     </head>
     <body>
         <h1>Paso 2 - Variables de entorno</h1>
@@ -114,6 +120,9 @@ if ($step === 'connection') {
             .error { color: #c0392b; background: #fdecea; padding: 12px; border-radius: 4px; }
             a { display: inline-block; margin-top: 16px; }
         </style>
+        <?php 
+        include_once __DIR__ . '/../shared/layouts/favicon.php';
+        ?>
     </head>
     <body>
         <h1>Paso 3 - Conexión</h1>
@@ -188,6 +197,9 @@ if ($step === 'database') {
             .error { color: #c0392b; background: #fdecea; padding: 12px; border-radius: 4px; }
             button { padding: 10px 18px; font-size: 16px; cursor: pointer; }
         </style>
+        <?php 
+        include_once __DIR__ . '/../shared/layouts/favicon.php';
+        ?>
     </head>
     <body>
         <h1>Paso 4 - Base de datos</h1>

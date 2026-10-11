@@ -213,6 +213,9 @@ $connection->close();
             margin-bottom: 16px;
         }
     </style>
+    <?php 
+        include_once __DIR__ . '/../shared/layouts/favicon.php';
+    ?>
 </head>
 <body>
     <div class="card">
