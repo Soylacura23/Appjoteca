@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 11-10-2026 a las 06:42:02
+-- Tiempo de generación: 12-10-2026 a las 00:39:18
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -29,7 +29,6 @@ USE `appjoteca`;
 -- Estructura de tabla para la tabla `autores`
 --
 -- Creación: 26-09-2026 a las 23:59:32
--- Última actualización: 10-10-2026 a las 23:57:50
 --
 
 CREATE TABLE `autores` (
@@ -100,7 +99,6 @@ CREATE TABLE `dewey` (
 -- Estructura de tabla para la tabla `editoriales`
 --
 -- Creación: 26-09-2026 a las 23:56:41
--- Última actualización: 10-10-2026 a las 23:57:50
 --
 
 CREATE TABLE `editoriales` (
@@ -114,7 +112,6 @@ CREATE TABLE `editoriales` (
 -- Estructura de tabla para la tabla `ejemplares`
 --
 -- Creación: 30-08-2026 a las 23:39:15
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `ejemplares` (
@@ -130,7 +127,6 @@ CREATE TABLE `ejemplares` (
 -- Estructura de tabla para la tabla `historial`
 --
 -- Creación: 21-09-2026 a las 03:10:47
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `historial` (
@@ -162,7 +158,6 @@ CREATE TABLE `idioma` (
 -- Estructura de tabla para la tabla `libros`
 --
 -- Creación: 26-09-2026 a las 21:04:08
--- Última actualización: 10-10-2026 a las 23:58:11
 --
 
 CREATE TABLE `libros` (
@@ -191,7 +186,6 @@ CREATE TABLE `libros` (
 -- Estructura de tabla para la tabla `libro_autor`
 --
 -- Creación: 26-09-2026 a las 23:59:49
--- Última actualización: 10-10-2026 a las 23:58:11
 --
 
 CREATE TABLE `libro_autor` (
@@ -220,7 +214,7 @@ CREATE TABLE `materias` (
 -- Estructura de tabla para la tabla `notificaciones`
 --
 -- Creación: 07-10-2026 a las 21:18:44
--- Última actualización: 11-10-2026 a las 01:34:15
+-- Última actualización: 11-10-2026 a las 21:55:39
 --
 
 CREATE TABLE `notificaciones` (
@@ -236,7 +230,7 @@ CREATE TABLE `notificaciones` (
 -- Estructura de tabla para la tabla `notificacion_usuario`
 --
 -- Creación: 07-10-2026 a las 21:18:21
--- Última actualización: 11-10-2026 a las 01:36:13
+-- Última actualización: 11-10-2026 a las 21:55:39
 --
 
 CREATE TABLE `notificacion_usuario` (
@@ -252,7 +246,6 @@ CREATE TABLE `notificacion_usuario` (
 -- Estructura de tabla para la tabla `prestamos`
 --
 -- Creación: 27-09-2026 a las 01:04:38
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `prestamos` (
@@ -272,7 +265,7 @@ CREATE TABLE `prestamos` (
 -- Estructura de tabla para la tabla `rate_limits`
 --
 -- Creación: 10-10-2026 a las 17:22:16
--- Última actualización: 11-10-2026 a las 02:06:10
+-- Última actualización: 11-10-2026 a las 22:24:49
 --
 
 CREATE TABLE `rate_limits` (
@@ -288,7 +281,6 @@ CREATE TABLE `rate_limits` (
 -- Estructura de tabla para la tabla `reservas`
 --
 -- Creación: 11-10-2026 a las 00:43:24
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `reservas` (
@@ -332,6 +324,7 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `solicitudes_cambio`
 --
 -- Creación: 27-09-2026 a las 18:42:44
+-- Última actualización: 11-10-2026 a las 21:58:47
 --
 
 CREATE TABLE `solicitudes_cambio` (
@@ -365,8 +358,8 @@ CREATE TABLE `tipos_materiales` (
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 27-09-2026 a las 18:43:47
--- Última actualización: 10-10-2026 a las 23:09:09
+-- Creación: 11-10-2026 a las 21:16:15
+-- Última actualización: 11-10-2026 a las 21:57:49
 --
 
 CREATE TABLE `usuarios` (
@@ -539,6 +532,9 @@ ALTER TABLE `tipos_materiales`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id_usuario`) USING BTREE,
+  ADD UNIQUE KEY `uq_usuarios_correo` (`correo_institucional`),
+  ADD UNIQUE KEY `uq_usuarios_usuario` (`nombre_usuario`),
+  ADD UNIQUE KEY `uq_usuarios_documento` (`documento`),
   ADD KEY `id_rol` (`id_rol`);
 
 --

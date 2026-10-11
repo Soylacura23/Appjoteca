@@ -1,5 +1,12 @@
 <?php
+
+require_once __DIR__ . '/../config/verify-csrf.php'; 
 require_once __DIR__ . '/../config/security.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Método no permitido');
+}
 
 if (isset($_SESSION['usuario_id'])) {
     require_once(__DIR__ . "/../Database/conexion.php"); 
@@ -9,6 +16,7 @@ if (isset($_SESSION['usuario_id'])) {
     $query_logout = $connection->prepare($sql_logout);
     $query_logout->bind_param("i", $id_usuario);
     $query_logout->execute();
+    $query_logout->close();
 }
 
 $_SESSION = array();

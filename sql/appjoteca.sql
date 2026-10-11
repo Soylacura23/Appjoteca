@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 11-10-2026 a las 06:44:00
+-- Tiempo de generación: 12-10-2026 a las 00:40:56
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -29,7 +29,6 @@ USE `appjoteca`;
 -- Estructura de tabla para la tabla `autores`
 --
 -- Creación: 26-09-2026 a las 23:59:32
--- Última actualización: 10-10-2026 a las 23:57:50
 --
 
 CREATE TABLE `autores` (
@@ -137,7 +136,6 @@ INSERT INTO `dewey` (`id_dewey`, `nombre`, `codigo`) VALUES
 -- Estructura de tabla para la tabla `editoriales`
 --
 -- Creación: 26-09-2026 a las 23:56:41
--- Última actualización: 10-10-2026 a las 23:57:50
 --
 
 CREATE TABLE `editoriales` (
@@ -160,7 +158,6 @@ INSERT INTO `editoriales` (`id_editorial`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `ejemplares`
 --
 -- Creación: 30-08-2026 a las 23:39:15
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `ejemplares` (
@@ -193,7 +190,6 @@ INSERT INTO `ejemplares` (`id_ejemplar`, `fk_id_libro_ejemplar`, `estado`, `id_c
 -- Estructura de tabla para la tabla `historial`
 --
 -- Creación: 21-09-2026 a las 03:10:47
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `historial` (
@@ -266,7 +262,6 @@ INSERT INTO `idioma` (`id_idioma`, `nombre_idioma`) VALUES
 -- Estructura de tabla para la tabla `libros`
 --
 -- Creación: 26-09-2026 a las 21:04:08
--- Última actualización: 10-10-2026 a las 23:58:11
 --
 
 CREATE TABLE `libros` (
@@ -306,7 +301,6 @@ INSERT INTO `libros` (`id_libro`, `id_editorial`, `id_materia`, `id_tipo_materia
 -- Estructura de tabla para la tabla `libro_autor`
 --
 -- Creación: 26-09-2026 a las 23:59:49
--- Última actualización: 10-10-2026 a las 23:58:11
 --
 
 CREATE TABLE `libro_autor` (
@@ -352,7 +346,7 @@ INSERT INTO `materias` (`id_materia`, `nombre`, `id_dewey`) VALUES
 -- Estructura de tabla para la tabla `notificaciones`
 --
 -- Creación: 07-10-2026 a las 21:18:44
--- Última actualización: 11-10-2026 a las 01:34:15
+-- Última actualización: 11-10-2026 a las 21:55:39
 --
 
 CREATE TABLE `notificaciones` (
@@ -393,7 +387,8 @@ INSERT INTO `notificaciones` (`id_notificacion`, `mensaje`, `url_accion`, `fecha
 (24, 'Nueva solicitud de reserva #9 · «One of us is lying» (1 ejemplar)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-10 19:51:40'),
 (25, 'Nueva solicitud de reserva #11 · «One of us is lying» (2 ejemplares)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-10 20:05:28'),
 (26, 'Nueva solicitud de reserva #12 · «One of us is lying» (2 ejemplares)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-10 20:05:53'),
-(27, 'Tu reserva #12 del libro «One of us is lying» fue aceptada (2 ejemplares). Ya puedes reclamarlo.', '/Appjoteca/pages/history/historial.php', '2026-10-10 20:34:15');
+(27, 'Tu reserva #12 del libro «One of us is lying» fue aceptada (2 ejemplares). Ya puedes reclamarlo.', '/Appjoteca/pages/history/historial.php', '2026-10-10 20:34:15'),
+(28, 'Nueva solicitud de cuenta: Matías Vargas (matias.vargas). Pendiente de aprobación.', '/Appjoteca/dashboards/Administrador/index.php', '2026-10-11 16:55:39');
 
 -- --------------------------------------------------------
 
@@ -401,7 +396,7 @@ INSERT INTO `notificaciones` (`id_notificacion`, `mensaje`, `url_accion`, `fecha
 -- Estructura de tabla para la tabla `notificacion_usuario`
 --
 -- Creación: 07-10-2026 a las 21:18:21
--- Última actualización: 11-10-2026 a las 01:36:13
+-- Última actualización: 11-10-2026 a las 21:55:39
 --
 
 CREATE TABLE `notificacion_usuario` (
@@ -439,7 +434,8 @@ INSERT INTO `notificacion_usuario` (`id_detalle`, `id_notificacion`, `id_usuario
 (25, 24, 7, 1),
 (26, 25, 7, 1),
 (27, 26, 7, 1),
-(28, 27, 5, 0);
+(28, 27, 5, 0),
+(29, 28, 12, 0);
 
 -- --------------------------------------------------------
 
@@ -447,7 +443,6 @@ INSERT INTO `notificacion_usuario` (`id_detalle`, `id_notificacion`, `id_usuario
 -- Estructura de tabla para la tabla `prestamos`
 --
 -- Creación: 27-09-2026 a las 01:04:38
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `prestamos` (
@@ -490,7 +485,7 @@ INSERT INTO `prestamos` (`id_prestamo`, `id_ejemplar`, `id_reserva`, `fecha_pres
 -- Estructura de tabla para la tabla `rate_limits`
 --
 -- Creación: 10-10-2026 a las 17:22:16
--- Última actualización: 11-10-2026 a las 02:06:10
+-- Última actualización: 11-10-2026 a las 22:24:49
 --
 
 CREATE TABLE `rate_limits` (
@@ -505,7 +500,11 @@ CREATE TABLE `rate_limits` (
 --
 
 INSERT INTO `rate_limits` (`id`, `identifier`, `attempts`, `reset_time`) VALUES
-(50, 'login:127.0.0.1', 2, 1791685182);
+(57, 'login:127.0.0.1', 6, 1791756424),
+(65, 'recover-send:127.0.0.1', 4, 1791759029),
+(66, 'recover-verify:127.0.0.1', 11, 1791758151),
+(69, 'recover-update:127.0.0.1', 1, 1791756399),
+(71, 'register:127.0.0.1', 3, 1791759285);
 
 -- --------------------------------------------------------
 
@@ -513,7 +512,6 @@ INSERT INTO `rate_limits` (`id`, `identifier`, `attempts`, `reset_time`) VALUES
 -- Estructura de tabla para la tabla `reservas`
 --
 -- Creación: 11-10-2026 a las 00:43:24
--- Última actualización: 11-10-2026 a las 01:34:15
 --
 
 CREATE TABLE `reservas` (
@@ -574,6 +572,7 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `solicitudes_cambio`
 --
 -- Creación: 27-09-2026 a las 18:42:44
+-- Última actualización: 11-10-2026 a las 21:58:47
 --
 
 CREATE TABLE `solicitudes_cambio` (
@@ -594,7 +593,7 @@ CREATE TABLE `solicitudes_cambio` (
 --
 
 INSERT INTO `solicitudes_cambio` (`id_solicitud`, `id_usuario`, `tipo`, `valor_actual`, `valor_nuevo`, `estado`, `fecha_solicitud`, `fecha_resolucion`, `id_admin_resuelve`, `comentario`) VALUES
-(1, 7, 'nombre', 'simonmontoya', 'Simon Montoya', 'pendiente', '2026-09-27 22:09:02', NULL, NULL, NULL);
+(1, 7, 'nombre', 'simonmontoya', 'Simon Montoya', 'rechazada', '2026-09-27 22:09:02', '2026-10-11 16:58:47', 12, '');
 
 -- --------------------------------------------------------
 
@@ -621,8 +620,8 @@ INSERT INTO `tipos_materiales` (`id_tipo_material`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 27-09-2026 a las 18:43:47
--- Última actualización: 10-10-2026 a las 23:09:09
+-- Creación: 11-10-2026 a las 21:16:15
+-- Última actualización: 11-10-2026 a las 21:57:49
 --
 
 CREATE TABLE `usuarios` (
@@ -649,14 +648,15 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `nombre_usuario_anterior`, `fecha_liberacion_nombre`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`, `ultimo_cambio_nombre`, `remember_token`) VALUES
-(4, 1, 'Simón Montoya Soto', 'simon.ms', NULL, NULL, 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$10$eBMwcJQfbGzWtqPWl8Eh0O3cPioBvrjb579/pBmeaZ0x8jRi769lq', NULL, NULL, '1', '2026-08-30', NULL, NULL),
+(4, 1, 'Simón Montoya Soto', 'simon.ms', NULL, NULL, 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$12$OmELGf9IV/cUljAnPz/R.O3QK6ZbjJrROQfugRfzT/UZCtNmg6wiG', NULL, NULL, '1', '2026-08-30', NULL, NULL),
 (5, 1, 'simoncito', 'simon.mo', NULL, NULL, 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, NULL, '2026-08-30', '2026-09-06 21:44:13', NULL),
 (7, 3, 'simonmontoya', 'simon.bibliotecario', NULL, NULL, 'simon.biblioteca@iemanueljbetancur.edu.co', '11864630345', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', 'uploads/profiles/photos/profile_7_1791673749.png', NULL, '1', '2026-09-04', NULL, NULL),
 (8, 2, 'simon profesor', 'simon.profesor', NULL, NULL, 'simon.profesor@iemanueljbetancur.edu.co', '1187472934', 'uploads/profiles/doc_82034dc7cf179fa01ae324707a3ff48e.pdf', '$2y$10$Fugnc824oVYRylQVb8Xjhu6Jqsqo9nFUeixxOW4sUWnz8y4uOr862', NULL, NULL, '1', '2026-09-11', NULL, NULL),
 (10, 1, 'afaasda', 'adad', NULL, NULL, 'simon@manueljbetancur.edu.co', '12947242424242', 'uploads/profiles/documents/doc_9a559adefe006b7034675051afe5ffd6.png', '$2y$10$7EwuK6BqkpoR8bhJceFuIuXU1iatFAhq9C2gZzc8nzliHG9riejZS', NULL, NULL, '1', '2026-09-14', NULL, NULL),
 (12, 4, 'simon admin', 'simon.admin', NULL, NULL, 'simon.admin@iemanueljbetancur.edu.co', '11864343434', NULL, '$2y$10$eQKNEGyQu90oV4uRhxF.1eIucesyzRYwy4dZJTOc7QSelSivQpIEe', NULL, NULL, '1', '2026-09-21', NULL, NULL),
 (13, NULL, 'Matías Ruiz López', 'matias.ruiz', NULL, NULL, 'matias.ruiz@iemanueljbetancur.edu.co', '24242424242', 'uploads/profiles/documents/doc_c75a7b7078c353cfbbde4f5076fa2a80.pdf', '$2y$10$7el8Eb.rhOdAkzKbXCA3sOEr2Hm3ZiC97YAi5HqHNa7UYSAXCp.qu', NULL, NULL, '1', '2026-10-07', NULL, NULL),
-(15, 1, 'sianuro', 'sianuroa.adwew', NULL, NULL, 'sianuro@iemanueljbetancur.edu.co', '1186463032', 'uploads/profiles/documents/doc_5dcf6fbf121e3cc518d4777dbf671ab1.pdf', '$2y$10$.NPl8r.xkj213GrC/tcxm.gRN6dnMND7Ztgyt5BRDoHUD/HvBwAN6', NULL, NULL, 'pendiente', '2026-10-07', NULL, NULL);
+(15, 1, 'sianuro', 'sianuroa.adwew', NULL, NULL, 'sianuro@iemanueljbetancur.edu.co', '1186463032', 'uploads/profiles/documents/doc_5dcf6fbf121e3cc518d4777dbf671ab1.pdf', '$2y$10$.NPl8r.xkj213GrC/tcxm.gRN6dnMND7Ztgyt5BRDoHUD/HvBwAN6', NULL, NULL, 'pendiente', '2026-10-07', NULL, NULL),
+(16, 1, 'Matías Vargas', 'matias.vargas', NULL, NULL, 'matias.vargas@iemanueljbetancur.edu.co', '1186463033', 'uploads/profiles/documents/doc_5487b01c65e3bc9bb9f50a1464febd59.jpg', '$2y$12$k.QErvJcaGcxvVobKdKDSu0mp7k69Q1GGtiRbIK7eWVCxO40mJwpK', NULL, NULL, '1', '2026-10-11', NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -809,6 +809,9 @@ ALTER TABLE `tipos_materiales`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id_usuario`) USING BTREE,
+  ADD UNIQUE KEY `uq_usuarios_correo` (`correo_institucional`),
+  ADD UNIQUE KEY `uq_usuarios_usuario` (`nombre_usuario`),
+  ADD UNIQUE KEY `uq_usuarios_documento` (`documento`),
   ADD KEY `id_rol` (`id_rol`);
 
 --
@@ -891,13 +894,13 @@ ALTER TABLE `materias`
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `notificacion_usuario`
 --
 ALTER TABLE `notificacion_usuario`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `prestamos`
@@ -909,7 +912,7 @@ ALTER TABLE `prestamos`
 -- AUTO_INCREMENT de la tabla `rate_limits`
 --
 ALTER TABLE `rate_limits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT de la tabla `reservas`
@@ -939,7 +942,7 @@ ALTER TABLE `tipos_materiales`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Restricciones para tablas volcadas

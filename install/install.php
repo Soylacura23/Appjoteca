@@ -41,7 +41,11 @@ if ($step === 'composer') {
 }
 
 if ($step === 'env') {
-    $requiredNotEmpty = ['DB_HOST', 'DB_USER', 'DB_NAME'];
+
+    $requiredNotEmpty = ['DB_HOST', 'DB_USER', 'DB_NAME', 'SMTP_PASS', 'SMTP_USER'];
+
+    $requiredCanBeEmpty = ['DB_PASS', 'GOOGLE_BOOKS_API_KEY'];
+    
     $missing = [];
 
     foreach ($requiredNotEmpty as $key) {
@@ -50,15 +54,17 @@ if ($step === 'env') {
         }
     }
 
-  
-    if (!array_key_exists('DB_PASS', $_ENV)) {
-        $missing[] = 'DB_PASS';
+    foreach ($requiredCanBeEmpty as $key) {
+        if (!array_key_exists($key, $_ENV)) {
+            $missing[] = $key;
+        }
     }
 
     if (empty($missing)) {
         header('Location: ?step=connection');
         exit;
     }
+
 ?>
     <!DOCTYPE html>
     <html lang="es">

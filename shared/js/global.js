@@ -151,7 +151,8 @@
     const routesPerRole = {
         "Estudiante": '/Appjoteca/pages/settings/configuracion.php',
         "Docente": 'Appjoteca/pages/settings/configuracion.php',
-        "Bibliotecario": '/Appjoteca/dashboards/bibliotecario/pages/ajustes/ajustes.php'
+        "Bibliotecario": '/Appjoteca/dashboards/bibliotecario/pages/ajustes/ajustes.php',
+        "Administrador": '/Appjoteca/pages/settings/configuracion.php'
     };
 
     const configBtn = document.querySelector('.menu-off-canva .config');
@@ -164,13 +165,6 @@
                 window.location.href = destination;
             }
             
-        });
-    }
-     //boton cerrar sesion
-    const signOutBtn = document.querySelector('.menu-off-canva .signout');
-    if (signOutBtn) {
-        signOutBtn.addEventListener('click', () => {
-            window.location.href = '/Appjoteca/backend/auth/logout.php';
         });
     }
 

@@ -35,6 +35,8 @@
   html {
     scroll-behavior: smooth;
     font-size: 16px;
+    max-width: 100%;
+    overflow-x: clip;
   }
   
   body {
@@ -203,6 +205,7 @@
     padding: 8rem 2rem 4rem;
     overflow: hidden;
     background: #050505;
+    overflow-x: clip;
   }
   
   .hero-bg {

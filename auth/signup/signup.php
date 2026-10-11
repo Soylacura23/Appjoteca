@@ -18,13 +18,29 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
   <title>Registro en AppJoteca</title>
 
+  <style>
+    html.auth-styles-loading { background: #0a0a0a; }
+    html.auth-styles-loading body { visibility: hidden; }
+  </style>
+  <script>
+    (() => {
+      document.documentElement.classList.add('auth-styles-loading');
+      const revealAuthPage = () => document.documentElement.classList.remove('auth-styles-loading');
+      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(revealAuthPage), { once: true });
+      window.setTimeout(revealAuthPage, 1500);
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0..1,0&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../components/theme.css">
+  
   <link rel="stylesheet" href="signup.css">
+   <link rel="stylesheet" href="../../shared/css/components/password-strength.css">
+  
 
   <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
@@ -283,6 +299,7 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
   </main>
 
+   <script src="../../shared/js/components/password-strength.js"></script>
   <script src="signup.js"></script>
 </body>
 </html>

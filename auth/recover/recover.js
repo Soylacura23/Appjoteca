@@ -1,31 +1,39 @@
-// Referencias al DOM
+// ── Referencias al DOM ──
 function getCSRFToken() {
   const meta = document.querySelector('meta[name="csrf-token"]');
   return meta ? meta.getAttribute('content') : '';
 }
-const form          = document.getElementById('recover-form');
-const correoInput   = document.getElementById('correo');
-const codeInputs    = document.querySelectorAll('.code-input');
-const passInput     = document.getElementById('nueva-contrasena');
-const confirmInput  = document.getElementById('confirmar-contrasena');
-const step2         = document.getElementById('step-2');
-const step3         = document.getElementById('step-3');
-const btnSend       = document.getElementById('btn-send-code');
-const btnSendText   = document.getElementById('btn-send-text');
-const btnRecover    = document.getElementById('btn-recover');
-const btnRecoverText = document.getElementById('btn-recover-text');
-const errorBox      = document.getElementById('recover-error');
-const errorText     = document.getElementById('recover-error-text');
-const successBox    = document.getElementById('recover-success');
-const successText   = document.getElementById('recover-success-text');
-const auxiliaryFieldValue = () => document.querySelector('input[name="middle_name"]')?.value || '';
 
-// Mensajes
+const form           = document.getElementById('recover-form');
+const correoInput    = document.getElementById('correo');
+const codeInputs     = document.querySelectorAll('.code-input');
+const passInput      = document.getElementById('nueva-contrasena');
+const confirmInput   = document.getElementById('confirmar-contrasena');
+const step2          = document.getElementById('step-2');
+const step3          = document.getElementById('step-3');
+const btnSend        = document.getElementById('btn-send-code');
+const btnSendText    = document.getElementById('btn-send-text');
+const btnRecover     = document.getElementById('btn-recover');
+const btnRecoverText = document.getElementById('btn-recover-text');
+const errorBox       = document.getElementById('recover-error');
+const errorText      = document.getElementById('recover-error-text');
+const successBox     = document.getElementById('recover-success');
+const successText    = document.getElementById('recover-success-text');
+
+// Medidor
+const strengthBar  = document.getElementById('strengthBar');
+const strengthText = document.getElementById('strengthText');
+const matchHint    = document.getElementById('matchHint');
+
+const auxiliaryFieldValue = () =>
+  document.querySelector('input[name="middle_name"]')?.value || '';
+
+// ── Mensajes ──
 function mostrarError(msg) {
   errorText.textContent = msg;
   errorBox.hidden = false;
   errorBox.style.animation = 'none';
-  void errorBox.offsetWidth; // reflow: reinicia la animación
+  void errorBox.offsetWidth;
   errorBox.style.animation = '';
 }
 
@@ -39,13 +47,31 @@ function ocultarMensajes() {
   successBox.hidden = true;
 }
 
-// Activar un paso (habilita sus campos)
+// ── Activar paso ──
 function activarPaso(stepEl) {
   stepEl.classList.remove('step-inactive');
   stepEl.querySelectorAll('input, button').forEach(el => el.disabled = false);
 }
 
-// Paso 1 → 2: enviar correo a PHP
+initPasswordStrength({
+  input:        passInput,
+  bar:          strengthBar,
+  text:         strengthText,
+  matchInput:   confirmInput,
+  matchHint:    matchHint,
+  toggleBtn:    document.getElementById('toggle-newpass'),
+  toggleIcon:   document.getElementById('toggle-newpass-icon'),
+  toggleBtn2:   document.getElementById('toggle-newpass2'),
+  toggleIcon2:  document.getElementById('toggle-newpass2-icon'),
+  onChange: () => {
+
+    const passOk  = passwordRulesPassed(passInput.value);
+    const matchOk = passInput.value !== '' && passInput.value === confirmInput.value;
+    btnRecover.disabled = !(passOk && matchOk);
+  }
+});
+
+// ── Paso 1 → 2: enviar correo ──
 btnSend.addEventListener('click', async () => {
   ocultarMensajes();
   const correo = correoInput.value.trim();
@@ -56,7 +82,6 @@ btnSend.addEventListener('click', async () => {
     return;
   }
 
-  // Estado de carga
   correoInput.disabled = true;
   btnSend.disabled     = true;
   btnSendText.textContent = 'Buscando y enviando...';
@@ -90,19 +115,28 @@ btnSend.addEventListener('click', async () => {
   }
 });
 
-// Paso 2 → 3: verificar el código en PHP
 codeInputs.forEach((input, i) => {
-  input.addEventListener('input', async () => {
-    input.value = input.value.replace(/\D/g, ''); // solo números
-    if (input.value && i < codeInputs.length - 1) codeInputs[i + 1].focus();
 
-    // Código completo
+  input.addEventListener('input', async () => {
+    let val = input.value.replace(/\D/g, '');
+
+    if (val.length > 1) {
+      const digits = val.slice(0, 6);
+      codeInputs.forEach((c, idx) => {
+        c.value = digits[idx] || '';
+      });
+      const next = Math.min(digits.length, 5);
+      codeInputs[next].focus();
+    } else {
+      input.value = val;
+      if (val && i < codeInputs.length - 1) {
+        codeInputs[i + 1].focus();
+      }
+    }
+
     const codigo = [...codeInputs].map(c => c.value).join('');
-    
     if (codigo.length === 6) {
       ocultarMensajes();
-      
-      // Bloquear inputs para que no editen mientras carga
       codeInputs.forEach(c => c.disabled = true);
 
       try {
@@ -112,7 +146,7 @@ codeInputs.forEach((input, i) => {
         formData.append('csrf_token', getCSRFToken());
         formData.append('middle_name', auxiliaryFieldValue());
 
-        const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
+        const res  = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
         const data = await res.json();
 
         if (data.status === 'success') {
@@ -121,7 +155,6 @@ codeInputs.forEach((input, i) => {
           passInput.focus();
         } else {
           mostrarError(data.message);
-          // Rehabilitar inputs para que lo intenten de nuevo
           codeInputs.forEach(c => { c.disabled = false; c.value = ''; });
           codeInputs[0].focus();
         }
@@ -133,17 +166,37 @@ codeInputs.forEach((input, i) => {
   });
 
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace' && !input.value && i > 0) codeInputs[i - 1].focus();
+    if (e.key === 'Backspace' && !input.value && i > 0) {
+      codeInputs[i - 1].focus();
+    }
+  });
+
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData)
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 6);
+
+    if (!pasted) return;
+
+    codeInputs.forEach((c, idx) => {
+      c.value = pasted[idx] || '';
+    });
+
+    codeInputs[Math.min(pasted.length - 1, 5)].dispatchEvent(
+      new Event('input', { bubbles: true })
+    );
   });
 });
 
-// Paso 3: actualizar contraseña en PHP
+// ── Paso 3: actualizar contraseña ──
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   ocultarMensajes();
 
-  if (passInput.value.length < 6) {
-    mostrarError('La contraseña debe tener al menos 6 caracteres.');
+  if (!passwordRulesPassed(passInput.value)) {
+    mostrarError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.');
     passInput.focus();
     return;
   }

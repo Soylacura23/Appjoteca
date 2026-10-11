@@ -1,31 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // VANTA.JS — Fondo animado
-    if (typeof VANTA !== 'undefined' && document.getElementById('vanta-bg')) {
+    if (typeof VANTA !== 'undefined' && document.getElementById('vanta-bg') && !prefersReducedMotion) {
         VANTA.NET({
             el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
+            mouseControls: !isMobile,
+            touchControls: !isMobile,
             gyroControls: false,
             minHeight: 200.00,
             minWidth: 200.00,
             scale: 1.00,
-            scaleMobile: 1.00,
+            scaleMobile: 0.75,
             color: 0xf2ca50,
             backgroundColor: 0x050505,
-            points: 12.00,
-            maxDistance: 22.00,
-            spacing: 18.00,
-            showDots: true
+            points: isMobile ? 7.00 : 12.00,
+            maxDistance: isMobile ? 18.00 : 22.00,
+            spacing: isMobile ? 22.00 : 18.00,
+            showDots: !isMobile
         });
     }
 
     // AOS — Animaciones al scroll
     if (typeof AOS !== 'undefined') {
         AOS.init({
-            duration: 800,
+            duration: isMobile ? 500 : 800,
             once: true,
             offset: 80,
-            easing: 'ease-out-cubic'
+            easing: 'ease-out-cubic',
+            debounceDelay: 100,
+            throttleDelay: 120
         });
     }
 
@@ -120,19 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // HEADER SCROLL EFFECT
+    // El estado lo gestiona JavaScript; los estilos del header viven en su componente CSS.
     const header = document.getElementById('mainHeader');
     if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.style.background = 'rgba(5, 5, 5, 0.95)';
-                header.style.borderBottomColor = 'rgba(242, 202, 80, 0.3)';
-                header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.5)';
-            } else {
-                header.style.background = 'rgba(5, 5, 5, 0.7)';
-                header.style.borderBottomColor = 'rgba(242, 202, 80, 0.1)';
-                header.style.boxShadow = 'none';
-            }
-        });
+        const updateHeader = () => header.classList.toggle('is-scrolled', window.scrollY > 50);
+        window.addEventListener('scroll', updateHeader, { passive: true });
+        updateHeader();
     }
 });

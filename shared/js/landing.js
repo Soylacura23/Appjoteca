@@ -10,7 +10,14 @@
   
     /* AOS */
     if (typeof AOS !== "undefined") {
-        AOS.init({ duration: 800, once: true, offset: 80, easing: "ease-out-cubic" });
+        AOS.init({
+            duration: window.matchMedia("(max-width: 768px)").matches ? 500 : 800,
+            once: true,
+            offset: 80,
+            easing: "ease-out-cubic",
+            debounceDelay: 100,
+            throttleDelay: 120
+        });
     }
   
     /* Animaciones de Revelado (fallback) */

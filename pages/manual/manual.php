@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../backend/config/security.php';
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Manual de Usuario - AppJoteca</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +31,7 @@ require_once __DIR__ . '/../../backend/config/security.php';
 <header class="main-header" id="mainHeader">
     <div class="header-container">
         <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img">
 </a>
         <nav class="main-nav">
             <ul class="nav-list">

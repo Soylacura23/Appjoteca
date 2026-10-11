@@ -6,6 +6,7 @@ $diccionario_roles = [
     1 => 'Estudiante',
     2 => 'Docente',
     3 => 'Bibliotecario',
+    4 => 'Administrador',
 ];
 define('BASE_URL', '/Appjoteca/');
 
@@ -41,23 +42,20 @@ if (!isset($_SESSION['resumen_libros']) && $mi_id) {
                 FROM reservas 
                 WHERE fk_id_usuario_reserva = ? AND estado = 'activo'";
 
-        if ($query = $connection->prepare($sql)) {
-
-            $query->bind_param("ii", $mi_id, $mi_id);
-
-            $query->execute();
-
-            $resultado = $query->get_result();
-
-            while ($fila = $resultado->fetch_assoc()) {
-
-                if ($fila['tipo'] === 'prestado')  $_SESSION['resumen_libros']['prestados'] = $fila['cantidad'];
-
-                if ($fila['tipo'] === 'reservado') $_SESSION['resumen_libros']['reservados'] = $fila['cantidad'];
-            }
-            $query->close();
+if ($query = $connection->prepare($sql)) {
+    $query->bind_param("ii", $mi_id, $mi_id);
+    if (!$query->execute()) {
+        error_log('user_context: fallo al ejecutar resumen_libros: ' . $query->error);
+    } else {
+        $resultado = $query->get_result();
+        while ($fila = $resultado->fetch_assoc()) {
+            if ($fila['tipo'] === 'prestado')  $_SESSION['resumen_libros']['prestados'] = (int) $fila['cantidad'];
+            if ($fila['tipo'] === 'reservado') $_SESSION['resumen_libros']['reservados'] = (int) $fila['cantidad'];
         }
     }
+    $query->close();
+}
+}
 
 ?>
 

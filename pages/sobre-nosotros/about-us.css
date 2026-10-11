@@ -1,5 +1,11 @@
 /* about.css — Estilos para "Sobre Nosotros" */
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 /* VARIABLES EXTRA */
 :root {
   --gold-glow: rgba(242, 202, 80, 0.5);
@@ -179,6 +185,7 @@
   text-align: center;
   padding: var(--px);
   overflow: hidden;
+  overflow-x: clip;
   background: radial-gradient(ellipse at top, #1a1208 0%, #050505 60%);
 }
 .hero-bg-abstract {

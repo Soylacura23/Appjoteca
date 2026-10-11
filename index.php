@@ -109,7 +109,8 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>APPJOTECA | El Legado de la Humanidad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -133,8 +134,8 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
 
 <header class="main-header" id="mainHeader">
     <div class="header-container">
-            <a href="../../index.php" class="logo-link">
-    <img src="shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+            <a href="#" class="logo-link">
+    <img src="shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img">
 </a>
         <nav class="main-nav">
             <ul class="nav-list">

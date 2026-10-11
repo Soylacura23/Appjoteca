@@ -6,7 +6,9 @@ header("Pragma: no-cache");
 header("Expires: 0"); 
 
 if ((int) ($_SESSION['usuario_id'] ?? 0) <= 0) {
-    header('Location: /Appjoteca/auth/login/login.php');
+    $current = $_SERVER['REQUEST_URI'] ?? '/Appjoteca/';
+    $loginUrl = '/Appjoteca/auth/login/login.php?return_to=' . urlencode($current);
+    header('Location: ' . $loginUrl);
     exit();
 }
 
@@ -16,9 +18,9 @@ if (empty($_SESSION['csrf_token'])) {
 
 $mi_rol_num = (int) ($_SESSION['rol'] ?? 0);
 
-function requiereRol(array $roles) {
-    global $mi_rol_num;
-    if (!in_array($mi_rol_num, $roles, true)) {
+function requiereRol(array $roles): void {
+    $rol = (int) ($_SESSION['rol'] ?? 0);
+    if (!in_array($rol, $roles, true)) {
         http_response_code(403);
         require __DIR__ . '/../../errors/403/403.php';
         exit();

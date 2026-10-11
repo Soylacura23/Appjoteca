@@ -23,7 +23,10 @@ class RateLimiter
             throw new InvalidArgumentException('Rate limit identifier must contain 1 to 255 bytes.');
         }
 
-        $this->purgeExpired();
+        if (random_int(1, 100) === 1) {
+            
+            $this->purgeExpired();
+        }
         $now = time();
         $resetTime = $now + $this->decaySeconds;
         $maxStoredAttempts = $this->maxAttempts + 1;

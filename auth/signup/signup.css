@@ -1169,3 +1169,35 @@
      vertical-align: middle;
      font-style: normal;
    }
+
+    @media (max-width: 1023px) {
+      html,
+      body {
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: auto;
+      }
+
+      .signup-body {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      .signup-shell {
+        flex: 1 0 auto;
+        min-height: calc(100vh - 56px);
+        min-height: calc(100dvh - 56px);
+      }
+
+      .signup-form-panel {
+        min-height: auto;
+      }
+
+      .signup-card {
+        max-height: none;
+        overflow: visible;
+      }
+    }

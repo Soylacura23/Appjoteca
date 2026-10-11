@@ -8,17 +8,15 @@ if (empty($_SESSION['csrf_token'])) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Sobre Nosotros - AppJoteca</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
     <link rel="stylesheet" href="../../auth/components/theme.css">
 
     <link rel="stylesheet" href="about-us.css">
@@ -33,7 +31,7 @@ if (empty($_SESSION['csrf_token'])) {
 <header class="main-header" id="mainHeader">
     <div class="header-container">
         <a href="../../index.php" class="logo-link">
-    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+    <img src="../../shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img">
 </a>
         
         <nav class="main-nav">
@@ -51,7 +49,7 @@ if (empty($_SESSION['csrf_token'])) {
                 Acceder
             </a>
         </div>
-        <button class="mobile-menu-btn" aria-label="Menú">
+        <button class="mobile-menu-btn" aria-label="Menú" aria-expanded="false">
             <span class="material-symbols-outlined">menu</span>
         </button>
     </div>
@@ -321,7 +319,7 @@ if (empty($_SESSION['csrf_token'])) {
 
     <script src="../../shared/js/components/alert.js"></script>
 
-    
+    <script src="../../shared/js/menu.js"></script>
     <script src="about-us.js"></script>
 </body>
 </html>

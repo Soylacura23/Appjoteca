@@ -7,9 +7,12 @@
             <span class="material-symbols-outlined">settings</span>
             Configuración
         </button>
-        <button class="signout" type="button">
-            <span class="material-symbols-outlined">logout</span>
-            Cerrar Sesión
-        </button>
+        <form method="POST" action="/Appjoteca/backend/auth/logout.php">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+            <button class="signout" type="submit">
+                <span class="material-symbols-outlined">logout</span>
+                Cerrar Sesión
+            </button>
+        </form>
     </div>
 </div>

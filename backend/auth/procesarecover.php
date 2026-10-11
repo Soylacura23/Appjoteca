@@ -5,19 +5,22 @@ error_reporting(E_ALL);
 ini_set('log_errors', 1);
 
 require_once __DIR__ . '/../config/verify-csrf.php';
-header('Content-Type: application/json');
+
+header('Content-Type: application/json; charset=utf-8');
+
 require("../Database/conexion.php");
 require_once __DIR__ . '/../helpers/RateLimiter.php';
+require_once __DIR__ . '/../helpers/Validator.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
 
 require '../PHPMailer/Exception.php';
 require '../PHPMailer/PHPMailer.php';
 require '../PHPMailer/SMTP.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
     exit;
 }
@@ -25,12 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $action = $_POST['action'] ?? '';
 
 if (!empty($_POST['middle_name'])) {
-    echo json_encode(['status' => 'success', 'message' => 'Si los datos son válidos, recibirás instrucciones.']);
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'Si los datos son válidos, recibirás instrucciones.',
+    ]);
     exit;
 }
 
+$MSG_GENERICO = 'Si los datos corresponden a una cuenta activa, recibirás un código.';
+
 switch ($action) {
+
     case 'send_code':
+
         $limiter = new RateLimiter($connection, 5, 3600);
         if (!$limiter->check('recover-send:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
             http_response_code(429);
@@ -38,14 +48,24 @@ switch ($action) {
             exit;
         }
 
-        $correo = filter_var(trim($_POST["correo"] ?? ''), FILTER_VALIDATE_EMAIL);
-        
-        if (!$correo) {
-            echo json_encode(['status' => 'error', 'message' => 'Formato de correo inválido.']);
+        $correo = mb_strtolower(trim($_POST['correo'] ?? ''));
+
+        $valor = new Validator();
+        $valor->requerido($correo, 'correo')
+          ->email($correo)
+          ->longitud($correo, 5, 150, 'correo')
+          ->emailInstitucional($correo, [
+              '.edu', '.edu.co', '.edu.mx', '.edu.ar', '.edu.pe', '.edu.cl',
+              '.ac.', '.gob.', '.gov.',
+          ]);
+
+        if ($valor->falla()) {
+            echo json_encode(['status' => 'success', 'message' => $MSG_GENERICO]);
             exit;
         }
 
-        $sql = "SELECT nombre_usuario FROM usuarios WHERE correo_institucional = ? AND estado = '1'";
+        $sql = "SELECT nombre_usuario FROM usuarios
+                WHERE correo_institucional = ? AND estado = '1'";
         $query = $connection->prepare($sql);
         $query->bind_param("s", $correo);
         $query->execute();
@@ -53,14 +73,14 @@ switch ($action) {
 
         if ($resultado->num_rows > 0) {
             $usuario = $resultado->fetch_assoc();
-            $codigo = random_int(100000, 999999);
-            
-            $_SESSION['recover_email'] = $correo;
-            $_SESSION['recover_code'] = (string)$codigo;
-            $_SESSION['recover_code_expires'] = time() + 600;
-            $_SESSION['recover_verified'] = false;
+            $codigo  = random_int(100000, 999999);
 
-            
+            $_SESSION['recover_email']        = $correo;
+            $_SESSION['recover_code_hash']    = password_hash((string) $codigo, PASSWORD_BCRYPT);
+            $_SESSION['recover_code_expires'] = time() + 600;
+            $_SESSION['recover_verified']     = false;
+            $_SESSION['recover_verified_at']  = null;
+            $_SESSION['recover_intentos']     = 0;
 
             $mail = new PHPMailer(true);
             try {
@@ -71,12 +91,12 @@ switch ($action) {
                 $mail->Password   = $_ENV['SMTP_PASS'] ?? '';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
-            
+
                 $mail->setFrom('appjotecainformation@gmail.com', 'Información Appjoteca');
-                $mail->addAddress($correo, $usuario['nombre_usuario']); 
-                
+                $mail->addAddress($correo, $usuario['nombre_usuario']);
+
                 $mail->isHTML(true);
-                $rutaImagen = dirname(__DIR__, 2) . '/shared/images/logo-appjoteca.png';
+                $rutaImagen = dirname(__DIR__, 2) . '/shared/images/favicon.png';
                 $mail->addEmbeddedImage($rutaImagen, 'logo_appjoteca');
                 $mail->CharSet = 'UTF-8';
                 $mail->Subject = 'Appjoteca: Código de recuperación';
@@ -89,13 +109,13 @@ switch ($action) {
                     <title>Código de Recuperación</title>
                 </head>
                 <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased;">
-                    
+
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f5; padding: 40px 20px;">
                         <tr>
                             <td align="center">
-                                
+
                                 <table width="100%" maxWidth="500" cellpadding="0" cellspacing="0" border="0" style="background-color: #0a0a0a; border-radius: 16px; overflow: hidden; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                    
+
                                     <tr>
                                         <td align="center" style="padding: 40px 40px 20px 40px;">
                                             <table cellpadding="0" cellspacing="0" border="0">
@@ -118,7 +138,6 @@ switch ($action) {
                                                 Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Usa el siguiente código de verificación de 6 dígitos para continuar con el proceso:
                                             </p>
 
-                                            <!-- Código -->
                                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                                 <tr>
                                                     <td align="center" style="background-color: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 12px; padding: 25px;">
@@ -126,6 +145,8 @@ switch ($action) {
                                                     </td>
                                                 </tr>
                                             </table>
+
+                                            <h3 style="margin: 15px 0 15px 0; font-size: 15px; font-weight: 400; color: #ffffff;">El código vencerá en 10 minutos</h3>
 
                                             <p style="margin: 25px 0 0 0; font-size: 13px; line-height: 1.5; color: #777777;">
                                                 Si no solicitaste este cambio, puedes ignorar este correo de forma segura. Tu cuenta sigue protegida.
@@ -143,7 +164,7 @@ switch ($action) {
                                             </p>
                                         </td>
                                     </tr>
-                                    
+
                                 </table>
 
                             </td>
@@ -152,29 +173,30 @@ switch ($action) {
 
                 </body>
                 </html>
-            HTML;
+                HTML;
 
-            
                 $mail->send();
-                echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
+                echo json_encode(['status' => 'success', 'message' => $MSG_GENERICO]);
             } catch (Exception $e) {
                 error_log('Error sending password recovery email: ' . $e->getMessage());
                 unset(
                     $_SESSION['recover_email'],
-                    $_SESSION['recover_code'],
+                    $_SESSION['recover_code_hash'],
                     $_SESSION['recover_code_expires'],
-                    $_SESSION['recover_verified']
+                    $_SESSION['recover_verified'],
+                    $_SESSION['recover_verified_at'],
+                    $_SESSION['recover_intentos']
                 );
-                echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
+                echo json_encode(['status' => 'success', 'message' => $MSG_GENERICO]);
             }
-        
-            
         } else {
-            echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
+
+            echo json_encode(['status' => 'success', 'message' => $MSG_GENERICO]);
         }
         break;
 
     case 'verify_code':
+
         $limiter = new RateLimiter($connection, 10, 900);
         if (!$limiter->check('recover-verify:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
             http_response_code(429);
@@ -183,11 +205,48 @@ switch ($action) {
         }
 
         $codigo_ingresado = trim($_POST['codigo'] ?? '');
-        
-        if (isset($_SESSION['recover_code'], $_SESSION['recover_code_expires'])
-            && $_SESSION['recover_code_expires'] >= time()
-            && hash_equals((string) $_SESSION['recover_code'], $codigo_ingresado)) {
-            $_SESSION['recover_verified'] = true;
+
+        if (!preg_match('/^\d{6}$/', $codigo_ingresado)) {
+            echo json_encode(['status' => 'error', 'message' => 'El código es incorrecto.']);
+            exit;
+        }
+
+        if (empty($_SESSION['recover_code_hash']) || empty($_SESSION['recover_code_expires'])) {
+            echo json_encode(['status' => 'error', 'message' => 'El código es incorrecto.']);
+            exit;
+        }
+
+        if ((int) $_SESSION['recover_code_expires'] < time()) {
+            unset(
+                $_SESSION['recover_code_hash'],
+                $_SESSION['recover_code_expires'],
+                $_SESSION['recover_verified'],
+                $_SESSION['recover_verified_at'],
+                $_SESSION['recover_intentos']
+            );
+            echo json_encode(['status' => 'error', 'message' => 'El código ha expirado.']);
+            exit;
+        }
+
+        $_SESSION['recover_intentos'] = ((int) ($_SESSION['recover_intentos'] ?? 0)) + 1;
+        if ($_SESSION['recover_intentos'] > 5) {
+            unset(
+                $_SESSION['recover_code_hash'],
+                $_SESSION['recover_code_expires'],
+                $_SESSION['recover_verified'],
+                $_SESSION['recover_verified_at'],
+                $_SESSION['recover_intentos']
+            );
+            echo json_encode(['status' => 'error', 'message' => 'Demasiados intentos. Solicita un código nuevo.']);
+            exit;
+        }
+
+        if (password_verify($codigo_ingresado, $_SESSION['recover_code_hash'])) {
+            $_SESSION['recover_verified']    = true;
+            $_SESSION['recover_verified_at'] = time();
+
+            unset($_SESSION['recover_code_hash']);
+
             echo json_encode(['status' => 'success', 'message' => 'Código verificado correctamente.']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'El código es incorrecto.']);
@@ -195,6 +254,7 @@ switch ($action) {
         break;
 
     case 'update_password':
+
         $limiter = new RateLimiter($connection, 5, 900);
         if (!$limiter->check('recover-update:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
             http_response_code(429);
@@ -203,15 +263,33 @@ switch ($action) {
         }
 
         $nueva_contrasena = $_POST['nueva_contrasena'] ?? '';
-        $correo_guardado = $_SESSION['recover_email'] ?? '';
+        $correo_guardado  = $_SESSION['recover_email'] ?? '';
 
-        if (empty($correo_guardado) || empty($_SESSION['recover_verified'])
-            || (int) ($_SESSION['recover_code_expires'] ?? 0) < time()) {
+        if (empty($correo_guardado) || empty($_SESSION['recover_verified'])) {
             echo json_encode(['status' => 'error', 'message' => 'La sesión ha expirado. Recarga la página.']);
             exit;
         }
-        if (strlen($nueva_contrasena) < 6) {
-            echo json_encode(['status' => 'error', 'message' => 'La contraseña debe tener al menos 6 caracteres.']);
+
+        if (empty($_SESSION['recover_verified_at'])
+            || (time() - (int) $_SESSION['recover_verified_at']) > 300) {
+            echo json_encode(['status' => 'error', 'message' => 'La verificación ha expirado. Vuelve a introducir el código.']);
+            exit;
+        }
+
+        if ((int) ($_SESSION['recover_code_expires'] ?? 0) < time()) {
+            echo json_encode(['status' => 'error', 'message' => 'La sesión ha expirado. Recarga la página.']);
+            exit;
+        }
+
+        $valor = new Validator();
+        $valor->password($nueva_contrasena, 8, 72);
+
+        if ($valor->falla()) {
+            echo json_encode([
+                'status'  => 'error',
+                'message' => $valor->primero(),
+                'errores' => $valor->errores(),
+            ], JSON_UNESCAPED_UNICODE);
             exit;
         }
 
@@ -220,37 +298,56 @@ switch ($action) {
         $query->bind_param("s", $correo_guardado);
         $query->execute();
         $resultado = $query->get_result();
-        
-        if ($resultado->num_rows > 0) {
-            $fila = $resultado->fetch_assoc();
-            
-            // ¿Es igual a la antigua?
-            if (password_verify($nueva_contrasena, $fila['password'])) {
-                echo json_encode(['status' => 'error', 'message' => 'La nueva contraseña no puede ser igual a la anterior.']);
-                exit;
-            }
 
-            $hash = password_hash($nueva_contrasena, PASSWORD_BCRYPT);
-            $sqlUpdate = "UPDATE usuarios SET password = ? WHERE correo_institucional = ?";
-            $queryUpdate = $connection->prepare($sqlUpdate);
-            $queryUpdate->bind_param("ss", $hash, $correo_guardado);
-            
-            if ($queryUpdate->execute()) {
-                unset(
-                    $_SESSION['recover_email'],
-                    $_SESSION['recover_code'],
-                    $_SESSION['recover_code_expires'],
-                    $_SESSION['recover_verified']
-                );
-                echo json_encode(['status' => 'success', 'message' => 'Contraseña actualizada.']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Error de base de datos.']);
-            }
+        if ($resultado->num_rows < 1) {
+            echo json_encode(['status' => 'error', 'message' => 'Error de base de datos.']);
+            exit;
         }
+
+        $fila = $resultado->fetch_assoc();
+
+        if (password_verify($nueva_contrasena, $fila['password'])) {
+            echo json_encode(['status' => 'error', 'message' => 'La nueva contraseña no puede ser igual a la anterior.']);
+            exit;
+        }
+
+        $hash = password_hash($nueva_contrasena, PASSWORD_BCRYPT, ['cost' => 12]);
+
+        $sqlUpdate = "UPDATE usuarios
+                      SET password = ?, remember_token = NULL
+                      WHERE correo_institucional = ?";
+        $queryUpdate = $connection->prepare($sqlUpdate);
+        $queryUpdate->bind_param("ss", $hash, $correo_guardado);
+
+        if (!$queryUpdate->execute()) {
+            error_log('update_password: execute falló: ' . $queryUpdate->error);
+            echo json_encode(['status' => 'error', 'message' => 'Error de base de datos.']);
+            exit;
+        }
+
+        setcookie("remember_me", "", [
+            'expires'  => time() - 3600,
+            'path'     => '/Appjoteca',
+            'secure'   => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        unset(
+            $_SESSION['recover_email'],
+            $_SESSION['recover_code_hash'],
+            $_SESSION['recover_code_expires'],
+            $_SESSION['recover_verified'],
+            $_SESSION['recover_verified_at'],
+            $_SESSION['recover_intentos']
+        );
+
+        session_regenerate_id(true);
+
+        echo json_encode(['status' => 'success', 'message' => 'Contraseña actualizada.']);
         break;
 
     default:
         echo json_encode(['status' => 'error', 'message' => 'Acción inválida.']);
         break;
 }
-?>

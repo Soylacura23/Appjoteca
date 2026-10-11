@@ -851,3 +851,35 @@
     padding: 44px 48px 40px;
   }
 }
+
+@media (max-width: 1023px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+  }
+
+  .login-body {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .login-shell {
+    flex: 1 0 auto;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
+  }
+
+  .login-form-panel {
+    min-height: auto;
+  }
+
+  .login-card {
+    max-height: none;
+    overflow: visible;
+  }
+}

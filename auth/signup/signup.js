@@ -15,11 +15,6 @@ const emailInput      = document.getElementById('email');
 const passInput       = document.getElementById('contrasena');
 const pass2Input      = document.getElementById('contrasena2');
 
-const togglePassBtn   = document.getElementById('toggle-pass');
-const togglePassIcon  = document.getElementById('toggle-pass-icon');
-const togglePass2Btn  = document.getElementById('toggle-pass2');
-const togglePass2Icon = document.getElementById('toggle-pass2-icon');
-
 const btnNext         = document.getElementById('btn-next');
 const btnBack         = document.getElementById('btn-back');
 const btnSubmit       = document.getElementById('btn-submit');
@@ -89,15 +84,12 @@ function paso2Completo() {
     /^[a-zA-Z0-9._-]+$/.test(usuario) &&
     email.length > 0 &&
     validarEmailInstitucional(email) &&
-    pass.length >= 8 &&
-    /[A-Z]/.test(pass) &&
-    /[0-9]/.test(pass) &&
+    passwordRulesPassed(pass) &&
     pass === pass2
   );
 }
 
 function actualizarBotones() {
-  // Atrás
   if (currentStep <= 1) {
     btnBack.hidden = true;
     btnBack.disabled = true;
@@ -106,7 +98,6 @@ function actualizarBotones() {
     btnBack.disabled = false;
   }
 
-  // Siguiente
   if (currentStep >= TOTAL_STEPS) {
     btnNext.hidden = true;
     btnNext.disabled = true;
@@ -115,7 +106,6 @@ function actualizarBotones() {
     btnNext.disabled = false;
   }
 
-  // Crear cuenta
   if (currentStep === TOTAL_STEPS) {
     btnSubmit.hidden = false;
     btnSubmit.disabled = !paso2Completo();
@@ -168,20 +158,22 @@ function renderStep() {
   }
 }
 
-// Toggle contraseña
-function setupPasswordToggle(btn, input, icon) {
-  if (!btn || !input || !icon) return;
-  btn.addEventListener('click', function () {
-    const visible = input.type === 'text';
-    input.type = visible ? 'password' : 'text';
-    icon.textContent = visible ? 'visibility' : 'visibility_off';
-    btn.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
-    input.focus({ preventScroll: true });
-  });
-}
-
-setupPasswordToggle(togglePassBtn, passInput, togglePassIcon);
-setupPasswordToggle(togglePass2Btn, pass2Input, togglePass2Icon);
+// ── Componente compartido de contraseña ──
+initPasswordStrength({
+  input:        passInput,
+  bar:          strengthBar,
+  text:         strengthText,
+  matchInput:   pass2Input,
+  matchHint:    matchHint,
+  toggleBtn:    document.getElementById('toggle-pass'),
+  toggleIcon:   document.getElementById('toggle-pass-icon'),
+  toggleBtn2:   document.getElementById('toggle-pass2'),
+  toggleIcon2:  document.getElementById('toggle-pass2-icon'),
+  onChange: () => {
+    ocultarMensajes();
+    if (currentStep === TOTAL_STEPS) actualizarBotones();
+  }
+});
 
 // Preview y eliminar documento
 function limpiarPreviewCedula() {
@@ -189,9 +181,7 @@ function limpiarPreviewCedula() {
   try {
     const dt = new DataTransfer();
     cedulaFileInput.files = dt.files;
-  } catch (err) {
-    // ok
-  }
+  } catch (err) {}
   if (cedulaPreview) {
     cedulaPreview.hidden = true;
     cedulaPreview.innerHTML = '';
@@ -305,7 +295,6 @@ function validarPaso2() {
     usuarioInput.focus({ preventScroll: true });
     return false;
   }
-
   if (!email) {
     mostrarError('Ingresa tu correo institucional.');
     emailInput.focus({ preventScroll: true });
@@ -316,7 +305,6 @@ function validarPaso2() {
     emailInput.focus({ preventScroll: true });
     return false;
   }
-
   if (!pass) {
     mostrarError('Ingresa una contraseña.');
     passInput.focus({ preventScroll: true });
@@ -332,6 +320,11 @@ function validarPaso2() {
     passInput.focus({ preventScroll: true });
     return false;
   }
+  if (!/[a-z]/.test(pass)) {
+    mostrarError('La contraseña debe incluir al menos una letra minúscula.');
+    passInput.focus({ preventScroll: true });
+    return false;
+  }
   if (!/[0-9]/.test(pass)) {
     mostrarError('La contraseña debe incluir al menos un número.');
     passInput.focus({ preventScroll: true });
@@ -343,76 +336,6 @@ function validarPaso2() {
     return false;
   }
   return true;
-}
-
-// Fortaleza de contraseña
-function actualizarFortaleza() {
-  if (!passInput || !strengthBar || !strengthText) return;
-
-  const v = passInput.value;
-  let puntos = 0;
-
-  if (v.length >= 8) puntos++;
-  if (/[A-Z]/.test(v)) puntos++;
-  if (/[0-9]/.test(v)) puntos++;
-  if (/[^A-Za-z0-9]/.test(v)) puntos++;
-
-  if (v.length === 0) {
-    strengthBar.className = 'strength-bar';
-    strengthText.innerHTML = 'Fortaleza: <em>Débil</em>';
-    return;
-  }
-
-  let label = 'Débil';
-  let color = '#ffb4ab';
-  let cls = 'weak';
-
-  if (puntos >= 4) {
-    label = 'Fuerte';
-    color = '#4ade80';
-    cls = 'strong';
-  } else if (puntos >= 2) {
-    label = 'Media';
-    color = '#f2ca50';
-    cls = 'medium';
-  }
-
-  strengthBar.className = 'strength-bar ' + cls;
-  strengthText.innerHTML = 'Fortaleza: <em style="color:' + color + '">' + label + '</em>';
-}
-
-function actualizarMatch() {
-  if (!matchHint || !passInput || !pass2Input) return;
-
-  if (!passInput.value || !pass2Input.value) {
-    matchHint.textContent = '';
-    return;
-  }
-
-  if (pass2Input.value === passInput.value) {
-    matchHint.textContent = 'Las contraseñas coinciden';
-    matchHint.style.color = '#4ade80';
-  } else {
-    matchHint.textContent = 'Las contraseñas no coinciden';
-    matchHint.style.color = '#ffb4ab';
-  }
-}
-
-if (passInput) {
-  passInput.addEventListener('input', function () {
-    ocultarMensajes();
-    actualizarFortaleza();
-    actualizarMatch();
-    if (currentStep === TOTAL_STEPS) actualizarBotones();
-  });
-}
-
-if (pass2Input) {
-  pass2Input.addEventListener('input', function () {
-    ocultarMensajes();
-    actualizarMatch();
-    if (currentStep === TOTAL_STEPS) actualizarBotones();
-  });
 }
 
 // Navegación
@@ -440,7 +363,7 @@ if (btnBack) {
 // Inputs: limpiar error y actualizar botón
 const allInputs = [
   nombreInput, cedulaInput, cedulaFileInput,
-  usuarioInput, emailInput, passInput, pass2Input
+  usuarioInput, emailInput
 ];
 
 allInputs.forEach(function (input) {
@@ -464,6 +387,10 @@ if (form) {
 
     try {
       const formData = new FormData(form);
+
+      // Normalizaciones coherentes con el backend
+      formData.set('usuario', (formData.get('usuario') || '').toString().trim().toLowerCase());
+      formData.set('email',   (formData.get('email')   || '').toString().trim().toLowerCase());
 
       const respuesta = await fetch(form.action, {
         method: form.method,
@@ -499,5 +426,4 @@ if (form) {
   });
 }
 
-// Init
 renderStep();

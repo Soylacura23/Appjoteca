@@ -31,12 +31,14 @@ if (!$limiter->check('login:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
 
 if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['remember_me'])) {
     $token_cookie = $_COOKIE['remember_me'];
+    $tokenHash = hash('sha256', $token_cookie);
+    $estado = "1";
 
     $sql_cookie = "SELECT id_usuario, nombre_usuario, nombre_apellido, id_rol, foto_perfil, documento
-                   FROM usuarios WHERE remember_token = ? AND estado = '1'";
+                   FROM usuarios WHERE remember_token = ? AND estado = ?";
     $query_cookie = $connection->prepare($sql_cookie);
 
-    $query_cookie->bind_param("s", $token_cookie);
+    $query_cookie->bind_param("ss", $tokenHash, $estado);
 
     $query_cookie->execute();
 
@@ -44,6 +46,23 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['remember_me'])) {
 
     if ($resultado_cookie->num_rows === 1) {
         $usuario_db = $resultado_cookie->fetch_assoc();
+
+            $nuevoToken = bin2hex(random_bytes(32));
+            $nuevoHash  = hash('sha256', $nuevoToken);
+            $nuevaExp   = time() + (86400 * 30);
+
+            $upd = $connection->prepare("UPDATE usuarios SET remember_token = ? WHERE id_usuario = ? AND estado = ?");
+            $upd->bind_param("sis", $nuevoHash, $usuario_db['id_usuario'], $estado);
+            $upd->execute();
+            $upd->close();
+
+            setcookie("remember_me", $nuevoToken, [
+                'expires'  => $nuevaExp,
+                'path'     => '/Appjoteca',
+                'secure'   => true,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
 
         session_regenerate_id(true);
 
@@ -115,13 +134,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (isset($_POST['remember'])) {
             $token = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $token); 
             $expiracion = time() + (86400 * 30); 
 
             $sql_update_token = "UPDATE usuarios SET remember_token = ? WHERE id_usuario = ?";
 
             $query_update = $connection->prepare($sql_update_token);
 
-            $query_update->bind_param("si", $token, $usuario_db['id_usuario']);
+            $query_update->bind_param("si", $tokenHash, $usuario_db['id_usuario']);
 
             $query_update->execute();
 

@@ -13,9 +13,22 @@ if (empty($_SESSION['csrf_token'])) {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
   <title>Recuperar Acceso en AppJoteca</title>
+
+  <style>
+    html.auth-styles-loading { background: #0a0a0a; }
+    html.auth-styles-loading body { visibility: hidden; }
+  </style>
+  <script>
+    (() => {
+      document.documentElement.classList.add('auth-styles-loading');
+      const revealAuthPage = () => document.documentElement.classList.remove('auth-styles-loading');
+      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(revealAuthPage), { once: true });
+      window.setTimeout(revealAuthPage, 1500);
+    })();
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +37,7 @@ if (empty($_SESSION['csrf_token'])) {
 
   <link rel="stylesheet" href="../components/theme.css">
   <link rel="stylesheet" href="recover.css">
+  <link rel="stylesheet" href="../../shared/css/components/password-strength.css">
 
   <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
   <link rel="stylesheet" href="../../shared/css/components/footer.css">
@@ -131,7 +145,7 @@ if (empty($_SESSION['csrf_token'])) {
 
             <div class="field-group">
               <label class="field-label" for="nueva-contrasena">Nueva contraseña</label>
-              <div class="field-wrapper">
+              <div class="field-wrapper field-wrapper--password">
                 <input
                   type="password"
                   id="nueva-contrasena"
@@ -141,13 +155,30 @@ if (empty($_SESSION['csrf_token'])) {
                   autocomplete="new-password"
                   disabled
                   required
+                  minlength="8"
                 >
+                <button type="button" class="field-toggle-pass" id="toggle-newpass"
+                        aria-label="Mostrar u ocultar contraseña">
+                  <span class="material-symbols-outlined" id="toggle-newpass-icon">visibility</span>
+                </button>
               </div>
+
+              <!-- Medidor de fortaleza -->
+              <div class="password-strength">
+                <div class="strength-track">
+                  <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <span class="strength-text" id="strengthText">Fortaleza: <em>Débil</em></span>
+              </div>
+
+              <p class="field-hint">
+                Mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número.
+              </p>
             </div>
 
             <div class="field-group">
               <label class="field-label" for="confirmar-contrasena">Confirmar contraseña</label>
-              <div class="field-wrapper">
+              <div class="field-wrapper field-wrapper--password">
                 <input
                   type="password"
                   id="confirmar-contrasena"
@@ -158,7 +189,12 @@ if (empty($_SESSION['csrf_token'])) {
                   disabled
                   required
                 >
+                <button type="button" class="field-toggle-pass" id="toggle-newpass2"
+                        aria-label="Mostrar u ocultar contraseña">
+                  <span class="material-symbols-outlined" id="toggle-newpass2-icon">visibility</span>
+                </button>
               </div>
+              <span class="match-hint" id="matchHint"></span>
             </div>
 
             <!-- Mensaje de error -->
@@ -241,7 +277,7 @@ if (empty($_SESSION['csrf_token'])) {
 
   </main>
  
-
+   <script src="../../shared/js/components/password-strength.js"></script>
   <script src="recover.js"></script>
 </body>
 </html>

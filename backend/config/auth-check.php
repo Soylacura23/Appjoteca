@@ -6,8 +6,8 @@ header("Pragma: no-cache");
 header("Expires: 0"); 
 
 
-if (isset($_SESSION['usuario_id'])) { 
-    $rol = $_SESSION['rol'] ?? 'estudiante';
+if (isset($_SESSION['usuario_id'])) {
+    $rol = (string) ($_SESSION['rol'] ?? '');
 
     switch ($rol) {
         case '4':
@@ -27,7 +27,7 @@ if (isset($_SESSION['usuario_id'])) {
             $url = "/Appjoteca/backend/auth/logout.php";
             break;
     }
-    echo "<script>window.location.replace('$url');</script>";
+    header('Location: ' . $url, true, 302);
     exit();
 }
 ?>
