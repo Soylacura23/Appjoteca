@@ -93,7 +93,7 @@ function obtenerFraseSemanal()
     $semana = date('o-W');
 
     if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+        require_once __DIR__ . '/../../../backend/config/security.php';
     }
 
     if (
@@ -152,52 +152,9 @@ function obtenerFraseSemanal()
 }
 
 try {
-    // ── Métricas ─────────────────────────────────────────
-    $trafico = unaFila($connection, "
-        SELECT
-            (SELECT COUNT(*) FROM reservas) +
-            (SELECT COUNT(*) FROM prestamos) AS total
-    ");
-    $traficoTotal = (int) ($trafico['total'] ?? 0);
-
-    $reservasHoy = unaFila($connection, "
-        SELECT COUNT(*) AS total FROM reservas WHERE fecha_reserva = CURDATE()
-    ");
-    $reservasDiarias = (int) ($reservasHoy['total'] ?? 0);
-
-    $usuariosAct = unaFila($connection, "
-        SELECT COUNT(*) AS total FROM usuarios WHERE estado = '1'
-    ");
-    $usuariosActivos = (int) ($usuariosAct['total'] ?? 0);
-
-    $usuariosInact = unaFila($connection, "
-        SELECT COUNT(*) AS total FROM usuarios
-        WHERE estado IS NULL OR estado != '1'
-    ");
-    $usuariosInactivos = (int) ($usuariosInact['total'] ?? 0);
-
-    $usuariosReserva = unaFila($connection, "
-        SELECT COUNT(DISTINCT fk_id_usuario_reserva) AS total
-        FROM reservas WHERE estado = 'activa'
-    ");
-    $usuariosConReserva = (int) ($usuariosReserva['total'] ?? 0);
-
-    $prestamosAct = unaFila($connection, "
-        SELECT COUNT(*) AS total FROM prestamos
-        WHERE estado IN ('activo', 'vencido')
-    ");
-    $prestamosActivos = (int) ($prestamosAct['total'] ?? 0);
-
-    $devoluciones = unaFila($connection, "
-        SELECT COUNT(*) AS total FROM prestamos WHERE estado = 'devuelto'
-    ");
-    $totalDevoluciones = (int) ($devoluciones['total'] ?? 0);
-
-    // ── Gráfica (filtro de período) ──────────────────────
-    $infoGrafica = obtenerGraficaReservas($connection, $periodo);
-
-    // Solo gráfica → respuesta corta
+    // Endpoints parciales salen antes de ejecutar las consultas del informe completo.
     if ($tipo === 'grafica') {
+        $infoGrafica = obtenerGraficaReservas($connection, $periodo);
         echo json_encode([
             'ok'               => true,
             'grafica_reservas' => $infoGrafica['datos'],
@@ -207,19 +164,53 @@ try {
         exit;
     }
 
-    // ── Categoría popular ────────────────────────────────
+    if ($tipo === 'frase') {
+        echo json_encode([
+            'ok' => true,
+            'frase' => obtenerFraseSemanal()
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // Métricas resumidas en una consulta para reducir los viajes a la base de datos.
+    $metricasRaw = unaFila($connection, "
+        SELECT
+            (SELECT COUNT(*) FROM reservas) +
+                (SELECT COUNT(*) FROM prestamos) AS trafico_total,
+            (SELECT COUNT(*) FROM reservas WHERE fecha_reserva = CURDATE()) AS reservas_diarias,
+            (SELECT COUNT(*) FROM usuarios WHERE estado = '1') AS usuarios_activos,
+            (SELECT COUNT(*) FROM usuarios WHERE estado IS NULL OR estado != '1') AS usuarios_inactivos,
+            (SELECT COUNT(DISTINCT fk_id_usuario_reserva) FROM reservas WHERE estado = 'activa') AS usuarios_con_reserva,
+            (SELECT COUNT(*) FROM prestamos WHERE estado IN ('activo', 'vencido')) AS prestamos_activos,
+            (SELECT COUNT(*) FROM prestamos WHERE estado = 'devuelto') AS devoluciones
+    ");
+    $traficoTotal = (int) ($metricasRaw['trafico_total'] ?? 0);
+    $reservasDiarias = (int) ($metricasRaw['reservas_diarias'] ?? 0);
+    $usuariosActivos = (int) ($metricasRaw['usuarios_activos'] ?? 0);
+    $usuariosInactivos = (int) ($metricasRaw['usuarios_inactivos'] ?? 0);
+    $usuariosConReserva = (int) ($metricasRaw['usuarios_con_reserva'] ?? 0);
+    $prestamosActivos = (int) ($metricasRaw['prestamos_activos'] ?? 0);
+    $totalDevoluciones = (int) ($metricasRaw['devoluciones'] ?? 0);
+
+    // Gráfica del informe completo (el selector de período sigue aplicando el mismo filtro).
+    $infoGrafica = obtenerGraficaReservas($connection, $periodo);
+
+    // Categoría popular
     $cat = unaFila($connection, "
-        SELECT m.nombre, COUNT(*) AS total
-        FROM reservas r
-        JOIN libros l ON r.fk_id_libro_reserva = l.id_libro
-        JOIN materias m ON l.id_materia = m.id_materia
-        GROUP BY m.id_materia
-        ORDER BY total DESC
+        SELECT categoria.nombre, categoria.total,
+            (SELECT COUNT(*) FROM reservas) AS total_reservas
+        FROM (
+            SELECT m.id_materia, m.nombre, COUNT(*) AS total
+            FROM reservas r
+            JOIN libros l ON r.fk_id_libro_reserva = l.id_libro
+            JOIN materias m ON l.id_materia = m.id_materia
+            GROUP BY m.id_materia, m.nombre
+        ) AS categoria
+        ORDER BY categoria.total DESC
         LIMIT 1
     ");
 
-    $totalReservasCat = unaFila($connection, "SELECT COUNT(*) AS total FROM reservas");
-    $totalR = max(1, (int) ($totalReservasCat['total'] ?? 1));
+    $totalR = max(1, (int) ($cat['total_reservas'] ?? 1));
 
     $categoriaPopular = null;
     if ($cat) {
@@ -230,7 +221,7 @@ try {
         ];
     }
 
-    // ── Libro más reservado ──────────────────────────────
+    // Libro más reservado
     $libroPop = unaFila($connection, "
         SELECT l.id_libro, l.titulo, l.portada, COUNT(*) AS total
         FROM reservas r
@@ -251,7 +242,7 @@ try {
         ];
     }
 
-    // ── Editoriales ──────────────────────────────────────
+    // Editoriales
     $editoriales = todasFilas($connection, "
         SELECT e.nombre, COUNT(l.id_libro) AS total
         FROM libros l
@@ -262,7 +253,7 @@ try {
         LIMIT 5
     ");
 
-    // ── Alertas de inventario ────────────────────────────
+    // Alertas de inventario
     $alertasRaw = todasFilas($connection, "
         SELECT
             l.id_libro,
@@ -307,7 +298,7 @@ try {
         ];
     }
 
-    $frase = obtenerFraseSemanal();
+    $frase = 'La lectura es a la mente lo que el ejercicio es al cuerpo.';
 
    
     echo json_encode([

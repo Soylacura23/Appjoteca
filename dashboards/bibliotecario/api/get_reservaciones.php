@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../backend/Database/conexion.php';
 require_once __DIR__ . '/../../../backend/models/reserva.php';
 require_once __DIR__ . '/../../../backend/models/prestamo.php';
 
-requiereRol([3]);
+requiereRol([3, 4]);
 
 $tipo  = $_GET['tipo']  ?? 'solicitudes';
 $page  = max(1, (int) ($_GET['page']  ?? 1));
@@ -32,6 +32,19 @@ try {
                 'limit'  => $limit,
                 'pages'  => (int) ceil($total / $limit)
             ]);
+            break;
+
+        case 'solicitud':
+            if ($id <= 0) {
+                echo json_encode(['ok' => false, 'error' => 'ID inválido']);
+                break;
+            }
+            $item = $modeloReserva->obtenerDetalleReserva($id);
+            if (!$item || $item['estado'] !== 'activa') {
+                echo json_encode(['ok' => false, 'error' => 'La solicitud ya no está pendiente.']);
+                break;
+            }
+            echo json_encode(['ok' => true, 'data' => $item]);
             break;
 
         case 'devoluciones':

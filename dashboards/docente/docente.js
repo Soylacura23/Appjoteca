@@ -47,12 +47,12 @@ async function loadSuggestedBooks() {
     }
 
     container.innerHTML = books.map(book => `
-      <article class="book-card" data-id="${book.id || ''}">
+      <article class="book-card" data-id="${Number(book.id) || 0}">
         <div class="book-cover">
-        <img src="../../${libro.portada ? libro.portada : 'shared/images/logo-appjoteca.svg'}" 
-     alt="${libro.titulo}" 
-     class="libro-img"
-     onerror="this.onerror=null; this.src='../../shared/images/logo-appjoteca.svg';">
+        <img src="${escapeHtml(book.portada_url || '../../shared/images/logo-appjoteca.svg')}"
+             alt="${escapeHtml(book.titulo)}"
+             class="libro-img"
+             onerror="this.onerror=null; this.src='../../shared/images/logo-appjoteca.svg';">
         </div>
         <div class="book-info">
           <h3 class="book-title">${escapeHtml(book.titulo)}</h3>

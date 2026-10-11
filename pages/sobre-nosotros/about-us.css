@@ -1,8 +1,6 @@
-/* ============================================================
-   about.css — Estilos para "Sobre Nosotros"
-   ============================================================ */
+/* about.css — Estilos para "Sobre Nosotros" */
 
-/* ============ VARIABLES EXTRA ============ */
+/* VARIABLES EXTRA */
 :root {
   --gold-glow: rgba(242, 202, 80, 0.5);
   --purple-accent: #a78bfa;
@@ -21,7 +19,7 @@
   position: absolute;
   left: -9999px;
 }
-.honeypot {
+.sec-email-field {
   position: absolute !important;
   left: -9999px !important;
   opacity: 0 !important;
@@ -31,7 +29,7 @@
 }
 
 
-/* ============ BOTONES ============ */
+/* BOTONES */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -107,7 +105,7 @@
   font-size: 1.2rem;
 }
 
-/* ============ UTILIDADES ============ */
+/* UTILIDADES */
 .text-center { text-align: center; }
 .limit-width { max-width: 700px; margin-left: auto; margin-right: auto; }
 .w-100 { width: 100%; }
@@ -171,7 +169,7 @@
   background-clip: text;
 }
 
-/* ============ HERO ============ */
+/* HERO */
 .hero-direct {
   position: relative;
   min-height: 100vh;
@@ -257,7 +255,7 @@
   50% { transform: translateX(-50%) translateY(10px); opacity: 0.5; }
 }
 
-/* ============ GRIDS Y TARJETAS BASE ============ */
+/* GRIDS Y TARJETAS BASE */
 .grid-4 { display: grid; gap: var(--sp-lg); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .grid-3 { display: grid; gap: var(--sp-lg); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 
@@ -309,7 +307,7 @@
 .card h3 { color: var(--on-surface); margin-bottom: var(--sp-sm); font-size: 1.2rem; }
 .card p { color: var(--on-surface-variant); font-size: 0.95rem; }
 
-/* ============ EQUIPO ============ */
+/* EQUIPO */
 .team-section {
   padding-top: var(--sp-xl);
 }
@@ -426,7 +424,7 @@
   margin-top: var(--sp-xl);
 }
 
-/* ============ MARQUESINA ============ */
+/* MARQUESINA */
 .marquee-section {
   overflow: hidden;
   padding: var(--sp-lg) 0;
@@ -484,7 +482,7 @@
   100% { transform: translateX(-50%); }
 }
 
-/* ============ MISIÓN Y VISIÓN ============ */
+/* MISIÓN Y VISIÓN */
 .mv-section {
   padding: var(--sp-2xl) var(--px);
   position: relative;
@@ -582,7 +580,7 @@
   line-height: 1.7;
 }
 
-/* ============ FAQ ============ */
+/* FAQ */
 .faq-section {
   padding: var(--sp-2xl) var(--px);
   max-width: 800px;
@@ -660,7 +658,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ============ CONTACTO ============ */
+/* CONTACTO */
 .contact-section {
   padding: var(--sp-2xl) var(--px);
   position: relative;
@@ -721,7 +719,7 @@
   margin: 0;
 }
 
-/* ============ FORMULARIO ============ */
+/* FORMULARIO */
 .form-wrapper {
   width: 100%;
   position: relative;
@@ -839,8 +837,24 @@
   font-weight: 400;
   cursor: pointer;
 }
+.privacy-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.25rem;
+}
+.privacy-policy-link {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.privacy-policy-link:hover {
+  color: var(--text-primary);
+}
 
-/* ============ RESPONSIVE ============ */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .mv-grid { grid-template-columns: 1fr; }
   .contact-grid {

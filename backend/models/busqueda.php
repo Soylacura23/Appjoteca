@@ -11,7 +11,7 @@ class Busqueda
     }
 
     // Libros por título, autor o isbn
-    public function libros($texto)
+    public function libros($texto, $rol = 0)
     {
         $like = '%' . $texto . '%';
         $sql = "SELECT l.id_libro, l.titulo, l.isbn, l.portada,
@@ -44,7 +44,9 @@ class Busqueda
                 'id'        => (int) $fila['id_libro'],
                 'titulo'    => $fila['titulo'] ?? 'Sin título',
                 'subtitulo' => trim(($fila['autores'] ?: 'Sin autor') . ' · ' . ($fila['materia'] ?: 'General')),
-                'url'       => '/Appjoteca/pages/biblioteca-catalogo/vista-libro/book-view.php?id=' . (int) $fila['id_libro'],
+                'url'       => (int) $rol === 3
+                    ? '/Appjoteca/dashboards/bibliotecario/pages/inventario/inventario.php?open_book=' . (int) $fila['id_libro']
+                    : '/Appjoteca/pages/biblioteca-catalogo/vista-libro/book-view.php?id=' . (int) $fila['id_libro'],
             ];
         }
         $q->close();
@@ -78,7 +80,7 @@ class Busqueda
                 'id'        => (int) $fila['id_usuario'],
                 'titulo'    => $fila['nombre_apellido'] ?? $fila['nombre_usuario'],
                 'subtitulo' => trim(($fila['rol'] ?? 'Usuario') . ' · @' . ($fila['nombre_usuario'] ?? '')),
-                'url'       => '/Appjoteca/dashboards/bibliotecario/pages/usuarios/usuarios.php?q=' . urlencode($fila['nombre_usuario'] ?? ''),
+                'url'       => '/Appjoteca/dashboards/bibliotecario/pages/usuarios/usuarios.php?id=' . (int) $fila['id_usuario'],
             ];
         }
         $q->close();

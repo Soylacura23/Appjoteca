@@ -1,20 +1,37 @@
 <?php
 require_once __DIR__ . '/../config/env.php';
 
-$host = $_ENV['DB_HOST'];
-$user = $_ENV['DB_USER'];
-$pw = $_ENV['DB_PASS'];
-$database = $_ENV['DB_NAME'];
-
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$connection = new mysqli($host, $user, $pw, $database);
-$connection->set_charset("utf8mb4"); 
 
-if($connection ->connect_error){
-    die("Connection error: " . $connection->connect_error);
+function db_connect(bool $withdb = true): mysqli
+{
+    if ($withdb) {
+        $connection = new mysqli(
+            $_ENV['DB_HOST'],
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASS'],
+            $_ENV['DB_NAME']
+        );
+    } else {
+        $connection = new mysqli(
+            $_ENV['DB_HOST'],
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASS']
+        );
+    }
+
+    $connection->set_charset('utf8mb4');
+
+    return $connection;
 }
 
+/** @var mysqli|null $connection */
+$connection = null;
 
-
+try {
+    $connection = db_connect(true);
+} catch (Throwable $e) {
+    $connection = null;
+}
 ?>

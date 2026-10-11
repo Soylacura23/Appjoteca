@@ -1,22 +1,23 @@
 <?php
-/**
- * Controlador estudiante — Crear / cancelar reservas
- * Acciones: crear | cancelar
- */
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/verify-csrf.php';
 require_once __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../models/reserva.php';
 require_once __DIR__ . '/../models/libro.php';
 require_once __DIR__ . '/../models/notificacion.php';
 require_once __DIR__ . '/../models/historial.php';
 require_once __DIR__ . '/../helpers/libros.php';
+require_once __DIR__ . '/../helpers/fecha_devolucion.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'Método no permitido']);
     exit();
 }
+
+requiereRol([1, 2]);
 
 $id_usuario = (int) ($_SESSION['usuario_id'] ?? 0);
 if ($id_usuario <= 0) {
@@ -29,11 +30,13 @@ $modelo = new Reserva($connection);
 $notif  = new Notificacion($connection);
 $hist   = new Historial($connection);
 
-// ── CREAR ────────────────────────────────────────────────
+// Crear reserva
 if ($accion === 'crear') {
     $id_libro  = (int) ($_POST['id_libro'] ?? 0);
     $razon     = trim($_POST['razon'] ?? '');
     $cantidad  = (int) ($_POST['cantidad'] ?? 1);
+    $fechaDevolucionRaw = $_POST['fecha_devolucion'] ?? '';
+    $fechaDevolucion = is_string($fechaDevolucionRaw) ? trim($fechaDevolucionRaw) : '';
 
     if ($id_libro <= 0) {
         echo json_encode(['ok' => false, 'error' => 'Libro inválido']);
@@ -42,6 +45,14 @@ if ($accion === 'crear') {
 
     if ($cantidad < 1) {
         $cantidad = 1;
+    }
+
+    if (!validarFechaDevolucionEstimada($fechaDevolucion)) {
+        echo json_encode([
+            'ok' => false,
+            'error' => 'La fecha debe estar entre el próximo día hábil y el límite de 10 días, con un día de tolerancia.'
+        ]);
+        exit();
     }
 
     $modeloLibro = new libro($connection);
@@ -69,7 +80,7 @@ if ($accion === 'crear') {
     }
 
     $tituloLibro = $libroData['titulo'] ?? ('Libro #' . $id_libro);
-    $id_reserva = $modelo->crearReserva($id_usuario, $id_libro, $cantidad, $razon);
+    $id_reserva = $modelo->crearReserva($id_usuario, $id_libro, $cantidad, $razon, $fechaDevolucion);
 
     if ($id_reserva) {
         $bibliotecarios = $notif->obtenerUsuariosPorRol(3);
@@ -99,7 +110,7 @@ if ($accion === 'crear') {
     exit();
 }
 
-// ── CANCELAR ─────────────────────────────────────────────
+// CANCELAR
 if ($accion === 'cancelar') {
     $id_reserva = (int) ($_POST['id_reserva'] ?? 0);
 
@@ -108,9 +119,9 @@ if ($accion === 'cancelar') {
         exit();
     }
 
-    $ok = $modelo->cancelarReserva($id_reserva, $id_usuario);
+    $resultadoCancelacion = $modelo->cancelarReserva($id_reserva, $id_usuario);
 
-    if ($ok) {
+    if ($resultadoCancelacion === 'cancelada') {
         $hist->registrar(
             $id_usuario,
             'reserva',
@@ -122,9 +133,18 @@ if ($accion === 'cancelar') {
             'ok'      => true,
             'mensaje' => 'Solicitud cancelada correctamente.'
         ]);
-    } else {
-        echo json_encode(['ok' => false, 'error' => 'No se pudo cancelar. Solo puedes cancelar si sigue pendiente.']);
+        exit();
     }
+
+    if ($resultadoCancelacion === 'ya_cancelada') {
+        echo json_encode([
+            'ok'      => true,
+            'mensaje' => 'Esta solicitud ya estaba cancelada.'
+        ]);
+        exit();
+    }
+
+    echo json_encode(['ok' => false, 'error' => 'No se pudo cancelar. Solo puedes cancelar si sigue pendiente.']);
     exit();
 }
 

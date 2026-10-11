@@ -1,4 +1,4 @@
-// ── Referencias al DOM ──────────────────────────────────────
+// Referencias al DOM
 function getCSRFToken() {
   const meta = document.querySelector('meta[name="csrf-token"]');
   return meta ? meta.getAttribute('content') : '';
@@ -18,8 +18,9 @@ const errorBox      = document.getElementById('recover-error');
 const errorText     = document.getElementById('recover-error-text');
 const successBox    = document.getElementById('recover-success');
 const successText   = document.getElementById('recover-success-text');
+const auxiliaryFieldValue = () => document.querySelector('input[name="middle_name"]')?.value || '';
 
-// ── Mensajes ────────────────────────────────────────────────
+// Mensajes
 function mostrarError(msg) {
   errorText.textContent = msg;
   errorBox.hidden = false;
@@ -38,13 +39,13 @@ function ocultarMensajes() {
   successBox.hidden = true;
 }
 
-// ── Activar un paso (habilita sus campos) ───────────────────
+// Activar un paso (habilita sus campos)
 function activarPaso(stepEl) {
   stepEl.classList.remove('step-inactive');
   stepEl.querySelectorAll('input, button').forEach(el => el.disabled = false);
 }
 
-// ── Paso 1 → 2: enviar correo a PHP ───────────────
+// Paso 1 → 2: enviar correo a PHP
 btnSend.addEventListener('click', async () => {
   ocultarMensajes();
   const correo = correoInput.value.trim();
@@ -65,6 +66,7 @@ btnSend.addEventListener('click', async () => {
     formData.append('action', 'send_code');
     formData.append('correo', correo);
     formData.append('csrf_token', getCSRFToken());
+    formData.append('middle_name', auxiliaryFieldValue());
 
     const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
     const data = await res.json();
@@ -88,7 +90,7 @@ btnSend.addEventListener('click', async () => {
   }
 });
 
-// ── Paso 2 → 3: verificar el código en PHP ─────────
+// Paso 2 → 3: verificar el código en PHP
 codeInputs.forEach((input, i) => {
   input.addEventListener('input', async () => {
     input.value = input.value.replace(/\D/g, ''); // solo números
@@ -108,6 +110,7 @@ codeInputs.forEach((input, i) => {
         formData.append('action', 'verify_code');
         formData.append('codigo', codigo);
         formData.append('csrf_token', getCSRFToken());
+        formData.append('middle_name', auxiliaryFieldValue());
 
         const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
         const data = await res.json();
@@ -134,7 +137,7 @@ codeInputs.forEach((input, i) => {
   });
 });
 
-// ── Paso 3: actualizar contraseña en PHP ────────────────────────────
+// Paso 3: actualizar contraseña en PHP
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   ocultarMensajes();
@@ -160,6 +163,7 @@ form.addEventListener('submit', async (e) => {
     formData.append('action', 'update_password');
     formData.append('nueva_contrasena', passInput.value);
     formData.append('csrf_token', getCSRFToken());
+    formData.append('middle_name', auxiliaryFieldValue());
 
     const res = await fetch('../../backend/auth/procesarecover.php', { method: 'POST', body: formData });
     const data = await res.json();

@@ -1,59 +1,14 @@
 <?php
 // Asegurar que la sesión esté iniciada para leer el rol
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+include_once __DIR__ . '/../../backend/helpers/routes.php';
 
-$baseUrl = '/Appjoteca/'; 
-$currentUri = $_SERVER['REQUEST_URI'];
-
-$userRole = isset($_SESSION['rol']) ? (string)$_SESSION['rol'] : null;
-
-$menusByRole = [
-    'guest' => [ 
-        ['text' => 'Catálogo', 'url' => 'pages/biblioteca-digital/index.php', 'nav' => 'catalogo'],
-        
-    ],
-    '1' => [ // Estudiante
-        ['text' => 'Catálogo',     'url' => 'pages/biblioteca-digital/index.php', 'nav' => 'catalogo'],
-        ['text' => 'Mi historial', 'url' => 'pages/history/historial.php',           'nav' => 'historial'],
-        ['text' => 'Panel',         'url' => 'dashboards/estudiante/index.php',            'nav' => 'panel']
-    ],
-    '2' => [ // Docente
-        ['text' => 'Catálogo',     'url' => 'pages/biblioteca-digital/index.php', 'nav' => 'catalogo'],
-        ['text' => 'Mi historial', 'url' => 'pages/history/historial.php',        'nav' => 'historial'],
-        ['text' => 'Panel',         'url' => 'dashboards/docente/index.php',        'nav' => 'panel']
-    ],
-    '3' => [ // Bibliotecario
-        ['text' => 'Gestión Libros', 'url' => 'pages/admin/libros.php',           'nav' => 'gestion-libros'],
-        ['text' => 'Préstamos',      'url' => 'pages/admin/prestamos.php',        'nav' => 'prestamos'],
-        ['text' => 'Panel Control',  'url' => 'pages/admin/dashboard.php',        'nav' => 'panel']
-    ],
-    '4' => [ // Administrador
-        ['text' => 'Gestión Comentarios', 'url' => 'dashboards/Administrador/comentarios/comentarios.php', 'nav' => 'comentarios'],
-        ['text' => 'Panel Control',  'url' => 'dashboards/Administrador/index.php',        'nav' => 'panel']
-    ]
-];
-
-$rolesValidos = ['1', '2', '3', '4'];
-if ($userRole !== null && !in_array($userRole, $rolesValidos, true)) {
-    header('Location: /Appjoteca/backend/auth/logout.php');
-    exit;
-}
-
-$navigationMenu = $menusByRole[$userRole] ?? $menusByRole['guest'];
-
-function isNavActive($urlTarget, $currentUri) {
-    $needle = ltrim($urlTarget, '/');
-    return (strpos($currentUri, $needle) !== false) ? 'active' : '';
-}
 ?>
 
 <header class="topbar" role="banner">
     <div class="topbar-inner">
         
-        <a href="<?php echo $baseUrl; ?>index.php" class="logo-link">
-            <img src="<?php echo $baseUrl; ?>shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
+        <a href="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>index.php" class="logo-link">
+            <img src="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>shared/images/logo-appjoteca.svg" alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
         </a>
         
         <div class="topbar-search">
@@ -63,10 +18,10 @@ function isNavActive($urlTarget, $currentUri) {
         
         <nav class="topbar-nav" aria-label="Navegación principal">
             <?php foreach ($navigationMenu as $item): ?>
-                <a href="<?php echo $baseUrl . $item['url']; ?>" 
-                    class="nav-link <?php echo isNavActive($item['url'], $currentUri); ?>" 
-                   data-nav="<?php echo $item['nav']; ?>">
-                    <?php echo $item['text']; ?>
+                <a href="<?php echo htmlspecialchars($baseUrl . $item['url'], ENT_QUOTES, 'UTF-8'); ?>"
+                    class="nav-link <?php echo htmlspecialchars(isNavActive($item['url'], $currentUri), ENT_QUOTES, 'UTF-8'); ?>"
+                   data-nav="<?php echo htmlspecialchars($item['nav'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php echo htmlspecialchars($item['text'], ENT_QUOTES, 'UTF-8'); ?>
                 </a>
             <?php endforeach; ?>
         </nav>

@@ -1,9 +1,6 @@
 <?php
 require_once __DIR__ . '/../Database/conexion.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/security.php';
 
 $diccionario_roles = [
     1 => 'Estudiante',
@@ -18,7 +15,7 @@ $mi_nombre   = $_SESSION['nombre'] ?? '';
 $mi_usuario  = $_SESSION['usuario'] ?? '';
 $mi_rol_num  = $_SESSION['rol'] ?? null;
 $mi_rol      = $diccionario_roles[$mi_rol_num] ?? 'Usuario';
-$mi_documento= $_SESSION['documento'];
+$mi_documento= $_SESSION['documento'] ?? '';
 
 
 
@@ -72,5 +69,5 @@ if (!isset($_SESSION['resumen_libros']) && $mi_id) {
         'rol' => $mi_rol,
         'foto' => $mi_foto,
         'libros' => $_SESSION['resumen_libros'] ?? null
-    ]); ?>;
+    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT); ?>;
 </script>

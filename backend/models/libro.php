@@ -53,32 +53,62 @@ class libro
         }
 
         if ($busqueda !== '') {
-            $where[]  = "(l.titulo LIKE ? OR l.isbn LIKE ?)";
-            $params[] = '%' . $busqueda . '%';
-            $params[] = '%' . $busqueda . '%';
-            $types   .= 'ss';
+            $like = '%' . $busqueda . '%';
+            $where[] = "(l.titulo LIKE ? OR l.isbn LIKE ?
+                         OR EXISTS (
+                             SELECT 1 FROM materias mc
+                             WHERE mc.id_materia = l.id_materia AND mc.nombre LIKE ?
+                         )
+                         OR EXISTS (
+                             SELECT 1
+                             FROM libro_autor lac
+                             INNER JOIN autores ac ON ac.id_autor = lac.id_autor
+                             WHERE lac.id_libro = l.id_libro AND ac.nombre LIKE ?
+                         ))";
+            array_push($params, $like, $like, $like, $like);
+            $types .= 'ssss';
         }
 
-        $having = '';
-        if ($estado === 'available') {
-            $having = "HAVING disponibles > 0";
-        } elseif ($estado === 'borrowed') {
-            $having = "HAVING prestados > 0";
+        if (in_array($estado, ['available', 'disponible'], true)) {
+            $where[] = "EXISTS (
+                            SELECT 1 FROM ejemplares ea
+                            WHERE ea.fk_id_libro_ejemplar = l.id_libro AND ea.estado = 'Disponible'
+                        )";
+        } elseif (in_array($estado, ['borrowed', 'prestado'], true)) {
+            $where[] = "EXISTS (
+                            SELECT 1 FROM ejemplares ep
+                            WHERE ep.fk_id_libro_ejemplar = l.id_libro AND ep.estado = 'Prestado'
+                        )";
+        } elseif (in_array($estado, ['reserved', 'reservado'], true)) {
+            $where[] = "EXISTS (
+                            SELECT 1 FROM reservas r
+                            WHERE r.fk_id_libro_reserva = l.id_libro AND r.estado = 'activa'
+                        )";
         } elseif ($estado === 'out') {
-            $having = "HAVING disponibles = 0 AND total_ejemplares > 0";
+            $where[] = "EXISTS (
+                            SELECT 1 FROM ejemplares et
+                            WHERE et.fk_id_libro_ejemplar = l.id_libro
+                        )
+                        AND NOT EXISTS (
+                            SELECT 1 FROM ejemplares ea
+                            WHERE ea.fk_id_libro_ejemplar = l.id_libro AND ea.estado = 'Disponible'
+                        )";
         }
 
         $orderBy = match ($orden) {
             'title-desc'  => 'l.titulo DESC',
             'author-asc'  => 'autores ASC',
-            'date-desc'   => 'l.id_libro DESC',
+            'recommended' => 'total_prestamos DESC, l.id_libro DESC',
+            'recent'      => 'l.fecha_registro_libro DESC, l.id_libro DESC',
+            'borrowed'    => 'prestados DESC, total_prestamos DESC, l.id_libro DESC',
+            'date-desc'   => 'l.fecha_registro_libro DESC, l.id_libro DESC',
             'copies-desc' => 'total_ejemplares DESC',
             default       => 'l.titulo ASC',
         };
 
         $whereSql = implode(' AND ', $where);
 
-        // Total (sin HAVING para no complicar el count)
+        // El total respeta los mismos filtros de libro y disponibilidad.
         $sqlCount = "SELECT COUNT(DISTINCT l.id_libro) AS total
                      FROM libros l
                      WHERE $whereSql";
@@ -94,12 +124,20 @@ class libro
         $offset = ($pagina - 1) * $porPagina;
 
         $sql = "SELECT l.id_libro, l.titulo, l.isbn, l.portada, l.id_materia,
-                       l.publicacion_year, l.fecha_registro_libro,
+                       l.sinopsis, l.publicacion_year, l.fecha_registro_libro,
                        m.nombre AS materia,
                        GROUP_CONCAT(DISTINCT a.nombre ORDER BY a.nombre SEPARATOR ', ') AS autores,
                        COUNT(DISTINCT e.id_ejemplar) AS total_ejemplares,
-                       SUM(CASE WHEN e.estado = 'Disponible' THEN 1 ELSE 0 END) AS disponibles,
-                       SUM(CASE WHEN e.estado = 'Prestado'   THEN 1 ELSE 0 END) AS prestados
+                       COUNT(DISTINCT CASE WHEN e.estado = 'Disponible' THEN e.id_ejemplar END) AS disponibles,
+                       COUNT(DISTINCT CASE WHEN e.estado = 'Prestado' THEN e.id_ejemplar END) AS prestados,
+                       (SELECT COALESCE(SUM(r.cantidad), 0)
+                        FROM reservas r
+                        WHERE r.fk_id_libro_reserva = l.id_libro
+                          AND r.estado = 'activa') AS reservados,
+                       (SELECT COUNT(*)
+                        FROM prestamos p
+                        INNER JOIN ejemplares ep ON ep.id_ejemplar = p.id_ejemplar
+                        WHERE ep.fk_id_libro_ejemplar = l.id_libro) AS total_prestamos
                 FROM libros l
                 LEFT JOIN materias m     ON m.id_materia = l.id_materia
                 LEFT JOIN libro_autor la ON la.id_libro  = l.id_libro
@@ -107,7 +145,6 @@ class libro
                 LEFT JOIN ejemplares e   ON e.fk_id_libro_ejemplar = l.id_libro
                 WHERE $whereSql
                 GROUP BY l.id_libro
-                $having
                 ORDER BY $orderBy
                 LIMIT ? OFFSET ?";
 
@@ -281,6 +318,71 @@ class libro
             'colecciones' => $this->listarSimple("SELECT id_coleccion AS id, nombre FROM colecciones ORDER BY nombre"),
             'idiomas'     => $this->listarSimple("SELECT id_idioma AS id, nombre_idioma AS nombre FROM idioma ORDER BY nombre_idioma"),
         ];
+    }
+
+    public function obtenerHistorial($id_libro, $limite = 8)
+    {
+        $limite = min(12, max(1, (int) $limite));
+        $sql = "SELECT actividad, usuario, detalle, cantidad, observacion, fecha
+                FROM (
+                    SELECT
+                        CASE r.estado
+                            WHEN 'activa' THEN 'reservado'
+                            WHEN 'aceptada' THEN 'reservado'
+                            WHEN 'rechazada' THEN 'reserva_rechazada'
+                            WHEN 'cancelada' THEN 'reserva_cancelada'
+                            ELSE 'reserva'
+                        END AS actividad,
+                        u.nombre_apellido AS usuario,
+                        CONCAT('Reserva #', r.id_reserva) AS detalle,
+                        r.cantidad AS cantidad,
+                        r.observacion,
+                        r.fecha_reserva AS fecha
+                    FROM reservas r
+                    INNER JOIN usuarios u ON u.id_usuario = r.fk_id_usuario_reserva
+                    WHERE r.fk_id_libro_reserva = ?
+                      AND r.estado IN ('activa', 'aceptada', 'rechazada', 'cancelada')
+                      AND NOT EXISTS (
+                          SELECT 1 FROM prestamos p
+                          WHERE p.id_reserva = r.id_reserva
+                      )
+
+                    UNION ALL
+
+                    SELECT
+                        CASE p.estado
+                            WHEN 'devuelto' THEN 'devuelto'
+                            WHEN 'vencido' THEN 'vencido'
+                            ELSE 'prestado'
+                        END AS actividad,
+                        u.nombre_apellido AS usuario,
+                        CONCAT('Reserva #', r.id_reserva) AS detalle,
+                        COUNT(*) AS cantidad,
+                        NULL AS observacion,
+                        CASE WHEN p.estado = 'devuelto' THEN
+                            COALESCE(p.fecha_devolucion_real, p.fecha_prestamo)
+                        ELSE p.fecha_prestamo END AS fecha
+                    FROM prestamos p
+                    INNER JOIN ejemplares e ON e.id_ejemplar = p.id_ejemplar
+                    INNER JOIN reservas r ON r.id_reserva = p.id_reserva
+                    INNER JOIN usuarios u ON u.id_usuario = r.fk_id_usuario_reserva
+                    WHERE e.fk_id_libro_ejemplar = ?
+                    GROUP BY r.id_reserva, actividad, fecha
+                ) AS movimientos
+                ORDER BY fecha DESC
+                LIMIT ?";
+
+        $query = $this->db->prepare($sql);
+        $query->bind_param('iii', $id_libro, $id_libro, $limite);
+        $query->execute();
+        $resultado = $query->get_result();
+        $movimientos = [];
+        while ($fila = $resultado->fetch_assoc()) {
+            $movimientos[] = $fila;
+        }
+        $query->close();
+
+        return $movimientos;
     }
 
     private function listarSimple($sql)

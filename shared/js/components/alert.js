@@ -1,5 +1,5 @@
 window.alerta = function(icon, title, text) {
-    Swal.fire({
+    return Swal.fire({
         icon: icon,
         title: title,
         text: text,

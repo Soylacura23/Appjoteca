@@ -1,6 +1,4 @@
-/* ============================================================
-   APPJOTECA — manual.css
-   ============================================================ */
+/* APPJOTECA — manual.css */
 
    :root {
     --bg-base: #0a0a0a;
@@ -32,7 +30,7 @@ body {
     background-clip: text;
 }
 
-/* ============ CABECERA ============ */
+/* CABECERA */
 .page-header {
     padding: 8rem 2rem 3rem;
     text-align: center;
@@ -73,7 +71,7 @@ body {
     font-size: 1.05rem;
 }
 
-/* ============ VISOR PDF ============ */
+/* VISOR PDF */
 .pdf-section {
     width: 95%;
     max-width: 1600px;
@@ -226,12 +224,10 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* ============ RESPONSIVE ============ */
-/* ============================================================
-   RESPONSIVE — COMPLETO
-   ============================================================ */
+/* RESPONSIVE */
+/* RESPONSIVE — COMPLETO */
 
-/* ---------- 1400px+ : Desktop amplio ---------- */
+/* 1400px+ : Desktop amplio */
 @media (min-width: 1400px) {
     .pdf-section {
         max-width: 1700px;
@@ -243,7 +239,7 @@ body {
     }
 }
 
-/* ---------- 1200px - 1399px : Desktop ---------- */
+/* 1200px - 1399px : Desktop */
 @media (max-width: 1399px) and (min-width: 1200px) {
     .pdf-section {
         width: 96%;
@@ -255,7 +251,7 @@ body {
     }
 }
 
-/* ---------- 992px - 1199px : Laptop ---------- */
+/* 992px - 1199px : Laptop */
 @media (max-width: 1199px) and (min-width: 992px) {
     .pdf-section {
         width: 96%;
@@ -272,7 +268,7 @@ body {
     }
 }
 
-/* ---------- 768px - 991px : Tablet horizontal ---------- */
+/* 768px - 991px : Tablet horizontal */
 @media (max-width: 991px) and (min-width: 768px) {
     .page-header {
         padding: 7rem 1.75rem 2.5rem;
@@ -298,7 +294,7 @@ body {
     }
 }
 
-/* ---------- 576px - 767px : Tablet vertical / móvil grande ---------- */
+/* 576px - 767px : Tablet vertical / móvil grande */
 @media (max-width: 767px) and (min-width: 576px) {
     .page-header {
         padding: 6.5rem 1.5rem 2rem;
@@ -346,7 +342,7 @@ body {
     }
 }
 
-/* ---------- 480px - 575px : Móvil estándar ---------- */
+/* 480px - 575px : Móvil estándar */
 @media (max-width: 575px) and (min-width: 480px) {
     .page-header {
         padding: 6rem 1.25rem 1.75rem;
@@ -394,7 +390,7 @@ body {
     }
 }
 
-/* ---------- 380px - 479px : Móvil pequeño ---------- */
+/* 380px - 479px : Móvil pequeño */
 @media (max-width: 479px) and (min-width: 380px) {
     .page-header {
         padding: 5.5rem 1rem 1.5rem;
@@ -456,7 +452,7 @@ body {
     }
 }
 
-/* ---------- 320px - 379px : Móvil muy pequeño ---------- */
+/* 320px - 379px : Móvil muy pequeño */
 @media (max-width: 379px) {
     .page-header {
         padding: 5rem 0.85rem 1.25rem;
@@ -518,7 +514,7 @@ body {
     }
 }
 
-/* ---------- Landscape en móviles (poca altura) ---------- */
+/* Landscape en móviles (poca altura) */
 @media (max-height: 500px) and (orientation: landscape) {
     .page-header {
         padding: 5rem 1.5rem 1rem;
@@ -535,7 +531,7 @@ body {
     }
 }
 
-/* ---------- Pantallas táctiles (mejora taps) ---------- */
+/* Pantallas táctiles (mejora taps) */
 @media (hover: none) and (pointer: coarse) {
     .pdf-btn {
         min-width: 40px;
@@ -546,7 +542,7 @@ body {
     }
 }
 
-/* ---------- Preferencia de movimiento reducido ---------- */
+/* Preferencia de movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
     .spin {
         animation: none;

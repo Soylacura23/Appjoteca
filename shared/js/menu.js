@@ -1,6 +1,4 @@
-// ============================================
 // APPJOTECA - MENÚ MÓVIL (compartido)
-// ============================================
 document.addEventListener('DOMContentLoaded', function () {
   const menuBtn = document.querySelector('.mobile-menu-btn');
   const header = document.querySelector('.main-header');

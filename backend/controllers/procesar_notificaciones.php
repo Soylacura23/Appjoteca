@@ -1,17 +1,7 @@
 <?php
-/**
- * GET  ?accion=listar&limite=5&offset=0
- * GET  ?accion=contar
- * POST accion=marcar_una  + id_notificacion
- * POST accion=marcar_todas
- * POST accion=eliminar    + id_notificacion
- */
 header('Content-Type: application/json; charset=utf-8');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+require_once __DIR__ . '/../config/security.php';
 require_once __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../models/notificacion.php';
 
@@ -63,6 +53,7 @@ if ($metodo === 'GET' && $accion === 'contar') {
 
 // ── MARCAR UNA
 if ($metodo === 'POST' && $accion === 'marcar_una') {
+    require_once __DIR__ . '/../config/verify-csrf.php';
     $id = (int) ($_POST['id_notificacion'] ?? 0);
     if ($id <= 0) {
         echo json_encode(['ok' => false, 'error' => 'ID inválido']);
@@ -80,6 +71,7 @@ if ($metodo === 'POST' && $accion === 'marcar_una') {
 
 // ── MARCAR TODAS
 if ($metodo === 'POST' && $accion === 'marcar_todas') {
+    require_once __DIR__ . '/../config/verify-csrf.php';
     $modelo->marcarTodasLeidas($id_usuario);
 
     echo json_encode([
@@ -91,6 +83,7 @@ if ($metodo === 'POST' && $accion === 'marcar_todas') {
 
 // ── ELIMINAR
 if ($metodo === 'POST' && $accion === 'eliminar') {
+    require_once __DIR__ . '/../config/verify-csrf.php';
     $id = (int) ($_POST['id_notificacion'] ?? 0);
     if ($id <= 0) {
         echo json_encode(['ok' => false, 'error' => 'ID inválido']);

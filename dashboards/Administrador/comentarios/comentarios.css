@@ -17,7 +17,7 @@
     padding: 0 16px;
 }
 
-/* ---- Cabecera de página ---- */
+/* Cabecera de página */
 .config-page-header {
     margin-bottom: 20px;
     text-align: left;
@@ -44,7 +44,7 @@
     margin: 0;
 }
 
-/* ---- Barra de acciones ---- */
+/* Barra de acciones */
 .admin-actions-bar {
     display: flex;
     justify-content: stretch;
@@ -85,9 +85,7 @@
     transform: translateY(0);
 }
 
-/* ---------------------------------------------------------
-   PESTAÑAS (TABS)
-   --------------------------------------------------------- */
+/* PESTAÑAS (TABS) */
 
 .admin-tabs-wrapper {
     position: relative;
@@ -172,9 +170,7 @@
     display: block;
 }
 
-/* ---------------------------------------------------------
-   SCROLL HORIZONTAL DE TABLAS
-   --------------------------------------------------------- */
+/* SCROLL HORIZONTAL DE TABLAS */
 
 .table-scroll {
     width: 100%;
@@ -202,9 +198,7 @@
     background: rgba(242, 202, 80, 0.6);
 }
 
-/* ---------------------------------------------------------
-   BOTONES DE ACCIÓN
-   --------------------------------------------------------- */
+/* BOTONES DE ACCIÓN */
 
 .btn-danger-sm {
     display: inline-flex;
@@ -260,9 +254,7 @@
     transform: scale(0.96);
 }
 
-/* ---------------------------------------------------------
-   MODAL
-   --------------------------------------------------------- */
+/* MODAL */
 
 .modal-overlay {
     position: fixed;
@@ -404,9 +396,7 @@
     color: rgba(255, 255, 255, 0.35);
 }
 
-/* ---------------------------------------------------------
-   TABULATOR
-   --------------------------------------------------------- */
+/* TABULATOR */
 
 .tabulator,
 .tabulator-tableholder,
@@ -477,9 +467,7 @@
     color: var(--on-primary-fixed, #241a00) !important;
 }
 
-/* =========================================================
-   8. COMENTARIOS (BANDEJA)
-   ========================================================= */
+/* 8. COMENTARIOS (BANDEJA) */
 
 .comentarios-panel {
     display: flex;
@@ -488,7 +476,7 @@
     width: 100%;
 }
 
-/* ---- Header del panel ---- */
+/* Header del panel */
 .comentarios-header {
     display: flex;
     align-items: center;
@@ -524,7 +512,7 @@
     font-weight: 700;
 }
 
-/* ---- Loading ---- */
+/* Loading */
 .comentarios-loading {
     display: flex;
     align-items: center;
@@ -549,7 +537,7 @@
     to   { transform: rotate(360deg); }
 }
 
-/* ---- Lista de tarjetas ---- */
+/* Lista de tarjetas */
 .comentarios-lista {
     display: flex;
     flex-direction: column;
@@ -557,7 +545,7 @@
     width: 100%;
 }
 
-/* ---- Tarjeta de comentario ---- */
+/* Tarjeta de comentario */
 .comentario-card {
     display: flex;
     flex-direction: column;
@@ -577,7 +565,7 @@
     transform: translateY(-1px);
 }
 
-/* ---- Header de la tarjeta ---- */
+/* Header de la tarjeta */
 .comentario-card__header {
     display: flex;
     align-items: flex-start;
@@ -647,7 +635,7 @@
     text-decoration: underline;
 }
 
-/* ---- Meta (tag + botón) ---- */
+/* Meta (tag + botón) */
 .comentario-card__meta {
     display: flex;
     align-items: center;
@@ -701,7 +689,7 @@
     transform: scale(0.95);
 }
 
-/* ---- Cuerpo del comentario ---- */
+/* Cuerpo del comentario */
 .comentario-card__body {
     padding-left: 46px;
 }
@@ -716,7 +704,7 @@
     word-break: break-word;
 }
 
-/* ---- Estado vacío ---- */
+/* Estado vacío */
 .comentarios-vacio {
     display: flex;
     flex-direction: column;
@@ -742,7 +730,7 @@
     margin: 0;
 }
 
-/* ---- Footer + botón cargar más ---- */
+/* Footer + botón cargar más */
 .comentarios-footer {
     display: flex;
     justify-content: center;
@@ -792,9 +780,7 @@
     cursor: not-allowed;
 }
 
-/* =========================================================
-   BREAKPOINT · 480px
-   ========================================================= */
+/* BREAKPOINT · 480px */
 @media (min-width: 480px) {
 
     .config-container {
@@ -895,9 +881,7 @@
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 640px
-   ========================================================= */
+/* BREAKPOINT · 640px */
 @media (min-width: 640px) {
 
     .config-main {
@@ -952,9 +936,7 @@
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 768px
-   ========================================================= */
+/* BREAKPOINT · 768px */
 @media (min-width: 768px) {
 
     .config-container {
@@ -1006,9 +988,7 @@
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 1024px
-   ========================================================= */
+/* BREAKPOINT · 1024px */
 @media (min-width: 1024px) {
 
     .config-main {
@@ -1093,9 +1073,7 @@
     }
 }
 
-/* =========================================================
-   BREAKPOINT · 1280px
-   ========================================================= */
+/* BREAKPOINT · 1280px */
 @media (min-width: 1280px) {
 
     .config-container {
@@ -1132,9 +1110,7 @@
     }
 }
 
-/* =========================================================
-   ACCESIBILIDAD · Reduce motion
-   ========================================================= */
+/* ACCESIBILIDAD · Reduce motion */
 @media (prefers-reduced-motion: reduce) {
     .btn-gold,
     .btn-danger-sm,

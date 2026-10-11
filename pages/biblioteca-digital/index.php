@@ -2,13 +2,12 @@
 require_once "../../backend/config/auth.php";
 require_once "../../backend/config/user_context.php";
 require_once "../../backend/Database/conexion.php";
+require_once "../../backend/models/libro.php";
 
-// Consulta de libros
-$resultado_libros = false;
-if (isset($connection) && $connection) {
-    $sql = "SELECT * FROM libros";
-    $resultado_libros = mysqli_query($connection, $sql);
-}
+$base_url = '/Appjoteca/';
+$modeloLibro = new libro($connection);
+$librosCarrusel = $modeloLibro->listarLibrosPaginado(1, 5, '', 0, 'recommended')['libros'];
+$librosCatalogo = $modeloLibro->listarLibrosPaginado(1, 8, '', 0, 'recommended')['libros'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -27,6 +26,7 @@ if (isset($connection) && $connection) {
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/book-card.css">
     <link rel="stylesheet" href="biblioteca.css">
+    <link rel="stylesheet" href="../../shared/css/components/catalog-filters.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -35,9 +35,7 @@ if (isset($connection) && $connection) {
 </head>
 <body>
 
-    <!-- ══════════════════════════════════════════
-         OVERLAY GLOBAL (perfil + notificaciones)
-    ══════════════════════════════════════════════ -->
+    <!-- OVERLAY GLOBAL (perfil + notificaciones) -->
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
 
@@ -46,17 +44,13 @@ if (isset($connection) && $connection) {
 
     <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
 
-    <!-- ══════════════════════════════════════════
-         CONTENIDO PRINCIPAL
-    ══════════════════════════════════════════════ -->
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
 
-        <!-- ──────────────────────────────────────
-             HERO / CARRUSEL DESTACADOS
-        ─────────────────────────────────────────── -->
+        <!-- HERO / CARRUSEL DESTACADOS -->
         <section class="hero-section">
 
             <!-- Fondo -->
@@ -92,70 +86,42 @@ if (isset($connection) && $connection) {
                 </button>
 
                 <div class="featured-carousel" id="featuredCarousel" role="list" aria-label="Libros destacados">
-                    <?php if ($resultado_libros && mysqli_num_rows($resultado_libros) > 0): ?>
-                        <?php while ($libro = mysqli_fetch_assoc($resultado_libros)): ?>
-                            <div class="featured-card" role="listitem">
-                                <div class="featured-cover">
-                                    <img src="<?php echo htmlspecialchars($libro['imagen'] ?? '../../assets/images/books/cien-años-de-soledad.jpg'); ?>" alt="<?php echo htmlspecialchars($libro['titulo']); ?>" loading="lazy">
-                                </div>
-                                <div class="featured-info">
-                                    <span class="featured-tag"><?php echo htmlspecialchars($libro['categoria'] ?? 'General'); ?></span>
-                                    <p class="featured-title"><?php echo htmlspecialchars($libro['titulo']); ?></p>
-                                    <p class="featured-desc"><?php echo htmlspecialchars($libro['descripcion'] ?? 'Sin descripción disponible.'); ?></p>
-                                    <a href="../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>" class="btn-primary" style="align-self:flex-start">
-                                        <span class="material-symbols-outlined">auto_stories</span>
-                                        Ver libro
-                                    </a>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    <?php endif; ?>
+                    <?php foreach ($librosCarrusel as $libro): ?>
+        <?php
+            $libroTitulo = htmlspecialchars($libro['titulo'] ?? '', ENT_QUOTES, 'UTF-8');
+            $libroCat    = htmlspecialchars($libro['materia'] ?? 'General', ENT_QUOTES, 'UTF-8');
+            $libroDesc   = htmlspecialchars($libro['sinopsis'] ?? 'Sin descripción disponible.', ENT_QUOTES, 'UTF-8');
+            $libroImg    = htmlspecialchars($base_url . (!empty($libro['portada']) ? $libro['portada'] : 'assets/images/books/default-cover.jpg'), ENT_QUOTES, 'UTF-8');
+            $libroId     = (int) ($libro['id_libro'] ?? 0);
+        ?>
+        <div class="featured-card" role="listitem">
+            <div class="featured-cover">
+                <img src="<?php echo $libroImg; ?>" alt="<?php echo $libroTitulo; ?>" loading="lazy">
+            </div>
+            <div class="featured-info">
+                <span class="featured-tag"><?php echo $libroCat; ?></span>
+                <p class="featured-title"><?php echo $libroTitulo; ?></p>
+                <p class="featured-desc"><?php echo $libroDesc; ?></p>
+                <a href="../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libroId; ?>" class="btn-primary" style="align-self:flex-start">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                    Ver libro
+                </a>
+            </div>
+        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
 
         </section><!-- /hero-section -->
 
 
-        <!-- ──────────────────────────────────────
-             FILTROS
-        ─────────────────────────────────────────── -->
+        <!-- FILTROS -->
         <section class="filters-section" aria-label="Filtros del catálogo">
-            <div class="filters-container">
-                <div class="filters-row">
-                    <div class="filter-group">
-                        <label class="filter-label" for="filterCategory">Categoría</label>
-                        <select class="filter-select" id="filterCategory">
-                            <option value="">Todas las categorías</option>
-                            <option value="literatura">Literatura</option>
-                            <option value="ciencia">Ciencia</option>
-                            <option value="filosofia">Filosofía</option>
-                            <option value="historia">Historia</option>
-                            <option value="arquitectura">Arquitectura</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label" for="filterAvailability">Disponibilidad</label>
-                        <select class="filter-select" id="filterAvailability">
-                            <option value="">Cualquier estado</option>
-                            <option value="disponible">Disponible</option>
-                            <option value="prestado">En préstamo</option>
-                            <option value="reservado">Reservado</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="filters-actions">
-                    <button class="btn-filter">
-                        <span class="material-symbols-outlined">filter_list</span>
-                        Aplicar
-                    </button>
-                </div>
-            </div>
+            <?php include __DIR__ . '/../../shared/layouts/catalog-filters.php'; ?>
         </section>
 
 
-        <!-- ──────────────────────────────────────
-             CATÁLOGO DINÁMICO DESDE MYSQL
-        ─────────────────────────────────────────── -->
+        <!-- CATÁLOGO DINÁMICO DESDE MYSQL -->
         <section class="catalog-section" aria-label="Catálogo de libros">
             <div class="catalog-header">
                 <div class="catalog-header-left">
@@ -166,54 +132,49 @@ if (isset($connection) && $connection) {
                     </button>
                 </div>
 
-                <div class="catalog-tabs" role="tablist" aria-label="Ordenar por">
-                    <button class="tab-btn active" role="tab" aria-selected="true">Más recomendados</button>
-                    <button class="tab-btn" role="tab" aria-selected="false">Agregados Recientemente</button>
-                    <button class="tab-btn" role="tab" aria-selected="false">Más Prestados</button>
-                </div>
             </div>
 
             <!-- Grid de tarjetas dinámicas -->
-            <div class="book-grid">
-                <?php 
-                if ($resultado_libros) {
-                    mysqli_data_seek($resultado_libros, 0); // Reiniciar el puntero para leer los datos de nuevo
-                }
-                
-                if ($resultado_libros && mysqli_num_rows($resultado_libros) > 0): 
-                    while ($libro = mysqli_fetch_assoc($resultado_libros)): 
-                ?>
-                    <article class="book-card" aria-label="<?php echo htmlspecialchars($libro['titulo']); ?>">
+            <div class="book-grid" id="landing-book-grid">
+                <?php if (!empty($librosCatalogo)): ?>
+                    <?php foreach ($librosCatalogo as $libro): ?>
+                    <article class="book-card" aria-label="<?php echo htmlspecialchars($libro['titulo'], ENT_QUOTES, 'UTF-8'); ?>">
                         <div class="book-cover-wrapper">
                             <img 
-                                src="<?php echo htmlspecialchars($libro['imagen'] ?? '../../assets/images/books/cien-años-de-soledad.jpg'); ?>" 
-                                alt="<?php echo htmlspecialchars($libro['titulo']); ?>" 
+                                src="<?php echo htmlspecialchars($base_url . ($libro['portada'] ?? 'assets/images/books/default-cover.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+                                alt="<?php echo htmlspecialchars($libro['titulo'], ENT_QUOTES, 'UTF-8'); ?>"
                                 class="book-cover" 
                                 loading="lazy" 
-                                onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>'"
+                                onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo (int) $libro['id_libro']; ?>'"
                             >
-                            <span class="book-badge"><?php echo htmlspecialchars($libro['categoria'] ?? 'Literatura'); ?></span>
+                            <span class="book-badge"><?php echo htmlspecialchars($libro['materia'] ?? 'Literatura', ENT_QUOTES, 'UTF-8'); ?></span>
                             <div class="book-card-cta">
-                                <button class="book-card-cta-btn" onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo $libro['id']; ?>'">
+                                <button class="book-card-cta-btn" type="button" onclick="window.location.href='../biblioteca-catalogo/vista-libro/book-view.php?id=<?php echo (int) $libro['id_libro']; ?>">
                                     <span class="material-symbols-outlined">auto_stories</span>
                                     Ver Libro
                                 </button>
                             </div>
                         </div>
                         <div class="book-info">
-                            <h4 class="book-title"><?php echo htmlspecialchars($libro['titulo']); ?></h4>
-                            <p class="book-author"><?php echo htmlspecialchars($libro['autor']); ?></p>
-                            <?php if (!empty($libro['etiqueta'])): ?>
-                                <div class="book-tags">
-                                    <span class="book-tag"><?php echo htmlspecialchars($libro['etiqueta']); ?></span>
-                                </div>
-                            <?php endif; ?>
+                            <h4 class="book-title"><?php echo htmlspecialchars($libro['titulo'], ENT_QUOTES, 'UTF-8'); ?></h4>
+                            <p class="book-author"><?php echo htmlspecialchars($libro['autores'] ?? 'Sin autor', ENT_QUOTES, 'UTF-8'); ?></p>
+                            <?php
+                                $disponibles = (int) ($libro['disponibles'] ?? 0);
+                                $reservados = (int) ($libro['reservados'] ?? 0);
+                                $prestados = (int) ($libro['prestados'] ?? 0);
+                                $estadoLibro = $disponibles > 0 ? 'Disponible' : ($reservados > 0 ? 'Reservado' : ($prestados > 0 ? 'Prestado' : 'No disponible'));
+                            ?>
+                            <div class="landing-book-stock" aria-label="Estado y existencias">
+                                <strong><?php echo htmlspecialchars($estadoLibro, ENT_QUOTES, 'UTF-8'); ?></strong>
+                                <span>Disponible: <?php echo $disponibles; ?></span>
+                                <span>Reservado: <?php echo $reservados; ?></span>
+                                <span>Prestado: <?php echo $prestados; ?></span>
+                                <span>Stock total: <?php echo (int) ($libro['total_ejemplares'] ?? 0); ?></span>
+                            </div>
                         </div>
                     </article>
-                <?php 
-                    endwhile; 
-                else: 
-                ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <p style="color: #fff; grid-column: 1 / -1; padding: 20px;">
                         No hay libros disponibles en la base de datos.
                     </p>
@@ -224,15 +185,14 @@ if (isset($connection) && $connection) {
     </main><!-- /main-content -->
 
 
-    <!-- ══════════════════════════════════════════
-         FOOTER
-    ══════════════════════════════════════════════ -->
+    <!-- FOOTER -->
     <?php include __DIR__ . '/../../shared/layouts/footer.php'; ?>
 
     <!-- Scripts -->
     <script src="../../shared/js/components/navbar.js"></script>
     <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../shared/js/components/book-cards.js"></script>
+    <script src="../../shared/js/components/catalog-filters.js"></script>
     <script src="../../shared/js/global.js"></script>
     <script src="biblioteca.js"></script>
 

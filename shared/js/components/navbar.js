@@ -10,14 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileMenuClose   = document.querySelector('.mobile-menu-close');
     const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
 
-    const searchToggleBtn   = document.querySelector('.search-toggle-btn');
-    const searchMobileArea  = document.querySelector('.topbar-search-mobile');
-    const searchMobileInput = searchMobileArea
-        ? searchMobileArea.querySelector('input')
-        : null;
-    const topbarSearchInput = document.querySelector('.topbar-search-input');
 
-    /* ── Menú móvil ─────────────────────────────── */
+    /* Menú móvil */
 
     function openMobileMenu() {
         if (!mobileMenu) return;
@@ -61,27 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* ── Búsqueda móvil ─────────────────────────── */
-
-    if (searchToggleBtn && searchMobileArea) {
-        searchToggleBtn.addEventListener('click', function () {
-            const isOpen = searchMobileArea.classList.toggle('open');
-            searchToggleBtn.setAttribute('aria-expanded', String(isOpen));
-            if (isOpen && searchMobileInput) searchMobileInput.focus();
-        });
-    }
-
-    // Sincronizar input desktop ↔ móvil
-    if (topbarSearchInput && searchMobileInput) {
-        topbarSearchInput.addEventListener('input', function () {
-            searchMobileInput.value = topbarSearchInput.value;
-        });
-        searchMobileInput.addEventListener('input', function () {
-            topbarSearchInput.value = searchMobileInput.value;
-        });
-    }
-
-    /* ── Escape y resize ────────────────────────── */
+    /* Escape y resize */
 
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape') return;
@@ -89,18 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (mobileMenu && mobileMenu.classList.contains('open')) {
             closeMobileMenu();
         }
-        if (searchMobileArea && searchMobileArea.classList.contains('open')) {
-            searchMobileArea.classList.remove('open');
-            if (searchToggleBtn) searchToggleBtn.setAttribute('aria-expanded', 'false');
-        }
     });
 
     window.addEventListener('resize', function () {
         if (window.innerWidth < 900) return;
         closeMobileMenu();
-        if (searchMobileArea) {
-            searchMobileArea.classList.remove('open');
-            if (searchToggleBtn) searchToggleBtn.setAttribute('aria-expanded', 'false');
-        }
     });
 });

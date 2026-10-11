@@ -30,9 +30,7 @@ let tablaRegistros = null;
 let tablaInicializada = false;
 
 
-/* ================================================================
-   Navegación del Stepper
-   ================================================================ */
+/* Navegación del Stepper */
 function pasoBloqueado(paso) {
     if (paso === 4 && conteos.bibliotecas === 0) return true;
     if (paso === 5 && conteos.dewey === 0) return true;
@@ -153,11 +151,9 @@ async function cargarBibliotecas() {
             return;
         }
 
-        select.innerHTML = '<option value="">Seleccione una biblioteca...</option>';
-
+        select.replaceChildren(new Option('Seleccione una biblioteca...', ''));
         datos.forEach(b => {
-
-            select.innerHTML += `<option value="${b.id_biblioteca}">${b.nombre}</option>`;
+            select.add(new Option(String(b.nombre ?? ''), String(Number(b.id_biblioteca) || 0)));
         });
         bloquearPaso(4, false);
 
@@ -185,9 +181,12 @@ async function cargarDewey() {
             return;
         }
 
-        select.innerHTML = '<option value="">Seleccione un área Dewey...</option>';
+        select.replaceChildren(new Option('Seleccione un área Dewey...', ''));
         datos.forEach(d => {
-            select.innerHTML += `<option value="${d.id_dewey}">${d.codigo} · ${d.nombre}</option>`;
+            select.add(new Option(
+                `${String(d.codigo ?? '')} · ${String(d.nombre ?? '')}`,
+                String(Number(d.id_dewey) || 0)
+            ));
         });
         bloquearPaso(5, false);
     } catch (error) {
@@ -219,9 +218,7 @@ function bloquearPaso(paso, bloquear) {
 }
 
 
-/* ================================================================
-   Tabulator — Registros
-   ================================================================ */
+/* Tabulator — Registros */
 const COLUMNAS = {
     bibliotecas: [
         { title: 'ID', field: 'id_biblioteca', width: 70 },
@@ -300,9 +297,7 @@ function obtenerCampoId(tabla) {
     return mapaIds[tabla];
 }
 
-/* ================================================================
-   ELIMINAR REGISTRO
-   ================================================================ */
+/* ELIMINAR REGISTRO */
 async function eliminarRegistro(tabla, fila) {
     const campoId = obtenerCampoId(tabla);
     const id = fila[campoId];
@@ -345,9 +340,7 @@ async function eliminarRegistro(tabla, fila) {
     }
 }
 
-/* ================================================================
-   EDITAR REGISTRO
-   ================================================================ */
+/* EDITAR REGISTRO */
 async function editarRegistro(tabla, fila) {
     const campoId = obtenerCampoId(tabla);
     const id = fila[campoId];

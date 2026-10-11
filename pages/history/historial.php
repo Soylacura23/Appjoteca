@@ -3,15 +3,18 @@ require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 require_once __DIR__ . '/../../backend/Database/conexion.php';
 require_once __DIR__ . '/../../backend/models/historial.php';
+require_once __DIR__ . '/../../backend/models/prestamo.php';
 
 requiereRol([1, 2, 3]);
 
-$id_usuario = $_SESSION['id_usuario'] ?? $_SESSION['user_id'] ?? 0;
+$id_usuario = (int) $_SESSION['usuario_id'];
 $historialModel = new Historial($connection);
+$prestamoModel = new Prestamo($connection);
+$prestamoModel->actualizarVencidos();
 
-$listaPrestamos    = $historialModel->obtenerPorUsuario($id_usuario, 'prestamo');
-$listaReservas     = $historialModel->obtenerPorUsuario($id_usuario, 'reserva');
-$listaDevoluciones = $historialModel->obtenerPorUsuario($id_usuario, 'devolucion');
+$listaPrestamos    = $historialModel->obtenerPrestamosUsuario($id_usuario);
+$listaReservas     = $historialModel->obtenerReservasUsuario($id_usuario);
+$listaDevoluciones = $historialModel->obtenerDevolucionesUsuario($id_usuario);
 $listaIncidencias  = $historialModel->obtenerPorUsuario($id_usuario, 'incidencia');
 
 function formatearFechaHistorial($fecha) {
@@ -52,21 +55,17 @@ function formatearFechaHistorial($fecha) {
     <!-- OVERLAY GLOBAL -->
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-    <!-- ══════════════════════════════════════════
-         BANDEJA DE NOTIFICACIONES
-    ══════════════════════════════════════════════ -->
+    <!-- BANDEJA DE NOTIFICACIONES -->
     <?php include __DIR__ . '/../../shared/layouts/notifications.php'; ?>
     <?php include __DIR__ . '/../../shared/layouts/menu-off-canvas.php'; ?>
 
     <!-- NAVBAR TOPBAR -->
     <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
 
-    <!-- ══════════════════════════════════════════
-         CONTENIDO PRINCIPAL: HISTORIAL
-    ══════════════════════════════════════════════ -->
+    <!-- CONTENIDO PRINCIPAL: HISTORIAL -->
     <div class="historial-layout">
 
         <!-- SIDEBAR EXPANDIBLE -->
@@ -123,7 +122,7 @@ function formatearFechaHistorial($fecha) {
             <!-- SECCIONES -->
             <div class="historial-sections">
 
-                <!-- ═══ PRÉSTAMOS ═══ -->
+                <!-- PRÉSTAMOS -->
                 <section class="historial-section active" id="prestamos" role="tabpanel" aria-labelledby="tab-prestamos">
                     <div class="section-header">
                         <span class="material-symbols-outlined">auto_stories</span>
@@ -155,7 +154,7 @@ function formatearFechaHistorial($fecha) {
                     </div>
                 </section>
 
-                <!-- ═══ RESERVAS ═══ -->
+                <!-- RESERVAS -->
                 <section class="historial-section" id="reservas" role="tabpanel" aria-labelledby="tab-reservas">
                     <div class="section-header">
                         <span class="material-symbols-outlined">bookmark_added</span>
@@ -187,7 +186,7 @@ function formatearFechaHistorial($fecha) {
                     </div>
                 </section>
 
-                <!-- ═══ DEVOLUCIONES ═══ -->
+                <!-- DEVOLUCIONES -->
                 <section class="historial-section" id="devoluciones" role="tabpanel" aria-labelledby="tab-devoluciones">
                     <div class="section-header">
                         <span class="material-symbols-outlined">assignment_return</span>
@@ -219,7 +218,7 @@ function formatearFechaHistorial($fecha) {
                     </div>
                 </section>
 
-                <!-- ═══ INCIDENCIAS ═══ -->
+                <!-- INCIDENCIAS -->
                 <section class="historial-section" id="incidencias" role="tabpanel" aria-labelledby="tab-incidencias">
                     <div class="section-header">
                         <span class="material-symbols-outlined">warning</span>
@@ -251,7 +250,7 @@ function formatearFechaHistorial($fecha) {
                     </div>
                 </section>
 
-                <!-- ═══ FRASE ═══ -->
+                <!-- FRASE -->
                 <section class="quote-section">
                     <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80" alt="Pasillo de biblioteca" loading="lazy">
                     <div class="quote-overlay">

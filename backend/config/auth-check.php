@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/security.php';
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache"); 

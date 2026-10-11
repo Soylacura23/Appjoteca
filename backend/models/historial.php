@@ -71,6 +71,120 @@ class Historial {
     }
 
     /**
+     * Préstamos reales del usuario, agrupados por reserva para evitar una
+     * tarjeta por cada ejemplar físico.
+     */
+    public function obtenerPrestamosUsuario($id_usuario, $limite = 50)
+    {
+        $sql = "SELECT
+                    MIN(p.id_prestamo) AS id_historial,
+                    'prestamo' AS tipo,
+                    CASE
+                        WHEN SUM(CASE WHEN p.estado = 'vencido' THEN 1 ELSE 0 END) > 0 THEN 'Préstamo atrasado'
+                        WHEN SUM(CASE WHEN p.estado IN ('activo', 'vencido') THEN 1 ELSE 0 END) > 0 THEN 'Préstamo activo'
+                        ELSE 'Préstamo completado'
+                    END AS accion,
+                    l.titulo AS detalle,
+                    CONCAT(COUNT(*) , ' ejemplar(es) · Reserva #', r.id_reserva) AS referencia,
+                    MIN(p.fecha_prestamo) AS fecha,
+                    r.id_reserva
+                FROM prestamos p
+                JOIN reservas r ON r.id_reserva = p.id_reserva
+                JOIN ejemplares e ON e.id_ejemplar = p.id_ejemplar
+                JOIN libros l ON l.id_libro = e.fk_id_libro_ejemplar
+                WHERE r.fk_id_usuario_reserva = ?
+                GROUP BY r.id_reserva, l.id_libro
+                ORDER BY MIN(p.fecha_prestamo) DESC, r.id_reserva DESC
+                LIMIT ?";
+
+        $query = $this->db->prepare($sql);
+        $query->bind_param('ii', $id_usuario, $limite);
+        $query->execute();
+        $resultado = $query->get_result();
+        $historial = [];
+        while ($fila = $resultado->fetch_assoc()) {
+            $historial[] = $fila;
+        }
+        $query->close();
+
+        return $historial;
+    }
+
+    /**
+     * Solicitudes del usuario desde la tabla de reservas, con su estado actual.
+     */
+    public function obtenerReservasUsuario($id_usuario, $limite = 50)
+    {
+        $sql = "SELECT
+                    r.id_reserva AS id_historial,
+                    'reserva' AS tipo,
+                    CASE r.estado
+                        WHEN 'activa' THEN 'Solicitud pendiente'
+                        WHEN 'aceptada' THEN 'Solicitud aceptada'
+                        WHEN 'rechazada' THEN 'Solicitud rechazada'
+                        WHEN 'cancelada' THEN 'Solicitud cancelada'
+                        ELSE CONCAT('Solicitud: ', r.estado)
+                    END AS accion,
+                    l.titulo AS detalle,
+                    CONCAT(COALESCE(r.cantidad, 1), ' ejemplar(es) · Reserva #', r.id_reserva) AS referencia,
+                    r.fecha_reserva AS fecha
+                FROM reservas r
+                JOIN libros l ON l.id_libro = r.fk_id_libro_reserva
+                WHERE r.fk_id_usuario_reserva = ?
+                ORDER BY r.fecha_reserva DESC, r.id_reserva DESC
+                LIMIT ?";
+
+        $query = $this->db->prepare($sql);
+        $query->bind_param('ii', $id_usuario, $limite);
+        $query->execute();
+        $resultado = $query->get_result();
+        $historial = [];
+        while ($fila = $resultado->fetch_assoc()) {
+            $historial[] = $fila;
+        }
+        $query->close();
+
+        return $historial;
+    }
+
+    /**
+     * Devoluciones reales del usuario agrupadas por reserva y fecha.
+     */
+    public function obtenerDevolucionesUsuario($id_usuario, $limite = 50)
+    {
+        $sql = "SELECT
+                    MIN(p.id_prestamo) AS id_historial,
+                    'devolucion' AS tipo,
+                    'Devolución registrada' AS accion,
+                    l.titulo AS detalle,
+                    CONCAT(COUNT(*), ' ejemplar(es) devuelto(s) · Reserva #', r.id_reserva) AS referencia,
+                    p.fecha_devolucion_real AS fecha,
+                    r.id_reserva
+                FROM prestamos p
+                JOIN reservas r ON r.id_reserva = p.id_reserva
+                JOIN ejemplares e ON e.id_ejemplar = p.id_ejemplar
+                JOIN libros l ON l.id_libro = e.fk_id_libro_ejemplar
+                WHERE r.fk_id_usuario_reserva = ?
+                  AND p.estado = 'devuelto'
+                  AND p.fecha_devolucion_real IS NOT NULL
+                GROUP BY r.id_reserva, l.id_libro, p.fecha_devolucion_real
+                ORDER BY p.fecha_devolucion_real DESC, r.id_reserva DESC
+                LIMIT ?";
+
+        $query = $this->db->prepare($sql);
+        $query->bind_param('ii', $id_usuario, $limite);
+        $query->execute();
+        $resultado = $query->get_result();
+        $historial = [];
+        while ($fila = $resultado->fetch_assoc()) {
+            $historial[] = $fila;
+        }
+        $query->close();
+
+        return $historial;
+    }
+
+    /**
      * Últimos movimientos globales (para dashboard de bibliotecario).
      */
     public function obtenerRecientes($limite = 10)

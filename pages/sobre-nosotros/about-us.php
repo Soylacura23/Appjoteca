@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
+require_once __DIR__ . '/../../backend/config/security.php';
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -269,8 +267,8 @@ if (empty($_SESSION['csrf_token'])) {
             </div>
             <div class="form-wrapper" data-aos="fade-left">
                 <form id="feedbackForm" class="custom-form" novalidate>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>" class="hidden-input">
-                    <input type="text" name="website_url_hp" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" class="hidden-input">
+                    <input type="text" name="middle_name" class="sec-email-field" tabindex="-1" autocomplete="off" aria-hidden="true">
 
                     <div class="form-group">
                         <label for="nombre"><span class="material-symbols-outlined">person</span> Nombre</label>
@@ -298,7 +296,11 @@ if (empty($_SESSION['csrf_token'])) {
                     </div>
                     <div class="form-group checkbox-group">
                         <input type="checkbox" id="privacidad" name="privacidad" required>
-                        <label for="privacidad">Acepto la política de privacidad.</label>
+                        <div class="privacy-copy">
+                            <label for="privacidad">Acepto la</label>
+                            <a class="privacy-policy-link" href="../legal/privacidad.php">política de privacidad</a>
+                            <span>.</span>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 btn-glow">
                         <span class="material-symbols-outlined">send</span>

@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
 require_once __DIR__ . '/../config/env.php';  
 require_once __DIR__ . '/../Database/conexion.php';
@@ -7,12 +8,28 @@ require_once __DIR__ . '/../models/libro.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'], true)) {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'mensaje' => 'Método no permitido.']);
+    exit;
+}
+
 define('RUTA_PORTADAS_FISICA',  __DIR__ . '/../../uploads/books/portadas/');
 define('RUTA_PORTADAS_PUBLICA', 'uploads/books/portadas/');
 define('PORTADA_DEFAULT',       'assets/images/books/default-cover.jpg');
 
 $modelo = new libro($connection);
-$action = $_REQUEST['action'] ?? '';
+requiereRol([3]);
+$action = $_SERVER['REQUEST_METHOD'] === 'GET'
+    ? ($_GET['action'] ?? '')
+    : ($_POST['action'] ?? '');
+$accionesLectura = ['listar', 'obtener', 'catalogos', 'buscar_portada', 'generar_sinopsis', 'historial'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !in_array($action, $accionesLectura, true)) {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'mensaje' => 'Método no permitido.']);
+    exit;
+}
 
 function responder($status, $mensaje = '', $data = null)
 {
@@ -26,8 +43,18 @@ function subirPortada()
         return null;
     }
 
-    $ext = strtolower(pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+    if ($_FILES['portada']['size'] > 10 * 1024 * 1024) {
+        return null;
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mimeType = $finfo->file($_FILES['portada']['tmp_name']);
+    $allowedTypes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+    if (!isset($allowedTypes[$mimeType])) {
         return null;
     }
 
@@ -35,7 +62,7 @@ function subirPortada()
         mkdir(RUTA_PORTADAS_FISICA, 0755, true);
     }
 
-    $nombre  = uniqid('portada_', true) . '.' . $ext;
+    $nombre  = 'portada_' . bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
     $destino = RUTA_PORTADAS_FISICA . $nombre;
 
     if (!move_uploaded_file($_FILES['portada']['tmp_name'], $destino)) {
@@ -47,7 +74,14 @@ function subirPortada()
 
 function descargarPortadaUrl($url)
 {
-    if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+    if (!is_string($url)) {
+        return null;
+    }
+
+    $parsedUrl = parse_url($url);
+    if (!filter_var($url, FILTER_VALIDATE_URL)
+        || ($parsedUrl['scheme'] ?? '') !== 'https'
+        || strtolower($parsedUrl['host'] ?? '') !== 'covers.openlibrary.org') {
         return null;
     }
 
@@ -55,14 +89,34 @@ function descargarPortadaUrl($url)
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS      => 3,
+        CURLOPT_PROTOCOLS      => CURLPROTO_HTTPS,
+        CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+        CURLOPT_CONNECTTIMEOUT => 4,
         CURLOPT_TIMEOUT        => 12,
+        CURLOPT_MAXFILESIZE    => 5 * 1024 * 1024,
         CURLOPT_USERAGENT      => 'AppJoteca/1.0',
     ]);
     $contenido = curl_exec($ch);
     $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $urlFinal  = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
     curl_close($ch);
+    $hostFinal = strtolower(parse_url($urlFinal, PHP_URL_HOST) ?: '');
 
-    if ($contenido === false || $httpCode !== 200) {
+    if ($contenido === false
+        || $httpCode !== 200
+        || $hostFinal !== 'covers.openlibrary.org'
+        || strlen($contenido) > 5 * 1024 * 1024) {
+        return null;
+    }
+
+    $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contenido);
+    $allowedTypes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+    if (!isset($allowedTypes[$mimeType])) {
         return null;
     }
 
@@ -70,7 +124,7 @@ function descargarPortadaUrl($url)
         mkdir(RUTA_PORTADAS_FISICA, 0755, true);
     }
 
-    $nombre  = uniqid('portada_', true) . '.jpg';
+    $nombre  = 'portada_' . bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
     $destino = RUTA_PORTADAS_FISICA . $nombre;
 
     if (file_put_contents($destino, $contenido) === false) {
@@ -124,13 +178,14 @@ function datosLibroDesdePost($rutaPortada, $modelo)
     ];
 }
 
-function httpGet($url, $timeout = 12)
+function httpGet($url, $timeout = 7)
 {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT        => $timeout,
+        CURLOPT_CONNECTTIMEOUT => min(3, $timeout),
         CURLOPT_USERAGENT      => 'AppJoteca/1.0',
     ]);
     $body = curl_exec($ch);
@@ -145,7 +200,7 @@ function httpGet($url, $timeout = 12)
 
 switch ($action) {
 
-    /* ---------- LISTAR (paginado) ---------- */
+    /* LISTAR (paginado) */
     case 'listar':
         $pagina      = max(1, (int)($_GET['pagina'] ?? 1));
         $porPagina   = 30;
@@ -160,7 +215,7 @@ switch ($action) {
         responder('success', '', $resultado);
         break;
 
-    /* ---------- OBTENER UNO ---------- */
+    /* OBTENER UNO */
     case 'obtener':
         $id = (int)($_GET['id'] ?? 0);
         $libro = $modelo->obtenerLibro($id);
@@ -170,16 +225,27 @@ switch ($action) {
         responder('error', 'Libro no encontrado');
         break;
 
-    /* ---------- CATÁLOGOS ---------- */
+    /* CATÁLOGOS */
     case 'catalogos':
         responder('success', '', $modelo->obtenerCatalogos());
         break;
 
-    /* ---------- GUARDAR (nuevo) ---------- */
+    case 'historial':
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            responder('error', 'ID de libro inválido');
+        }
+        responder('success', '', $modelo->obtenerHistorial($id));
+        break;
+
+    /* GUARDAR (nuevo) */
     case 'guardar':
         $portada = subirPortada();
         if (!$portada && !empty($_POST['portada_url'])) {
             $portada = descargarPortadaUrl(trim($_POST['portada_url']));
+            if (!$portada) {
+                responder('error', 'No se pudo guardar la portada seleccionada. Intenta elegir otra o subir una imagen local.');
+            }
         }
         if (!$portada) {
             $portada = PORTADA_DEFAULT;
@@ -210,7 +276,7 @@ switch ($action) {
         responder('error', 'Error al guardar el libro');
         break;
 
-    /* ---------- ACTUALIZAR ---------- */
+    /* ACTUALIZAR */
     case 'actualizar':
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -220,6 +286,9 @@ switch ($action) {
         $portada = subirPortada();
         if (!$portada && !empty($_POST['portada_url'])) {
             $portada = descargarPortadaUrl(trim($_POST['portada_url']));
+            if (!$portada) {
+                responder('error', 'No se pudo guardar la portada seleccionada. Intenta elegir otra o subir una imagen local.');
+            }
         }
 
         $datos = datosLibroDesdePost($portada, $modelo);
@@ -242,7 +311,7 @@ switch ($action) {
         responder('error', 'Error al actualizar el libro');
         break;
 
-    /* ---------- ELIMINAR (soft) ---------- */
+    /* ELIMINAR (soft) */
     case 'eliminar':
         $id = (int)($_POST['id'] ?? 0);
         if ($modelo->eliminarLibro($id)) {
@@ -251,79 +320,150 @@ switch ($action) {
         responder('error', 'No se pudo eliminar el libro');
         break;
 
-    /* ---------- BUSCAR PORTADAS (varias) ---------- */
+    /* BUSCAR PORTADAS (varias) */
     case 'buscar_portada':
         $titulo = trim($_GET['titulo'] ?? '');
-        if ($titulo === '') {
-            responder('error', 'Título vacío');
+        $isbn = preg_replace('/[^0-9Xx]/', '', $_GET['isbn'] ?? '');
+        $autor = trim($_GET['autor'] ?? '');
+        if ($titulo === '' && $isbn === '') {
+            responder('error', 'Indica un título o ISBN');
         }
 
-        $url  = 'https://openlibrary.org/search.json?title=' . urlencode($titulo) . '&limit=8';
-        $json = httpGet($url);
-
-        if (!$json) {
-            responder('error', 'No se pudo consultar Open Library');
+        $consultas = [];
+        if ($isbn !== '') {
+            $consultas[] = 'https://openlibrary.org/search.json?isbn=' . urlencode($isbn) . '&limit=8';
         }
-
-        $data = json_decode($json, true);
-        $docs = $data['docs'] ?? [];
+        if ($titulo !== '') {
+            $parametros = ['title' => $titulo, 'limit' => 8];
+            if ($autor !== '') $parametros['author'] = $autor;
+            $consultas[] = 'https://openlibrary.org/search.json?' . http_build_query($parametros);
+        }
 
         $portadas = [];
-        foreach ($docs as $doc) {
-            if (empty($doc['cover_i'])) continue;
+        $consultasCorrectas = false;
+        foreach ($consultas as $url) {
+            $json = httpGet($url, 4);
+            if (!$json) continue;
+            $data = json_decode($json, true);
+            if (!is_array($data)) continue;
+            $consultasCorrectas = true;
 
-            $portadas[] = [
-                'url'    => 'https://covers.openlibrary.org/b/id/' . $doc['cover_i'] . '-L.jpg',
-                'titulo' => $doc['title'] ?? '',
-                'autor'  => isset($doc['author_name']) ? implode(', ', $doc['author_name']) : '',
-                'anio'   => $doc['first_publish_year'] ?? null,
-            ];
+            foreach ($data['docs'] ?? [] as $doc) {
+                if (empty($doc['cover_i'])) continue;
+                $portadas[(string)$doc['cover_i']] = [
+                    'url'    => 'https://covers.openlibrary.org/b/id/' . $doc['cover_i'] . '-M.jpg',
+                    'titulo' => $doc['title'] ?? '',
+                    'autor'  => isset($doc['author_name']) ? implode(', ', $doc['author_name']) : '',
+                    'anio'   => $doc['first_publish_year'] ?? null,
+                ];
+                if (count($portadas) >= 8) break;
+            }
+            if (count($portadas) >= 8) break;
         }
 
         if (empty($portadas)) {
+            if (!$consultasCorrectas) {
+                responder('error', 'No se pudo consultar Open Library');
+            }
             responder('error', 'No se encontraron portadas');
         }
 
-        responder('success', '', ['portadas' => $portadas]);
+        responder('success', '', ['portadas' => array_values($portadas)]);
         break;
 
-    /* ---------- GENERAR SINOPSIS (Google Books + API key) ---------- */
     case 'generar_sinopsis':
         $titulo = trim($_GET['titulo'] ?? '');
         $idioma = trim($_GET['idioma'] ?? 'es');
+        $autor = trim($_GET['autor'] ?? '');
+        $isbn = preg_replace('/[^0-9Xx]/', '', $_GET['isbn'] ?? '');
 
-        if ($titulo === '') {
-            responder('error', 'Título vacío');
+        if ($titulo === '' && $isbn === '') {
+            responder('error', 'Indica un título o ISBN');
         }
 
         $apiKey = $_ENV['GOOGLE_BOOKS_API_KEY'] ?? getenv('GOOGLE_BOOKS_API_KEY') ?? '';
-        if ($apiKey === '') {
-            responder('error', 'Falta la clave de Google Books en el .env (GOOGLE_BOOKS_API_KEY)');
+
+        $consultas = [];
+        if ($isbn !== '') $consultas[] = 'isbn:' . $isbn;
+        if ($titulo !== '') {
+            $consultaTitulo = 'intitle:' . $titulo;
+            if ($autor !== '') $consultaTitulo .= ' inauthor:' . $autor;
+            $consultas[] = $consultaTitulo;
+            if ($autor !== '') $consultas[] = 'intitle:' . $titulo;
         }
 
-        $q = urlencode($titulo);
-        $urls = [
-            "https://www.googleapis.com/books/v1/volumes?q=intitle:{$q}&langRestrict={$idioma}&maxResults=3&key={$apiKey}",
-            "https://www.googleapis.com/books/v1/volumes?q=intitle:{$q}&maxResults=3&key={$apiKey}",
-        ];
+        $candidatos = [];
+        foreach (array_unique($consultas) as $consulta) {
+            foreach ([$idioma, ''] as $restriccionIdioma) {
+                $parametros = [
+                    'q' => $consulta,
+                    'maxResults' => 10,
+                ];
+                if ($apiKey !== '') $parametros['key'] = $apiKey;
+                if ($restriccionIdioma !== '') $parametros['langRestrict'] = $restriccionIdioma;
+                $url = 'https://www.googleapis.com/books/v1/volumes?' . http_build_query($parametros);
+                $json = httpGet($url, 5);
+                if (!$json) continue;
 
-        $desc = null;
-        foreach ($urls as $url) {
-            $json = httpGet($url);
-            if (!$json) continue;
-
-            $data = json_decode($json, true);
-            if (!empty($data['items'][0]['volumeInfo']['description'])) {
-                $desc = $data['items'][0]['volumeInfo']['description'];
-                break;
+                $data = json_decode($json, true);
+                foreach ($data['items'] ?? [] as $item) {
+                    $info = $item['volumeInfo'] ?? [];
+                    if (empty($info['description'])) continue;
+                    $candidatos[] = [
+                        'titulo' => $info['title'] ?? '',
+                        'autores' => $info['authors'] ?? [],
+                        'descripcion' => $info['description'],
+                        'puntaje' => 0,
+                    ];
+                }
+                if ($candidatos) break;
             }
+            if ($candidatos) break;
         }
 
-        if (!$desc) {
+        if (!$candidatos) {
+            if ($apiKey === '') {
+                responder('error', 'Google Books no devolvió una sinopsis; configura GOOGLE_BOOKS_API_KEY para disponer de una cuota estable.');
+            }
             responder('error', 'No se encontró sinopsis para este título');
         }
 
-        responder('success', '', ['sinopsis' => strip_tags($desc)]);
+        $normalizar = static function ($texto) {
+            $texto = function_exists('mb_strtolower')
+                ? mb_strtolower($texto, 'UTF-8')
+                : strtolower($texto);
+            return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', $texto));
+        };
+        $tituloBuscado = $normalizar($titulo);
+        $autorBuscado = $normalizar($autor);
+        foreach ($candidatos as &$candidato) {
+            if ($isbn !== '') $candidato['puntaje'] += 100;
+            $tituloResultado = $normalizar($candidato['titulo']);
+            if ($tituloBuscado !== '' && $tituloResultado !== '') {
+                similar_text($tituloBuscado, $tituloResultado, $coincidencia);
+                $candidato['puntaje'] += $coincidencia;
+            }
+            if ($autorBuscado !== '') {
+                foreach ($candidato['autores'] as $autorResultado) {
+                    if (strpos($normalizar($autorResultado), $autorBuscado) !== false) {
+                        $candidato['puntaje'] += 30;
+                        break;
+                    }
+                }
+            }
+        }
+        unset($candidato);
+        usort($candidatos, static fn($a, $b) => $b['puntaje'] <=> $a['puntaje']);
+        $descripcionHtml = preg_replace('/<(?:br|\/p|\/div|\/li)\b[^>]*>/i', ' ', $candidatos[0]['descripcion']);
+        $descripcion = html_entity_decode(
+            preg_replace('/\s+/u', ' ', strip_tags($descripcionHtml)),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
+        $descripcion = function_exists('mb_substr')
+            ? mb_substr(trim($descripcion), 0, 2000, 'UTF-8')
+            : substr(trim($descripcion), 0, 2000);
+        responder('success', '', ['sinopsis' => trim($descripcion)]);
         break;
 
     default:

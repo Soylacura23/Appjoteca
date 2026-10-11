@@ -1,15 +1,7 @@
-/* ================================================================
-   catalogo.css — Página de Detalle de Libro
-   AppJoteca v2.0
-
-   Requiere: theme.css, navbar.css, notifications.css,
-             book-card.css (para la sección de relacionados)
-   ================================================================ */
+/* catalogo.css — Página de Detalle de Libro */
 
 
-/* ────────────────────────────────────────────────
-   Layout principal
-   ──────────────────────────────────────────────── */
+/* Layout principal */
    .catalogo-main {
     padding-top: var(--topbar-h);
     min-height: 100vh;
@@ -22,9 +14,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Breadcrumb / Botón volver
-   ──────────────────────────────────────────────── */
+/* Breadcrumb / Botón volver */
 .back-btn {
     display: inline-flex;
     align-items: center;
@@ -57,14 +47,12 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Hero del libro — cuadrícula principal
-   ──────────────────────────────────────────────── */
+/* Hero del libro — cuadrícula principal */
 .book-hero {
     display: grid;
     /* En celulares se mantiene en 1 columna */
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: var(--sp-lg);
     align-items: start;
     margin-bottom: var(--sp-2xl);
 }
@@ -79,17 +67,19 @@
 /* Aura de fondo */
 .book-cover-glow {
     position: absolute;
-    /* Reducimos el inset negativo para que el brillo no se salga demasiado */
-    inset: -10%; 
-    background: radial-gradient(ellipse 80% 60% at 50% 60%, rgba(242, 202, 80, 0.20) 0%, transparent 70%);
+    inset: -15%;
+    background: radial-gradient(ellipse 70% 60% at 50% 55%,
+                rgba(242, 202, 80, 0.18) 0%,
+                transparent 70%);
     border-radius: 50%;
     pointer-events: none;
-    transition: opacity 0.6s ease;
     z-index: 0;
+    opacity: 0.7;
+    transition: opacity 0.6s ease;
 }
 
 .book-cover-col:hover .book-cover-glow {
-    opacity: 1.5;
+    opacity: 1;
 }
 
 .book-cover-frame {
@@ -103,8 +93,8 @@
     aspect-ratio: 2 / 3;
     background: var(--surface-container-highest);
     width: 100%;
-    max-width: 340px; 
-    margin: 0;
+    max-width: min(280px, calc(70vh * 2 / 3));
+    margin: 0 auto;
 }
 
 .book-cover-frame:hover {
@@ -132,18 +122,6 @@
     flex-direction: column;
     gap: 12px;
 }
-
-@media (min-width: 768px) {
-    .book-hero {
-        grid-template-columns: minmax(200px, 340px) 1fr;
-        gap: 40px;
-    }
-    
-    .book-cover-col {
-        justify-content: flex-start; /* Alínea a la izquierda en pantallas grandes */
-    }
-}
-
 
 .book-meta-row {
     display: flex;
@@ -223,9 +201,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Metadatos — bento grid
-   ──────────────────────────────────────────────── */
+/* Metadatos — bento grid */
 .book-metadata {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -277,9 +253,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Sinopsis
-   ──────────────────────────────────────────────── */
+/* Sinopsis */
 .synopsis-section {
     display: flex;
     flex-direction: column;
@@ -303,10 +277,32 @@
     max-width: 640px;
 }
 
+.synopsis-text.is-collapsed {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 7;
+    overflow: hidden;
+}
 
-/* ────────────────────────────────────────────────
-   Tags del libro
-   ──────────────────────────────────────────────── */
+.synopsis-toggle {
+    align-self: flex-start;
+    border: 1px solid rgba(242, 202, 80, 0.35);
+    border-radius: 999px;
+    padding: 7px 14px;
+    color: var(--primary);
+    background: rgba(242, 202, 80, 0.07);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.synopsis-toggle:hover {
+    background: rgba(242, 202, 80, 0.14);
+}
+
+
+/* Tags del libro */
 .book-tags-detail {
     display: flex;
     flex-wrap: wrap;
@@ -337,9 +333,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Botones de acción
-   ──────────────────────────────────────────────── */
+/* Botones de acción */
 .book-actions {
     display: flex;
     flex-wrap: wrap;
@@ -420,9 +414,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Sección: Libros relacionados
-   ──────────────────────────────────────────────── */
+/* Sección: Libros relacionados */
 .related-section {
     margin-top: var(--sp-2xl);
     padding-top: var(--sp-2xl);
@@ -539,10 +531,29 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
+/* Botón cancelar solicitud — variante del .btn-reservar */
+.btn-reservar.btn-cancelar {
+    background: transparent;
+    color: var(--error);
+    border: 1px solid rgba(255, 180, 171, 0.28);
+    box-shadow: none;
+}
 
-/* ════════════════════════════════════════════════
-   RESPONSIVE
-   ════════════════════════════════════════════════ */
+.btn-reservar.btn-cancelar:hover {
+    background: rgba(255, 180, 171, 0.08);
+    border-color: rgba(255, 180, 171, 0.5);
+    color: var(--error);
+    box-shadow: 0 8px 24px rgba(255, 180, 171, 0.12);
+}
+
+.btn-reservar:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* RESPONSIVE */
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {
@@ -551,8 +562,8 @@
     }
 
     .book-cover-frame {
-        max-width: 400px;
-        margin: 0;
+        max-width: min(320px, calc(65vh * 2 / 3));
+        margin: 0 auto;
     }
 
     .book-metadata {
@@ -573,13 +584,21 @@
 /* Desktop 900px+ */
 @media (min-width: 900px) {
     .book-hero {
-        grid-template-columns: 5fr 7fr;
+        grid-template-columns: minmax(220px, 320px) 1fr;
         gap: 60px;
         margin-bottom: 100px;
+        align-items: start;
+    }
+
+    .book-cover-col {
+        justify-content: flex-start;
+        position: sticky;
+        top: calc(var(--topbar-h, 64px) + 24px);
     }
 
     .book-cover-frame {
         max-width: 100%;
+        max-height: 70vh;
         margin: 0;
     }
 
@@ -604,7 +623,12 @@
 /* Wide 1200px+ */
 @media (min-width: 1200px) {
     .book-hero {
+        grid-template-columns: minmax(260px, 360px) 1fr;
         gap: 80px;
+    }
+
+    .book-cover-frame {
+        max-height: 72vh;
     }
 
     .related-grid {
@@ -623,12 +647,23 @@
     }
 
     .book-title-main {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     .btn-reservar {
-        padding: 14px 28px;
+        padding: 14px 24px;
         font-size: 0.625rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-add-library {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .book-cover-frame {
+        max-width: 200px;
     }
 
     .related-grid {
@@ -638,5 +673,43 @@
     .book-metadata {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px 12px;
+    }
+}
+
+@media (max-width: 899px) {
+    body > .topbar {
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+
+    body > .topbar .topbar-inner {
+        display: flex;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-width: 0;
+    }
+
+    body > .topbar .logo-link {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    body > .topbar .logo-link img {
+        width: auto;
+        max-width: 100%;
+    }
+
+    body > .topbar .topbar-actions {
+        flex: 0 0 auto;
+        min-width: max-content;
+    }
+
+    body > .topbar .menu-toggle-btn {
+        display: flex;
+        flex: 0 0 40px;
+        position: relative;
+        z-index: 1;
     }
 }

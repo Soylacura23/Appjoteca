@@ -12,7 +12,7 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Ajustes · Bibliotecario · AppJoteca</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,300;1,400&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
@@ -40,7 +40,7 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 
 <?php include '../../../../shared/layouts/notifications.php'; ?>
 <?php include '../../../../shared/layouts/menu-off-canvas.php'; ?>
-<?php include '../../../../shared/layouts/menu-movil.php'; ?>
+<?php include_once __DIR__ . '/../../../../shared/layouts/menu-movil.php'; ?>
 
 <header class="topbar" role="banner">
     <div class="topbar-inner">

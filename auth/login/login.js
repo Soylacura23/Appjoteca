@@ -1,4 +1,4 @@
-// ── Referencias al DOM ──────────────────────────────────────
+// Referencias al DOM
 const form           = document.getElementById('login-form');
 const errorBox       = document.getElementById('login-error');
 const errorText      = document.getElementById('login-error-text');
@@ -12,7 +12,7 @@ const btnLogin       = document.querySelector('.btn-login');
 const btnLoginText   = document.getElementById('btn-login-text');
 const rememberInput  = document.getElementById('remember');
 
-// ── Utilidades de mensajes ──────────────────────────────────
+// Utilidades de mensajes
 function ocultarMensajes() {
   errorBox.hidden = true;
   successBox.hidden = true;

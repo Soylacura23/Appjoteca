@@ -1,9 +1,7 @@
 /* Reutiliza la base responsiva de estudiante */
 @import url('../estudiante/estudiante.css');
 
-/* ==========================================================================
-   ESTILOS ESPECÍFICOS: PANEL DE DOCENTES
-   ========================================================================== */
+/* ESTILOS ESPECÍFICOS: PANEL DE DOCENTES */
 
 /* Métricas Dashboard */
 .metrics-grid {

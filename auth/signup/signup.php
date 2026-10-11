@@ -1,7 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+if (!file_exists(__DIR__ . '/../../install.lock')) {
+    header('Location: ../../install/install.php');
+    exit;
 }
+
+require_once __DIR__ . '/../../backend/config/security.php';
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -82,7 +85,11 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
         <form id="signup-form" class="signup-form" novalidate autocomplete="on"
               action="../../backend/auth/register-send.php" method="POST" enctype="multipart/form-data">
 
-          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+          <div class="sec-email-field" aria-hidden="true">
+            <label for="middle-name-field">Deja este campo vacío</label>
+            <input type="text" id="middle-name-field" name="middle_name" tabindex="-1" autocomplete="off">
+          </div>
 
           <!-- ══ PASO 1 ══ -->
           <fieldset class="step-panel is-active" data-step="1">

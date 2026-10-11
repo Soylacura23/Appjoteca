@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../helpers/fecha_devolucion.php';
+
 /**
  * Modelo Reserva — Appjoteca
  * Gestión de reservas de libros
@@ -39,9 +41,17 @@ class Reserva
                     r.fecha_reserva,
                     r.fecha_limite,
                     r.observacion,
-                    l.titulo AS libro
+                    l.titulo AS libro,
+                    l.portada,
+                    u.nombre_apellido AS usuario,
+                    u.foto_perfil,
+                    (SELECT COUNT(*)
+                     FROM ejemplares e
+                     WHERE e.fk_id_libro_ejemplar = l.id_libro
+                       AND e.estado = 'Disponible') AS stock_disponible
                 FROM reservas r
                 JOIN libros l ON r.fk_id_libro_reserva = l.id_libro
+                JOIN usuarios u ON r.fk_id_usuario_reserva = u.id_usuario
                 WHERE r.id_reserva = ?
                 LIMIT 1";
 
@@ -56,16 +66,16 @@ class Reserva
 
     
 
-    public function crearReserva($id_usuario, $id_libro, $cantidad = 1, $observacion = null)
+    public function crearReserva($id_usuario, $id_libro, $cantidad = 1, $observacion = null, $fecha_devolucion_estimada = null)
     {
         try {
             $sql = "INSERT INTO reservas
-                    (fk_id_usuario_reserva, fk_id_libro_reserva, cantidad, fecha_reserva, fecha_limite, estado, observacion)
-                    VALUES (?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'activa', ?)";
+                    (fk_id_usuario_reserva, fk_id_libro_reserva, cantidad, fecha_reserva, fecha_limite, fecha_devolucion_estimada, estado, observacion)
+                    VALUES (?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), ?, 'activa', ?)";
 
             $query = $this->db->prepare($sql);
             $obs = ($observacion !== null && $observacion !== '') ? substr($observacion, 0, 100) : null;
-            $query->bind_param("iiis", $id_usuario, $id_libro, $cantidad, $obs);
+            $query->bind_param("iisss", $id_usuario, $id_libro, $cantidad, $fecha_devolucion_estimada, $obs);
             $query->execute();
 
             $id_reserva = $this->db->insert_id;
@@ -99,6 +109,26 @@ class Reserva
     public function cancelarReserva($id_reserva, $id_usuario)
     {
         try {
+            $sqlEstado = "SELECT estado
+                          FROM reservas
+                          WHERE id_reserva = ? AND fk_id_usuario_reserva = ?
+                          LIMIT 1";
+            $qEstado = $this->db->prepare($sqlEstado);
+            $qEstado->bind_param("ii", $id_reserva, $id_usuario);
+            $qEstado->execute();
+            $reserva = $qEstado->get_result()->fetch_assoc();
+            $qEstado->close();
+
+            if (!$reserva) {
+                return false;
+            }
+            if ($reserva['estado'] === 'cancelada') {
+                return 'ya_cancelada';
+            }
+            if ($reserva['estado'] !== 'activa') {
+                return false;
+            }
+
             $sql = "UPDATE reservas
                     SET estado = 'cancelada'
                     WHERE id_reserva = ?
@@ -111,7 +141,18 @@ class Reserva
             $filas = $query->affected_rows;
             $query->close();
 
-            return $filas > 0;
+            if ($filas > 0) {
+                return 'cancelada';
+            }
+
+            // Another request may have cancelled it after the initial read.
+            $qEstado = $this->db->prepare($sqlEstado);
+            $qEstado->bind_param("ii", $id_reserva, $id_usuario);
+            $qEstado->execute();
+            $reserva = $qEstado->get_result()->fetch_assoc();
+            $qEstado->close();
+
+            return ($reserva['estado'] ?? null) === 'cancelada' ? 'ya_cancelada' : false;
         } catch (Exception $e) {
             error_log("Error en cancelarReserva: " . $e->getMessage());
             return false;
@@ -128,8 +169,8 @@ class Reserva
         try {
             $this->db->begin_transaction();
 
-            $sqlReserva = "SELECT fk_id_libro_reserva, fk_id_usuario_reserva, cantidad
-                        FROM reservas WHERE id_reserva = ? AND estado = 'activa'";
+            $sqlReserva = "SELECT fk_id_libro_reserva, fk_id_usuario_reserva, cantidad, fecha_devolucion_estimada
+                        FROM reservas WHERE id_reserva = ? AND estado = 'activa' FOR UPDATE";
             $qReserva = $this->db->prepare($sqlReserva);
             $qReserva->bind_param("i", $id_reserva);
             $qReserva->execute();
@@ -148,7 +189,7 @@ class Reserva
 
             $sqlEjemplar = "SELECT id_ejemplar FROM ejemplares
                             WHERE fk_id_libro_ejemplar = ? AND estado = 'Disponible'
-                            LIMIT ?";
+                            LIMIT ? FOR UPDATE";
             $qEjemplar = $this->db->prepare($sqlEjemplar);
             $qEjemplar->bind_param("ii", $id_libro, $cantidad);
             $qEjemplar->execute();
@@ -163,30 +204,42 @@ class Reserva
                 throw new Exception("No hay ejemplares disponibles.");
             }
 
-            $sqlUpdEj = "UPDATE ejemplares SET estado = 'Prestado' WHERE id_ejemplar = ?";
+            $sqlUpdEj = "UPDATE ejemplares SET estado = 'Prestado'
+                         WHERE id_ejemplar = ? AND estado = 'Disponible'";
             $qUpdEj = $this->db->prepare($sqlUpdEj);
 
+            $fechaDevolucion = $res['fecha_devolucion_estimada'];
+            if (!$fechaDevolucion) {
+                $fechaDevolucion = fechaDevolucionPredeterminada();
+            }
             $sqlPrestamo = "INSERT INTO prestamos
                             (id_ejemplar, id_reserva, fecha_prestamo, fecha_devolucion_prevista, estado)
-                            VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 15 DAY), 'activo')";
+                            VALUES (?, ?, CURDATE(), ?, 'activo')";
             $qPrestamo = $this->db->prepare($sqlPrestamo);
 
             $ids_prestamo = [];
             foreach ($ejemplares as $id_ejemplar) {
                 $qUpdEj->bind_param("i", $id_ejemplar);
                 $qUpdEj->execute();
+                if ($qUpdEj->affected_rows !== 1) {
+                    throw new Exception("El ejemplar ya no está disponible.");
+                }
 
-                $qPrestamo->bind_param("ii", $id_ejemplar, $id_reserva);
+                $qPrestamo->bind_param("iis", $id_ejemplar, $id_reserva, $fechaDevolucion);
                 $qPrestamo->execute();
                 $ids_prestamo[] = (int) $this->db->insert_id;
             }
             $qUpdEj->close();
             $qPrestamo->close();
 
-            $sqlUpdRes = "UPDATE reservas SET estado = 'aceptada' WHERE id_reserva = ?";
+            $sqlUpdRes = "UPDATE reservas SET estado = 'aceptada'
+                          WHERE id_reserva = ? AND estado = 'activa'";
             $qUpdRes = $this->db->prepare($sqlUpdRes);
             $qUpdRes->bind_param("i", $id_reserva);
             $qUpdRes->execute();
+            if ($qUpdRes->affected_rows !== 1) {
+                throw new Exception("La reserva ya fue procesada.");
+            }
             $qUpdRes->close();
 
             $this->db->commit();
@@ -225,10 +278,16 @@ class Reserva
                     r.cantidad,
                     r.fecha_reserva,
                     r.fecha_limite,
+                    r.observacion,
                     u.nombre_apellido AS usuario,
+                    u.foto_perfil,
                     l.titulo AS libro,
                     l.edicion,
                     l.portada,
+                    (SELECT COUNT(*)
+                     FROM ejemplares ea
+                     WHERE ea.fk_id_libro_ejemplar = l.id_libro
+                       AND ea.estado = 'Disponible') AS stock_disponible,
                     COALESCE(
                         (SELECT GROUP_CONCAT(a.nombre SEPARATOR ', ')
                          FROM libro_autor la

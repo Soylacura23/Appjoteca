@@ -1,17 +1,36 @@
 <?php
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
-require_once __DIR__ . '/../../backend/settings/configuracion-back.php';
-requiereRol([1, 2]);
+requiereRol([1, 2, 4]);
 
 $documento = $_SESSION['documento'] ?? '';
+$foto_actual = $mi_foto;
+$tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
+    && strpos($_SESSION['foto_perfil'], 'default-avatar') === false;
+$foto_documento = '';
+
+$consultaFotoDocumento = $connection->prepare(
+    'SELECT foto_documento FROM usuarios WHERE id_usuario = ?'
+);
+if (!$consultaFotoDocumento) {
+    throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
+}
+
+$consultaFotoDocumento->bind_param('i', $mi_id);
+$consultaFotoDocumento->execute();
+$datosDocumento = $consultaFotoDocumento->get_result()->fetch_assoc();
+$consultaFotoDocumento->close();
+
+if (!empty($datosDocumento['foto_documento'])) {
+    $foto_documento = BASE_URL . ltrim($datosDocumento['foto_documento'], '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Configuración de Perfil - Appjoteca</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,300;1,400&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
@@ -38,7 +57,7 @@ $documento = $_SESSION['documento'] ?? '';
     <!-- NAVBAR TOPBAR -->
     <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
 
 <main class="config-main">
@@ -61,7 +80,16 @@ $documento = $_SESSION['documento'] ?? '';
                         <button class="avatar-edit" id="avatarEditBtn" type="button" aria-label="Cambiar foto de perfil">
                             <span class="material-symbols-outlined">photo_camera</span>
                         </button>
+                        <button class="avatar-delete" id="deletePhotoBtn" type="button" aria-label="Eliminar foto" title="Eliminar foto" <?= $tiene_foto_personalizada ? '' : 'hidden'; ?>>
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                         <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" hidden>
+                    </div>
+
+                    <div class="avatar-actions">
+                        <button type="button" class="btn-outline" id="previewConfirmBtn" hidden>
+                            <span class="material-symbols-outlined">check</span> Confirmar foto
+                        </button>
                     </div>
 
                     <div class="profile-info">
@@ -89,14 +117,6 @@ $documento = $_SESSION['documento'] ?? '';
                         </div>
                     </div>
 
-                    <div class="avatar-actions">
-                        <button type="button" class="btn-outline" id="previewConfirmBtn" style="display:none;">
-                            <span class="material-symbols-outlined">check</span> Confirmar foto
-                        </button>
-                        <button type="button" class="btn-outline btn-delete-photo" id="deletePhotoBtn">
-                            <span class="material-symbols-outlined">delete</span> Eliminar foto
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Documento de identidad -->
@@ -106,11 +126,19 @@ $documento = $_SESSION['documento'] ?? '';
                         <span>Documento de Identidad</span>
                     </div>
                     <div class="id-doc-preview" id="idDocPreview">
-                        <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento ID" id="idDocImage" loading="lazy">
-                        <div class="id-doc-blur-overlay">
-                            <span class="material-symbols-outlined">visibility_off</span>
-                            <span>Click para visualizar</span>
-                        </div>
+                        <?php if ($foto_documento !== ''): ?>
+                            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento ID" id="idDocImage" loading="lazy">
+                            <div class="id-doc-blur-overlay">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                                <span>Click para visualizar</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="id-doc-placeholder" role="status">
+                                <span class="material-symbols-outlined">image_not_supported</span>
+                                <p>No hay ninguna foto de documento.</p>
+                                <span>Agrega uno para que pueda ser verificado.</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <div class="id-doc-footer">
                         <span class="material-symbols-outlined">lock</span>
@@ -324,14 +352,16 @@ $documento = $_SESSION['documento'] ?? '';
 </main>
 
 <!-- Overlay documento ID -->
-<div class="id-doc-overlay" id="idDocOverlay" aria-hidden="true">
-    <button class="id-doc-overlay-close" id="idDocOverlayClose" aria-label="Cerrar">
-        <span class="material-symbols-outlined">close</span>
-    </button>
-    <div class="id-doc-overlay-content">
-        <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de Identidad" id="idDocOverlayImg">
+<?php if ($foto_documento !== ''): ?>
+    <div class="id-doc-overlay" id="idDocOverlay" aria-hidden="true">
+        <button class="id-doc-overlay-close" id="idDocOverlayClose" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="id-doc-overlay-content">
+            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de Identidad" id="idDocOverlayImg">
+        </div>
     </div>
-</div>
+<?php endif; ?>
 
 <?php include '../../shared/layouts/footer.php'; ?>
 

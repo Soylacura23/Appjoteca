@@ -1,4 +1,4 @@
-// ── Referencias al DOM ──────────────────────────────────────
+// Referencias al DOM
 const form            = document.getElementById('signup-form');
 const errorBox        = document.getElementById('signup-error');
 const errorText       = document.getElementById('signup-error-text');
@@ -36,11 +36,11 @@ const strengthBar     = document.getElementById('strengthBar');
 const strengthText    = document.getElementById('strengthText');
 const matchHint       = document.getElementById('matchHint');
 
-// ── Estado ──────────────────────────────────────────────────
+// Estado
 let currentStep = 1;
 const TOTAL_STEPS = 2;
 
-// ── Utilidades ──────────────────────────────────────────────
+// Utilidades
 function ocultarMensajes() {
   if (errorBox) errorBox.hidden = true;
   if (successBox) successBox.hidden = true;
@@ -69,7 +69,7 @@ function setLoading(isLoading) {
   btnSignupText.textContent = isLoading ? 'Creando cuenta…' : 'Crear cuenta';
 }
 
-// ── Completitud de pasos ────────────────────────────────────
+// Completitud de pasos
 function paso1Completo() {
   return (
     nombreInput.value.trim().length >= 3 &&
@@ -125,7 +125,7 @@ function actualizarBotones() {
   }
 }
 
-// ── Stepper ─────────────────────────────────────────────────
+// Stepper
 function renderStep() {
   stepPanels.forEach(function (panel) {
     panel.classList.toggle('is-active', Number(panel.dataset.step) === currentStep);
@@ -168,7 +168,7 @@ function renderStep() {
   }
 }
 
-// ── Toggle contraseña ───────────────────────────────────────
+// Toggle contraseña
 function setupPasswordToggle(btn, input, icon) {
   if (!btn || !input || !icon) return;
   btn.addEventListener('click', function () {
@@ -183,7 +183,7 @@ function setupPasswordToggle(btn, input, icon) {
 setupPasswordToggle(togglePassBtn, passInput, togglePassIcon);
 setupPasswordToggle(togglePass2Btn, pass2Input, togglePass2Icon);
 
-// ── Preview y eliminar documento ────────────────────────────
+// Preview y eliminar documento
 function limpiarPreviewCedula() {
   cedulaFileInput.value = '';
   try {
@@ -245,7 +245,7 @@ if (cedulaFileInput) {
   });
 }
 
-// ── Validaciones ────────────────────────────────────────────
+// Validaciones
 function validarEmailInstitucional(email) {
   const dominios = [
     '.edu', '.edu.co', '.edu.mx', '.edu.ar', '.edu.pe', '.edu.cl',
@@ -345,7 +345,7 @@ function validarPaso2() {
   return true;
 }
 
-// ── Fortaleza de contraseña ─────────────────────────────────
+// Fortaleza de contraseña
 function actualizarFortaleza() {
   if (!passInput || !strengthBar || !strengthText) return;
 
@@ -415,7 +415,7 @@ if (pass2Input) {
   });
 }
 
-// ── Navegación ──────────────────────────────────────────────
+// Navegación
 if (btnNext) {
   btnNext.addEventListener('click', function () {
     ocultarMensajes();
@@ -437,7 +437,7 @@ if (btnBack) {
   });
 }
 
-// ── Inputs: limpiar error y actualizar botón ────────────────
+// Inputs: limpiar error y actualizar botón
 const allInputs = [
   nombreInput, cedulaInput, cedulaFileInput,
   usuarioInput, emailInput, passInput, pass2Input
@@ -452,7 +452,7 @@ allInputs.forEach(function (input) {
   });
 });
 
-// ── Envío final ─────────────────────────────────────────────
+// Envío final
 if (form) {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -499,5 +499,5 @@ if (form) {
   });
 }
 
-// ── Init ────────────────────────────────────────────────────
+// Init
 renderStep();

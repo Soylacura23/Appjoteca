@@ -1,14 +1,6 @@
-/* ================================================================
-   recommended-books.css — Componente: Libros Recomendados
-   AppJoteca v2.0
+/* recommended-books.css — Componente: Libros Recomendados */
 
-   Requiere: theme.css
-   Uso: <section class="recommended-section">...</section>
-   ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Sección contenedora
-   ──────────────────────────────────────────────── */
+/* Sección contenedora */
    .recommended-section {
     margin-top: var(--sp-2xl, 64px);
     padding-top: var(--sp-xl, 32px);
@@ -72,9 +64,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Grid de tarjetas
-   ──────────────────────────────────────────────── */
+/* Grid de tarjetas */
 .recommended-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -82,9 +72,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Tarjeta individual
-   ──────────────────────────────────────────────── */
+/* Tarjeta individual */
 .rec-card {
     cursor: pointer;
     display: flex;
@@ -184,9 +172,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Info del libro
-   ──────────────────────────────────────────────── */
+/* Info del libro */
 .rec-info {
     display: flex;
     flex-direction: column;
@@ -222,9 +208,7 @@
 }
 
 
-/* ════════════════════════════════════════════════
-   RESPONSIVE
-   ════════════════════════════════════════════════ */
+/* RESPONSIVE */
 
 /* Tablet pequeña 480px+ */
 @media (min-width: 480px) {

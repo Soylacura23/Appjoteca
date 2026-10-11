@@ -49,9 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
             : (document.querySelector('meta[name="csrf-token"]')?.content || '');
     }
 
-    // ════════════════════════════════════
     // 1. Foto de perfil (preview + confirmar + eliminar)
-    // ════════════════════════════════════
     if (avatarEditBtn && avatarInput) {
         avatarEditBtn.addEventListener('click', function () {
             avatarInput.click();
@@ -65,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
             avatarImg.src = URL.createObjectURL(archivo);
 
             if (previewConfirmBtn) {
-                previewConfirmBtn.style.display = 'inline-flex';
+                previewConfirmBtn.hidden = false;
             }
         });
     }
@@ -89,13 +87,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     alerta('success', 'Foto actualizada', data.message);
                     fotoOriginal = avatarImg.src;
                     archivoPendiente = null;
-                    previewConfirmBtn.style.display = 'none';
+                    previewConfirmBtn.hidden = true;
+                    if (deletePhotoBtn) deletePhotoBtn.hidden = false;
                     if (avatarInput) avatarInput.value = '';
                 } else {
                     alerta('error', 'Error', data.message);
                     avatarImg.src = fotoOriginal;
                     archivoPendiente = null;
-                    previewConfirmBtn.style.display = 'none';
+                    previewConfirmBtn.hidden = true;
                 }
             })
             .catch(function (err) {
@@ -103,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alerta('error', 'Error de red', 'No se pudo subir la foto');
                 avatarImg.src = fotoOriginal;
                 archivoPendiente = null;
-                previewConfirmBtn.style.display = 'none';
+                previewConfirmBtn.hidden = true;
             });
         });
     }
@@ -139,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         alerta('success', 'Listo', data.message);
                         avatarImg.src = '/Appjoteca/assets/images/default-avatar.png';
                         fotoOriginal = avatarImg.src;
+                        deletePhotoBtn.hidden = true;
                     } else {
                         alerta('error', 'Error', data.message);
                     }
@@ -151,9 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 2. Guardar nombre de usuario
-    // ════════════════════════════════════
     if (saveUsernameBtn) {
         saveUsernameBtn.addEventListener('click', function () {
             const nuevo = usernameInput.value.trim();
@@ -189,9 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 3. Documento ID — overlay
-    // ════════════════════════════════════
     if (idPreview && idOverlay) {
         idPreview.addEventListener('click', function () {
             Swal.fire({
@@ -229,9 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 4. Mostrar / ocultar contraseñas
-    // ════════════════════════════════════
     document.querySelectorAll('.toggle-password').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const input = document.getElementById(this.dataset.target);
@@ -248,9 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ════════════════════════════════════
     // 5. Fortaleza de contraseña
-    // ════════════════════════════════════
     if (newPass) {
         newPass.addEventListener('input', function () {
             const v = this.value;
@@ -286,9 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 6. Coincidencia de contraseñas
-    // ════════════════════════════════════
     if (confirmPass) {
         confirmPass.addEventListener('input', function () {
             if (!newPass.value || !this.value) {
@@ -306,9 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 7. Actualizar contraseña
-    // ════════════════════════════════════
     if (updatePassBtn) {
         updatePassBtn.addEventListener('click', function (e) {
             e.preventDefault();
@@ -364,9 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 8. Solicitudes al bibliotecario
-    // ════════════════════════════════════
     requestBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             const tipo = this.dataset.request;
@@ -424,9 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ════════════════════════════════════
     // 9. Solicitar eliminación de cuenta
-    // ════════════════════════════════════
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', function () {
             Swal.fire({

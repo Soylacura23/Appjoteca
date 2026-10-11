@@ -11,7 +11,7 @@ requiereRol([3]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Inventario · APPJOTECA</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
@@ -37,7 +37,7 @@ requiereRol([3]);
 
 <?php include '../../../../shared/layouts/notifications.php'; ?>
 <?php include '../../../../shared/layouts/menu-off-canvas.php'; ?>
-<?php include '../../../../shared/layouts/menu-movil.php'; ?>
+<?php include_once __DIR__ . '/../../../../shared/layouts/menu-movil.php'; ?>
 
 <header class="topbar" role="banner">
     <div class="topbar-inner">
@@ -204,9 +204,7 @@ requiereRol([3]);
         </nav>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════
-         OVERLAY DETALLE DEL LIBRO
-         ═══════════════════════════════════════════════════ -->
+    <!-- OVERLAY DETALLE DEL LIBRO -->
     <div class="book-detail-overlay" id="book-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-panel-title" hidden>
         <div class="detail-backdrop" id="detail-backdrop"></div>
 
@@ -228,32 +226,34 @@ requiereRol([3]);
                     </div>
                     <div class="section-fields">
 
-                        <div class="field-cover">
-                            <div class="cover-preview" id="cover-preview">
-                                <img id="detail-cover-img" src="" alt="Portada del libro" hidden>
-                                <div class="cover-placeholder" id="cover-placeholder">
-                                    <span class="material-symbols-outlined">image</span>
-                                    <span>Sin portada</span>
+                        <div class="basic-title-row">
+                            <div class="field-cover">
+                                <div class="cover-preview" id="cover-preview">
+                                    <img id="detail-cover-img" src="" alt="Portada del libro" hidden>
+                                    <div class="cover-placeholder" id="cover-placeholder">
+                                        <span class="material-symbols-outlined">image</span>
+                                        <span>Sin portada</span>
+                                    </div>
+                                    <div class="cover-hover-overlay">
+                                        <button type="button" class="btn btn-secondary btn-sm" id="detail-cover-change">
+                                            <span class="material-symbols-outlined">camera_alt</span>
+                                            Cambiar
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="cover-hover-overlay">
-                                    <button type="button" class="btn btn-secondary btn-sm" id="detail-cover-change">
-                                        <span class="material-symbols-outlined">camera_alt</span>
-                                        Cambiar
-                                    </button>
-                                </div>
+                                <input type="file" id="detail-cover-file" accept="image/*" hidden>
                             </div>
-                            <input type="file" id="detail-cover-file" accept="image/*" hidden>
-                        </div>
 
-                        <div class="form-field full" style="display:flex; gap:10px; align-items:flex-end;">
-                            <div style="flex:1;">
-                                <label for="detail-title-input" class="form-label">Título del libro <span class="req">*</span></label>
-                                <input type="text" id="detail-title-input" class="form-input" placeholder="Ej: Cien años de soledad" autocomplete="off">
+                            <div class="form-field full title-search-field">
+                                <div class="title-search-input">
+                                    <label for="detail-title-input" class="form-label">Título del libro <span class="req">*</span></label>
+                                    <input type="text" id="detail-title-input" class="form-input" placeholder="Ej: Cien años de soledad" autocomplete="off">
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-buscar-portada" title="Buscar portada automáticamente">
+                                    <span class="material-symbols-outlined">image_search</span>
+                                    Portada
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-secondary btn-sm" id="btn-buscar-portada" title="Buscar portada automáticamente">
-                                <span class="material-symbols-outlined">image_search</span>
-                                Portada
-                            </button>
                         </div>
 
                         <div class="field-row two-cols">
@@ -307,10 +307,8 @@ requiereRol([3]);
                         <div class="field-row two-cols">
                             <div class="form-field">
                                 <label for="detail-publisher-input" class="form-label">Editorial</label>
-                                <select id="detail-publisher-input" class="form-select">
-                                    <option value="">Selecciona o escribe abajo</option>
-                                </select>
-                                <input type="text" id="detail-publisher-text" class="form-input" placeholder="O escribe una editorial nueva" style="margin-top:6px;">
+                                <input type="text" id="detail-publisher-input" class="form-input" list="publisher-options" placeholder="Selecciona o escribe una editorial" autocomplete="off">
+                                <datalist id="publisher-options"></datalist>
                             </div>
                             <div class="form-field">
                                 <label for="detail-year-input" class="form-label">Año de publicación</label>
@@ -347,10 +345,8 @@ requiereRol([3]);
                             </div>
                             <div class="form-field">
                                 <label for="detail-language" class="form-label">Idioma</label>
-                                <select id="detail-language" class="form-select">
-                                    <option value="">Selecciona o escribe abajo</option>
-                                </select>
-                                <input type="text" id="detail-language-text" class="form-input" placeholder="O escribe un idioma nuevo" style="margin-top:6px;">
+                                <input type="text" id="detail-language" class="form-input" list="language-options" placeholder="Selecciona o escribe un idioma" autocomplete="off">
+                                <datalist id="language-options"></datalist>
                             </div>
                         </div>
 
@@ -488,7 +484,7 @@ requiereRol([3]);
                     <div class="history-timeline" id="history-timeline">
                         <div class="history-empty" id="history-empty">
                             <span class="material-symbols-outlined">history</span>
-                            <p>No hay actividad reciente<br><small>El historial aparecerá aquí tras el primer guardado.</small></p>
+                            <p>Selecciona un libro para consultar su actividad.</p>
                         </div>
                     </div>
                 </section>
@@ -550,7 +546,7 @@ requiereRol([3]);
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div id="cover-select-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px; max-height:400px; overflow:auto;"></div>
+            <div id="cover-select-grid" class="cover-select-grid"></div>
         </div>
     </div>
 

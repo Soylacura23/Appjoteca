@@ -1,15 +1,13 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
+ini_set('log_errors', 1);
 
 require_once __DIR__ . '/../config/verify-csrf.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 header('Content-Type: application/json');
 require("../Database/conexion.php");
+require_once __DIR__ . '/../helpers/RateLimiter.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -26,8 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $action = $_POST['action'] ?? '';
 
+if (!empty($_POST['middle_name'])) {
+    echo json_encode(['status' => 'success', 'message' => 'Si los datos son válidos, recibirás instrucciones.']);
+    exit;
+}
+
 switch ($action) {
     case 'send_code':
+        $limiter = new RateLimiter($connection, 5, 3600);
+        if (!$limiter->check('recover-send:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+            http_response_code(429);
+            echo json_encode(['status' => 'error', 'message' => 'Demasiadas solicitudes. Inténtalo más tarde.']);
+            exit;
+        }
+
         $correo = filter_var(trim($_POST["correo"] ?? ''), FILTER_VALIDATE_EMAIL);
         
         if (!$correo) {
@@ -43,10 +53,12 @@ switch ($action) {
 
         if ($resultado->num_rows > 0) {
             $usuario = $resultado->fetch_assoc();
-            $codigo = rand(100000, 999999);
+            $codigo = random_int(100000, 999999);
             
             $_SESSION['recover_email'] = $correo;
             $_SESSION['recover_code'] = (string)$codigo;
+            $_SESSION['recover_code_expires'] = time() + 600;
+            $_SESSION['recover_verified'] = false;
 
             
 
@@ -55,8 +67,8 @@ switch ($action) {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'appjotecainformation@gmail.com';
-                $mail->Password   = 'yudtydunnmcchnmd'; 
+                $mail->Username   = $_ENV['SMTP_USER'] ?? '';
+                $mail->Password   = $_ENV['SMTP_PASS'] ?? '';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
             
@@ -144,21 +156,38 @@ switch ($action) {
 
             
                 $mail->send();
-                echo json_encode(['status' => 'success', 'message' => 'Código enviado con éxito.']);
+                echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
             } catch (Exception $e) {
-                echo json_encode(['status' => 'error', 'message' => 'Error al enviar correo.']);
+                error_log('Error sending password recovery email: ' . $e->getMessage());
+                unset(
+                    $_SESSION['recover_email'],
+                    $_SESSION['recover_code'],
+                    $_SESSION['recover_code_expires'],
+                    $_SESSION['recover_verified']
+                );
+                echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
             }
         
             
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'El correo no existe o está inactivo.']);
+            echo json_encode(['status' => 'success', 'message' => 'Si los datos corresponden a una cuenta activa, recibirás un código.']);
         }
         break;
 
     case 'verify_code':
+        $limiter = new RateLimiter($connection, 10, 900);
+        if (!$limiter->check('recover-verify:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+            http_response_code(429);
+            echo json_encode(['status' => 'error', 'message' => 'Demasiados intentos. Inténtalo más tarde.']);
+            exit;
+        }
+
         $codigo_ingresado = trim($_POST['codigo'] ?? '');
         
-        if (isset($_SESSION['recover_code']) && $_SESSION['recover_code'] === $codigo_ingresado) {
+        if (isset($_SESSION['recover_code'], $_SESSION['recover_code_expires'])
+            && $_SESSION['recover_code_expires'] >= time()
+            && hash_equals((string) $_SESSION['recover_code'], $codigo_ingresado)) {
+            $_SESSION['recover_verified'] = true;
             echo json_encode(['status' => 'success', 'message' => 'Código verificado correctamente.']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'El código es incorrecto.']);
@@ -166,10 +195,18 @@ switch ($action) {
         break;
 
     case 'update_password':
+        $limiter = new RateLimiter($connection, 5, 900);
+        if (!$limiter->check('recover-update:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+            http_response_code(429);
+            echo json_encode(['status' => 'error', 'message' => 'Demasiados intentos. Inténtalo más tarde.']);
+            exit;
+        }
+
         $nueva_contrasena = $_POST['nueva_contrasena'] ?? '';
         $correo_guardado = $_SESSION['recover_email'] ?? '';
 
-        if (empty($correo_guardado)) {
+        if (empty($correo_guardado) || empty($_SESSION['recover_verified'])
+            || (int) ($_SESSION['recover_code_expires'] ?? 0) < time()) {
             echo json_encode(['status' => 'error', 'message' => 'La sesión ha expirado. Recarga la página.']);
             exit;
         }
@@ -199,7 +236,12 @@ switch ($action) {
             $queryUpdate->bind_param("ss", $hash, $correo_guardado);
             
             if ($queryUpdate->execute()) {
-                session_destroy();
+                unset(
+                    $_SESSION['recover_email'],
+                    $_SESSION['recover_code'],
+                    $_SESSION['recover_code_expires'],
+                    $_SESSION['recover_verified']
+                );
                 echo json_encode(['status' => 'success', 'message' => 'Contraseña actualizada.']);
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'Error de base de datos.']);

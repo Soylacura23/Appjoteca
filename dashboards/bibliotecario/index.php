@@ -29,6 +29,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Dashboard | Bibliotecario</title>
     
     <!-- Fuentes e Íconos -->
@@ -93,7 +94,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
     </div>
 </header>
 
-<?php include '../../shared/layouts/menu-movil.php'; ?>
+<?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
 <div class="dashboard-layout">
 <aside id="sidebar" class="sidebar">
@@ -175,7 +176,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
         <div class="reservation-table-container">
             <div class="table-header flex justify-between align-center mb-3">
                 <h3 class="headline-md white-text">Fila de reservación</h3>
-                <button class="btn-outline">VER TODOS</button>
+                <button class="btn-outline" id="btn-ver-reservaciones" type="button">VER TODOS</button>
             </div>
             <div id="reservas-table" class="custom-tabulator"></div>
         </div>
@@ -217,6 +218,7 @@ $historial = $modeloHistorial->obtenerRecientes(5);
                 <?php if (empty($historial)): ?>
                     <span class="text-sm text-outline">No hay actividad reciente.</span>
                 <?php endif; ?>
+                <a class="btn-outline history-more" href="pages/reservaciones/reservaciones.php">VER MÁS EN RESERVACIONES</a>
             </div>
         </div>
     </section>
@@ -227,6 +229,8 @@ $historial = $modeloHistorial->obtenerRecientes(5);
 <?php include '../../shared/layouts/footer.php'; ?>
 
 <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="../../shared/js/components/alert.js"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../shared/js/global.js"></script>
 <script src="js/dashboard.js"></script>

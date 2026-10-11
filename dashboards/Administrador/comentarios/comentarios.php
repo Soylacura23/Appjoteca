@@ -12,7 +12,7 @@ requiereRol([4]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Comentarios - AppJoteca</title>
 
     <!-- Fuentes -->
@@ -49,7 +49,7 @@ requiereRol([4]);
     <!-- BARRA DE NAVEGACIÓN -->
     <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
     <!-- MENÚ MÓVIL -->
-    <?php include '../../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="config-main">

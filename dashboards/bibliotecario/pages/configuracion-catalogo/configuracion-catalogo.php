@@ -135,7 +135,7 @@ requiereRol([3]);
         </nav>
     </aside>
 
-    <?php include '../../../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../../../shared/layouts/menu-movil.php'; ?>
 
     <!-- Main Content -->
     <main id="main-content" class="main-content">

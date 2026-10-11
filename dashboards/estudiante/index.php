@@ -40,7 +40,7 @@ requiereRol([1]);
 
     <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
     <main class="dashboard-main">
         <div class="dashboard-container">
@@ -48,11 +48,11 @@ requiereRol([1]);
             <!-- BIENVENIDA -->
             <section class="welcome-section">
                 <div class="welcome-text">
-                    <h1 class="welcome-title"><span id="greetingTime"></span>, <?= $mi_nombre ?> </h1>
+                    <h1 class="welcome-title"><span id="greetingTime"></span>, <?= htmlspecialchars($mi_nombre, ENT_QUOTES, 'UTF-8') ?> </h1>
                     <p class="welcome-subtitle">¿Qué quieres descubrir hoy?</p>
                 </div>
                 <div class="welcome-meta">
-                    <p class="welcome-info">Tienes <strong><?= $_SESSION['resumen_libros']['prestados']; ?> libros prestados</strong> y <strong><?= $_SESSION['resumen_libros']['reservados']; ?> reserva activa</strong>.</p>
+                    <p class="welcome-info">Tienes <strong><?= (int) ($_SESSION['resumen_libros']['prestados'] ?? 0); ?> libros prestados</strong> y <strong><?= (int) ($_SESSION['resumen_libros']['reservados'] ?? 0); ?> reserva activa</strong>.</p>
                     <p class="welcome-date" id="currentDate">Cargando fecha...</p>
                 </div>
             </section>
@@ -176,7 +176,7 @@ requiereRol([1]);
                                 <span class="material-symbols-outlined">person</span>
                             </div>
                             <div class="profile-details">
-                                <h4><?= $mi_nombre ?></h4>
+                                <h4><?= htmlspecialchars($mi_nombre, ENT_QUOTES, 'UTF-8') ?></h4>
                                 <span class="student-id">ID: <?= $mi_documento; ?></span>
                             </div>
                         </div>

@@ -12,11 +12,11 @@ header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $nombre = trim(strip_tags($_POST['nombre'])) ?? '';
-    $correo = trim($_POST['correo']) ?? '';
-    $tipo_comentario = trim($_POST['tipo']) ?? '';
-    $comentario = trim(strip_tags($_POST['mensaje'])) ?? '';
-    $honeypot = $_POST['website_url_hp'] ?? '';
+    $nombre = trim(strip_tags($_POST['nombre'] ?? ''));
+    $correo = trim($_POST['correo'] ?? '');
+    $tipo_comentario = trim($_POST['tipo'] ?? '');
+    $comentario = trim(strip_tags($_POST['mensaje'] ?? ''));
+    $auxiliaryField = $_POST['middle_name'] ?? '';
 
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)){
         echo json_encode([
@@ -28,12 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $acepto_privacidad = isset($_POST['privacidad']);
 
-    if(!empty($honeypot)){
-        http_response_code(403);
-        echo json_encode([
-            "ok" => false,
-            "message" => "No está permitido el Spam ni el uso de bots para hacer spam"
-        ]);
+    if(!empty($auxiliaryField)){
+        echo json_encode(["ok" => true, "message" => "Comentario enviado con éxito."]);
         exit;
     }
 

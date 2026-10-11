@@ -1,9 +1,7 @@
  (() => {
     'use strict';
 
-    /* ════════════════════════════════════════════
-       Config
-    ════════════════════════════════════════════ */
+    /* Config */
     window.getCSRFToken = function() {
         const meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
@@ -11,10 +9,14 @@
     const PROFILE_IMAGE = window.AppUser.foto;
     const PROFILE_NAME  = window.AppUser.nombre;
     const PROFILE_ROLE  = window.AppUser.rol;
+    const escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 
-    /* ════════════════════════════════════════════
-       Elementos Globales
-    ════════════════════════════════════════════ */
+    /* Elementos Globales */
     const overlay = document.getElementById('overlay');
     const menuOffCanvas = document.querySelector('.menu-off-canva');
     const notifContainer = document.getElementById('notification-container');
@@ -24,9 +26,7 @@
     const topbar = document.querySelector('.topbar');
     const hamburguer = document.querySelector('#menu-activar');
 
-    /* ════════════════════════════════════════════
-       Controladores de Paneles y Overlay
-    ════════════════════════════════════════════ */
+    /* Controladores de Paneles y Overlay */
     function showOverlay() {
         if (!overlay) return;
         overlay.classList.add('show');
@@ -80,9 +80,7 @@
         });
     }
 
-    /* ════════════════════════════════════════════
-       Sidebar (Exclusivo Bibliotecario)
-    ════════════════════════════════════════════ */
+    /* Sidebar (Exclusivo Bibliotecario) */
     if (hamburguer) {
         hamburguer.addEventListener('click', () => {
             
@@ -101,15 +99,13 @@
         });
     }
 
-    /* ════════════════════════════════════════════
-       Botón de perfil — creación dinámica
-    ════════════════════════════════════════════ */
+    /* Botón de perfil — creación dinámica */
     function createProfileButton(containerId, sizeClass = 'btn-md') {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = `
             <button class="profile-button ${sizeClass}" aria-label="Abrir menú de perfil" type="button">
-              <img src="${PROFILE_IMAGE}" alt="Foto de perfil" class="img-profile">
+              <img src="${escapeHtml(PROFILE_IMAGE)}" alt="Foto de perfil" class="img-profile">
             </button>
         `;
     }
@@ -117,9 +113,7 @@
     createProfileButton('profile-button-topbar', 'btn-md');
     createProfileButton('profile-button-menu',   'btn-lg');
 
-    /* ════════════════════════════════════════════
-       Menú off-canvas de perfil
-    ════════════════════════════════════════════ */
+    /* Menú off-canvas de perfil */
     const menuProfileContainer = document.getElementById('profile-button-menu');
 
     if (menuProfileContainer) {
@@ -180,9 +174,7 @@
         });
     }
 
-    /* ════════════════════════════════════════════
-       Bandeja de notificaciones
-    ════════════════════════════════════════════ */
+    /* Bandeja de notificaciones */
     function openNotifications() {
         if (!notifContainer) return;
         closeProfileMenu(); 
@@ -244,9 +236,7 @@
         });
     }
 
-    /* ════════════════════════════════════════════
-       Búsqueda (formulario)
-    ════════════════════════════════════════════ */
+    /* Búsqueda (formulario) */
     const searchForm = document.getElementById('search-form');
     if (searchForm) {
         searchForm.addEventListener('submit', (e) => {
@@ -256,9 +246,7 @@
         });
     }
 
-    /* ════════════════════════════════════════════
-       Teclado y Resize
-    ════════════════════════════════════════════ */
+    /* Teclado y Resize */
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeProfileMenu();

@@ -1,21 +1,28 @@
    document.addEventListener('DOMContentLoaded', () => {
 
-    // ── Rutas API ────────────────────────────────────────
+    // Rutas API
     const API_GET  = '../../api/get_reservaciones.php';
     const API_POST = '../../../../backend/controllers/procesar_reservas.php';
     const DEFAULT_COVER = '../../../../assets/images/books/default-cover.jpg';
 
-    // ── Estado local ─────────────────────────────────────
+    // Estado local
     let returnsPage = 1;
     let returnsTotalPages = 1;
     let queuePage = 1;
     let historyTable = null;
     let currentLoanId = null;
+    let currentLoanMaxReturns = 1;
 
-    // ── Helpers ──────────────────────────────────────────
+    // Helpers
     function coverUrl(path) {
         if (!path) return DEFAULT_COVER;
         if (path.startsWith('http')) return path;
+        return '../../../../' + path.replace(/^\//, '');
+    }
+
+    function avatarUrl(path) {
+        if (!path) return '../../../../assets/images/default-avatar.png';
+        if (path.startsWith('http') || path.startsWith('/')) return path;
         return '../../../../' + path.replace(/^\//, '');
     }
 
@@ -23,6 +30,15 @@
         if (!str) return '—';
         const d = new Date(str + 'T00:00:00');
         return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function diasLabel(dias) {
@@ -42,6 +58,7 @@
     async function postForm(data) {
         const body = new FormData();
         Object.entries(data).forEach(([k, v]) => body.append(k, v));
+        body.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
         const res = await fetch(API_POST, {
             method: 'POST',
             body,
@@ -51,7 +68,7 @@
         return res.json();
     }
 
-    // ── Stats ────────────────────────────────────────────
+    // Stats
     async function cargarStats() {
         try {
             const json = await getJSON(`${API_GET}?tipo=stats`);
@@ -70,7 +87,7 @@
         }
     }
 
-    // ── Solicitudes Nuevas (preview, max 6) ──────────────
+    // Solicitudes Nuevas (preview, max 6)
     async function cargarSolicitudes() {
         const grid = document.getElementById('requests-grid');
         grid.innerHTML = '<div class="empty-state"><span class="loading-spinner"></span></div>';
@@ -95,25 +112,28 @@
                 card.style.animationDelay = `${i * 80}ms`;
                 card.dataset.id = req.id_reserva;
 
-                const badge = [req.coleccion, req.edicion].filter(Boolean).join(' · ') || 'Reserva';
+                const badge = escapeHtml([req.coleccion, req.edicion].filter(Boolean).join(' · ') || 'Reserva');
                 card.innerHTML = `
                     <div class="request-thumb">
-                        <img src="${coverUrl(req.portada)}" alt="Portada de ${req.libro}" loading="lazy"
+                        <img src="${escapeHtml(coverUrl(req.portada))}" alt="Portada de ${escapeHtml(req.libro)}" loading="lazy"
                              onerror="this.src='${DEFAULT_COVER}'">
                     </div>
                     <div class="request-body">
                         <div class="request-meta">
                             <span class="request-badge">${badge}</span>
-                            <h3 class="request-title">${req.libro}</h3>
-                            <p class="request-author">${req.autor}</p>
+                            <h3 class="request-title">${escapeHtml(req.libro)}</h3>
+                            <p class="request-author">${escapeHtml(req.autor)}</p>
                             <div class="request-user">
-                                <span class="material-symbols-outlined">person</span>
-                                <a href="../usuarios/usuarios.php?id=${req.id_usuario}">${req.usuario}</a>
+                                <img class="request-user-avatar" src="${escapeHtml(avatarUrl(req.foto_perfil))}" alt="" loading="lazy"
+                                     onerror="this.src='../../../../assets/images/default-avatar.png'">
+                                <a href="../usuarios/usuarios.php?id=${Number(req.id_usuario)}">${escapeHtml(req.usuario)}</a>
                             </div>
                             <div class="request-extra">
                                 <span>📅 ${formatDate(req.fecha_reserva)}</span>
-                                <span>📦 ${req.cantidad} ej.</span>
+                                <span>📦 Solicita ${Number(req.cantidad)} ${Number(req.cantidad) === 1 ? 'ejemplar' : 'ejemplares'}</span>
+                                <span class="request-stock">📚 Disponibles ahora: ${Number(req.stock_disponible) || 0}</span>
                             </div>
+                            ${req.observacion ? `<details class="request-reason"><summary>Ver motivo de la solicitud</summary><p>${escapeHtml(req.observacion)}</p></details>` : ''}
                         </div>
                         <div class="request-actions">
                             <button class="btn-approve" data-action="aceptar" data-id="${req.id_reserva}">Aprobar</button>
@@ -133,7 +153,43 @@
         }
     }
 
-    // ── Acción aprobar / rechazar ────────────────────────
+    async function abrirSolicitudDesdeUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const id = Number(params.get('reserva'));
+        if (!Number.isInteger(id) || id <= 0 || !window.Swal) return;
+
+        try {
+            const json = await getJSON(`${API_GET}?tipo=solicitud&id=${id}`);
+            if (!json.ok) throw new Error(json.error || 'No se encontró la solicitud.');
+            const req = json.data;
+            const result = await Swal.fire({
+                icon: 'info',
+                title: 'Solicitud pendiente',
+                html: `<div class="reservation-preview">
+                    <p><strong>${escapeHtml(req.libro)}</strong></p>
+                    <p>Solicitante: ${escapeHtml(req.usuario)}</p>
+                    <p>Cantidad: ${Number(req.cantidad)} ejemplar${Number(req.cantidad) === 1 ? '' : 'es'}</p>
+                    <p>Fecha: ${formatDate(req.fecha_reserva)}</p>
+                    ${req.observacion ? `<p>Motivo: ${escapeHtml(req.observacion)}</p>` : ''}
+                </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Aprobar solicitud',
+                cancelButtonText: 'Cerrar',
+                confirmButtonColor: '#22c55e',
+                background: '#121212',
+                color: '#e2e2e2'
+            });
+            if (result.isConfirmed) {
+                const response = await postForm({ accion: 'aceptar', id_reserva: id });
+                if (!response.ok) throw new Error(response.error || 'No se pudo aprobar la solicitud.');
+                window.alerta('success', 'Solicitud aprobada', 'El préstamo ya está registrado.');
+            }
+        } catch (error) {
+            window.alerta('error', 'No se pudo abrir la solicitud', error.message || 'Inténtalo de nuevo.');
+        }
+    }
+
+    // Acción aprobar / rechazar
     async function handleReservaAction(e) {
         const btn = e.currentTarget;
         const id  = btn.dataset.id;
@@ -183,11 +239,11 @@
             console.error(err);
             btn.disabled = false;
             btn.textContent = accion === 'aceptar' ? 'Aprobar' : 'Rechazar';
-            alert(err.message || 'No se pudo procesar');
+            window.alerta('error', 'No se pudo procesar', err.message || 'Intenta nuevamente.');
         }
     }
 
-    // ── Cola completa (paginada) ─────────────────────────
+    // Cola completa (paginada)
     async function cargarCola(page = 1) {
         const list = document.getElementById('queue-list');
         const pag  = document.getElementById('queue-pagination');
@@ -212,13 +268,13 @@
                 item.dataset.id = req.id_reserva;
                 item.innerHTML = `
                     <div class="queue-item-thumb">
-                        <img src="${coverUrl(req.portada)}" alt="" loading="lazy"
+                        <img src="${escapeHtml(coverUrl(req.portada))}" alt="" loading="lazy"
                              onerror="this.src='${DEFAULT_COVER}'">
                     </div>
                     <div class="queue-item-info">
-                        <div class="queue-item-title">${req.libro}</div>
+                        <div class="queue-item-title">${escapeHtml(req.libro)}</div>
                         <div class="queue-item-meta">
-                            ${req.autor} · ${req.usuario} · ${formatDate(req.fecha_reserva)} · ${req.cantidad} ej.
+                            ${escapeHtml(req.autor)} · ${escapeHtml(req.usuario)} · ${formatDate(req.fecha_reserva)} · ${Number(req.cantidad)} ej.
                         </div>
                     </div>
                     <div class="queue-item-actions">
@@ -260,7 +316,7 @@
         cargarSolicitudes();
     });
 
-    // ── Próximas Devoluciones ────────────────────────────
+    // Próximas Devoluciones
     async function cargarDevoluciones(page = 1, append = false) {
         const list = document.getElementById('returns-list');
         const moreBtn = document.getElementById('returns-more-btn');
@@ -309,19 +365,20 @@
                 item.innerHTML = `
                     <div class="return-book">
                         <div class="return-thumb">
-                            <img src="${coverUrl(ret.portada)}" alt="" loading="lazy"
+                            <img src="${escapeHtml(coverUrl(ret.portada))}" alt="" loading="lazy"
                                  onerror="this.src='${DEFAULT_COVER}'">
                         </div>
                         <div class="return-info">
-                            <span class="return-title">${ret.libro}</span>
-                            <span class="return-user">Prestado a: ${ret.usuario}</span>
+                            <span class="return-title">${escapeHtml(ret.libro)}</span>
+                            <span class="return-user">Prestado a: ${escapeHtml(ret.usuario)}</span>
+                            <span class="return-copies">${Number(ret.cantidad_devolver) || 1} ejemplar${Number(ret.cantidad_devolver) === 1 ? '' : 'es'}</span>
                         </div>
                     </div>
                     <div class="return-time">
                         <span class="return-time-main">${timeMain}</span>
                         <span class="return-time-label">${timeLabel}</span>
                     </div>
-                    <button class="btn-return-sm" data-id="${ret.id_prestamo}" title="Marcar devuelto">Devuelto</button>`;
+                    <button class="btn-return-sm" data-id="${ret.id_prestamo}" title="Registrar devolución">Devolver</button>`;
 
                 item.addEventListener('click', (ev) => {
                     if (ev.target.closest('.btn-return-sm')) return;
@@ -330,7 +387,7 @@
 
                 item.querySelector('.btn-return-sm').addEventListener('click', (ev) => {
                     ev.stopPropagation();
-                    marcarDevuelto(ret.id_prestamo, item);
+                    marcarDevuelto(ret.id_prestamo, item, Number(ret.cantidad_devolver) || 1);
                 });
 
                 list.appendChild(item);
@@ -348,12 +405,38 @@
         cargarDevoluciones(returnsPage + 1, true);
     });
 
-    // ── Marcar devuelto (desde lista o overlay) ──────────
-    async function marcarDevuelto(idPrestamo, elementToRemove) {
-        if (!confirm('¿Confirmar devolución de este libro?')) return;
+    // Marcar devuelto (desde lista o overlay)
+    async function marcarDevuelto(idPrestamo, elementToRemove, maxCantidad = 1) {
+        maxCantidad = Math.max(1, Number(maxCantidad) || 1);
+        const confirmacion = await Swal.fire({
+            icon: 'question',
+            title: 'Registrar devolución',
+            text: maxCantidad > 1
+                ? `Este usuario tiene ${maxCantidad} ejemplares activos o vencidos de este libro.`
+                : 'Confirma la devolución de este ejemplar.',
+            input: 'number',
+            inputLabel: 'Cantidad de ejemplares a devolver',
+            inputValue: 1,
+            inputAttributes: { min: '1', max: String(maxCantidad), step: '1' },
+            showCancelButton: true,
+            confirmButtonText: 'Devolver',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#22c55e',
+            background: '#121212',
+            color: '#e2e2e2',
+            customClass: { popup: 'reservations-swal' },
+            inputValidator: value => {
+                const cantidad = Number(value);
+                if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > maxCantidad) {
+                    return `Indica una cantidad entre 1 y ${maxCantidad}.`;
+                }
+            }
+        });
+        if (!confirmacion.isConfirmed) return;
+        const cantidad = Number(confirmacion.value);
 
         try {
-            const json = await postForm({ accion: 'devolver', id_prestamo: idPrestamo });
+            const json = await postForm({ accion: 'devolver', id_prestamo: idPrestamo, cantidad });
             if (!json.ok) throw new Error(json.error);
 
             if (elementToRemove) {
@@ -365,12 +448,17 @@
             cargarStats();
             cargarDevoluciones(1);
             if (historyTable) historyTable.setData();
+            window.alerta(
+                'success',
+                'Devolución registrada',
+                `Se ${cantidad === 1 ? 'devolvió 1 ejemplar' : `devolvieron ${cantidad} ejemplares`} correctamente.`
+            );
         } catch (e) {
-            alert(e.message || 'No se pudo registrar la devolución');
+            window.alerta('error', 'No se pudo registrar la devolución', e.message || 'Intenta nuevamente.');
         }
     }
 
-    // ── Overlay de préstamo ──────────────────────────────
+    // Overlay de préstamo
     async function abrirOverlayPrestamo(id) {
         currentLoanId = id;
         const overlay = document.getElementById('loan-overlay');
@@ -384,7 +472,8 @@
             document.getElementById('loan-overlay-title').textContent = d.libro;
             document.getElementById('loan-author').textContent = d.autor;
             document.getElementById('loan-user').textContent = d.usuario;
-            document.getElementById('loan-ejemplar').textContent = `#${d.id_ejemplar}`;
+            document.getElementById('loan-ejemplar').textContent =
+                `${Number(d.cantidad_devolver) || 1} ejemplar${Number(d.cantidad_devolver) === 1 ? '' : 'es'}`;
             document.getElementById('loan-fecha-prestamo').textContent = formatDate(d.fecha_prestamo);
             document.getElementById('loan-fecha-prevista').textContent = formatDate(d.fecha_devolucion_prevista);
             document.getElementById('loan-estado').textContent = d.estado;
@@ -394,16 +483,17 @@
             if (d.estado === 'devuelto') {
                 btnDev.style.display = 'none';
             } else {
+                currentLoanMaxReturns = Number(d.cantidad_devolver) || 1;
                 btnDev.style.display = '';
                 btnDev.disabled = false;
-                btnDev.textContent = 'Marcar como Devuelto';
+                btnDev.textContent = 'Devolver';
             }
 
             overlay.classList.add('open');
             overlay.setAttribute('aria-hidden', 'false');
         } catch (e) {
             console.error(e);
-            alert('No se pudo cargar el detalle');
+            window.alerta('error', 'No se pudo cargar el detalle', 'Intenta abrir el préstamo nuevamente.');
         }
     }
 
@@ -417,10 +507,10 @@
     document.getElementById('loan-overlay-close').addEventListener('click', cerrarOverlay);
     document.getElementById('loan-overlay-backdrop').addEventListener('click', cerrarOverlay);
     document.getElementById('loan-btn-devolver').addEventListener('click', () => {
-        if (currentLoanId) marcarDevuelto(currentLoanId);
+        if (currentLoanId) marcarDevuelto(currentLoanId, null, currentLoanMaxReturns);
     });
 
-    // ── Historial con Tabulator ──────────────────────────
+    // Historial con Tabulator
     function initHistorial() {
         historyTable = new Tabulator('#history-table', {
             ajaxURL: `${API_GET}?tipo=historial`,
@@ -437,7 +527,7 @@
             paginationSize: 20,
             paginationSizeSelector: [10, 20, 50],
             layout: 'fitColumns',
-            responsiveLayout: 'collapse',
+            responsiveLayout: false,
             placeholder: 'No hay movimientos registrados',
             columns: [
                 {
@@ -449,8 +539,8 @@
                         return `<div class="history-item-book">
                             <div class="history-item-icon"><span class="material-symbols-outlined">book_4</span></div>
                             <div>
-                                <div class="history-item-title">${d.libro}</div>
-                                <div class="history-item-id">ID: ${d.id_libro} · Ej. ${d.id_ejemplar}</div>
+                                <div class="history-item-title">${escapeHtml(d.libro)}</div>
+                                <div class="history-item-id">ID: ${Number(d.id_libro)} · Reserva #${Number(d.id_reserva)} · ${Number(d.cantidad) || 1} ${(Number(d.cantidad) || 1) === 1 ? 'ejemplar' : 'ejemplares'}</div>
                             </div>
                         </div>`;
                     },
@@ -462,7 +552,7 @@
                     minWidth: 120,
                     formatter: (cell) => {
                         const d = cell.getRow().getData();
-                        return `<div class="history-item-user">${d.usuario}</div>`;
+                        return `<div class="history-item-user">${escapeHtml(d.usuario)}</div>`;
                     }
                 },
                 {
@@ -477,7 +567,7 @@
                             overdue: 'badge-overdue',
                             extension: 'badge-extension'
                         }[d.tipo] || 'badge-loan';
-                        return `<span class="history-badge ${cls}">${d.tipo_label}</span>`;
+                        return `<span class="history-badge ${cls}">${escapeHtml(d.tipo_label)}</span>`;
                     }
                 },
                 {
@@ -489,7 +579,7 @@
                         const d = cell.getRow().getData();
                         const fecha = d.fecha_devolucion_real || d.fecha_prestamo;
                         return `<span class="history-item-date">${formatDate(fecha)}</span>
-                                <span class="history-item-time">${d.estado}</span>`;
+                                <span class="history-item-time">${escapeHtml(d.estado)}</span>`;
                     }
                 }
             ],
@@ -502,12 +592,12 @@
         });
     }
 
-    // ── Exportar PDF ─────────────────────────────────────
+    // Exportar PDF
     document.getElementById('btn-export-pdf').addEventListener('click', async () => {
         try {
             const json = await getJSON(`${API_GET}?tipo=historial&limit=200&page=1`);
             if (!json.ok || !json.data.length) {
-                alert('No hay datos para exportar');
+                window.alerta('info', 'Sin datos', 'No hay datos para exportar.');
                 return;
             }
 
@@ -528,6 +618,7 @@
                 d.libro,
                 d.usuario,
                 d.tipo_label,
+                Number(d.cantidad) || 1,
                 formatDate(d.fecha_prestamo),
                 d.fecha_devolucion_real ? formatDate(d.fecha_devolucion_real) : '—',
                 d.estado
@@ -535,7 +626,7 @@
 
             doc.autoTable({
                 startY: 28,
-                head: [['Libro', 'Usuario', 'Movimiento', 'Préstamo', 'Devolución', 'Estado']],
+                head: [['Libro', 'Usuario', 'Movimiento', 'Ejemplares', 'Préstamo', 'Devolución', 'Estado']],
                 body: rows,
                 theme: 'grid',
                 headStyles: {
@@ -556,11 +647,11 @@
             doc.save(`historial-movimientos-${Date.now()}.pdf`);
         } catch (e) {
             console.error(e);
-            alert('Error al generar el PDF');
+            window.alerta('error', 'Error al generar el PDF', 'No se pudo generar el documento.');
         }
     });
 
-    // ── Notificaciones / búsqueda móvil (legado) ─────────
+    // Notificaciones / búsqueda móvil (legado)
     const notifBtn = document.getElementById('notification-tray-btn');
     const notifContainer = document.getElementById('notification-container');
     if (notifBtn && notifContainer) {
@@ -579,23 +670,14 @@
         });
     }
 
-    const searchToggle = document.getElementById('search-toggle-btn');
-    const searchMobile = document.getElementById('topbar-search-mobile');
-    if (searchToggle && searchMobile) {
-        searchToggle.addEventListener('click', () => {
-            const isOpen = searchMobile.classList.toggle('open');
-            searchToggle.setAttribute('aria-expanded', isOpen);
-            searchMobile.setAttribute('aria-hidden', !isOpen);
-            if (isOpen) {
-                const input = searchMobile.querySelector('input');
-                if (input) input.focus();
-            }
-        });
-    }
-
-    // ── Init ─────────────────────────────────────────────
+    // Init
     cargarStats();
     cargarSolicitudes();
     cargarDevoluciones(1);
     initHistorial();
+    abrirSolicitudDesdeUrl();
+    const loanIdFromUrl = Number(new URLSearchParams(window.location.search).get('prestamo'));
+    if (Number.isInteger(loanIdFromUrl) && loanIdFromUrl > 0) {
+        abrirOverlayPrestamo(loanIdFromUrl);
+    }
 });

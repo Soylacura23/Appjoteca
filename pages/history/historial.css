@@ -1,14 +1,6 @@
-/* ================================================================
-   historial.css — Página de Historial de Actividad
-   AppJoteca v2.0
+/* historial.css — Página de Historial de Actividad */
 
-   Sidebar expandible, timeline visual, animaciones y responsive.
-   Mobile-first. Importar DESPUÉS de theme.css.
-   ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Variables locales
-   ──────────────────────────────────────────────── */
+/* Variables locales */
    :root {
     --hist-sidebar-w:      72px;
     --hist-sidebar-w-exp:  240px;
@@ -19,18 +11,14 @@
     --hist-glow:           rgba(242, 202, 80, 0.12);
   }
   
-  /* ────────────────────────────────────────────────
-     Layout principal
-     ──────────────────────────────────────────────── */
+  /* Layout principal */
   .historial-layout {
     display: flex;
     min-height: 100vh;
     padding-top: var(--topbar-h);
   }
   
-  /* ────────────────────────────────────────────────
-     Sidebar
-     ──────────────────────────────────────────────── */
+  /* Sidebar */
   .historial-sidebar {
     position: fixed;
     top: var(--topbar-h);
@@ -215,9 +203,7 @@
     opacity: 1;
   }
   
-  /* ────────────────────────────────────────────────
-     Contenido principal
-     ──────────────────────────────────────────────── */
+  /* Contenido principal */
   .historial-main {
     flex: 1;
     margin-left: var(--hist-sidebar-w);
@@ -229,9 +215,7 @@
     margin-left: var(--hist-sidebar-w-exp);
   }
   
-  /* ────────────────────────────────────────────────
-     Header hero
-     ──────────────────────────────────────────────── */
+  /* Header hero */
   .historial-hero {
     position: relative;
     height: 200px;
@@ -293,9 +277,7 @@
     font-weight: 300;
   }
   
-  /* ────────────────────────────────────────────────
-     Secciones de contenido
-     ──────────────────────────────────────────────── */
+  /* Secciones de contenido */
   .historial-sections {
     padding: 36px var(--px) 64px;
     max-width: 860px;
@@ -347,9 +329,7 @@
     font-weight: 400;
   }
   
-  /* ────────────────────────────────────────────────
-     Timeline cards
-     ──────────────────────────────────────────────── */
+  /* Timeline cards */
   .timeline-list {
     display: flex;
     flex-direction: column;
@@ -495,9 +475,7 @@
     font-weight: 500;
   }
   
-  /* ────────────────────────────────────────────────
-     Tarjeta de estado vacío / ilustrativa
-     ──────────────────────────────────────────────── */
+  /* Tarjeta de estado vacío / ilustrativa */
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -515,9 +493,7 @@
     font-weight: 300;
   }
   
-  /* ────────────────────────────────────────────────
-     Quote section (la frase favorita)
-     ──────────────────────────────────────────────── */
+  /* Quote section (la frase favorita) */
   .quote-section {
     margin-top: 52px;
     position: relative;
@@ -583,9 +559,7 @@
     letter-spacing: 0.22em;
   }
   
-  /* ────────────────────────────────────────────────
-     Animaciones de entrada escalonadas
-     ──────────────────────────────────────────────── */
+  /* Animaciones de entrada escalonadas */
   .timeline-card {
     opacity: 0;
     transform: translateY(18px);
@@ -597,9 +571,7 @@
     transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
   
-  /* ────────────────────────────────────────────────
-     Mobile sidebar toggle (botón flotante)
-     ──────────────────────────────────────────────── */
+  /* Mobile sidebar toggle (botón flotante) */
   .mobile-sidebar-toggle {
     position: fixed;
     bottom: 24px;
@@ -636,9 +608,7 @@
     font-size: 24px;
   }
   
-  /* ────────────────────────────────────────────────
-     Responsive
-     ──────────────────────────────────────────────── */
+  /* Responsive */
   
   /* Tablet y desktop */
   @media (min-width: 768px) {

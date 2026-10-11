@@ -27,6 +27,7 @@ requiereRol([1, 2]);
 
     <!-- Estilos específicos de la página -->
     <link rel="stylesheet" href="catalogo.css">
+    <link rel="stylesheet" href="../../../shared/css/components/catalog-filters.css">
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
@@ -45,7 +46,7 @@ requiereRol([1, 2]);
     <?php include __DIR__ . '/../../../shared/layouts/topbar.php'; ?>
 
     <!-- MENÚ MÓVIL -->
-    <?php include __DIR__ . '/../../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL DEL CATÁLOGO -->
     <main class="catalog-main">
@@ -57,27 +58,27 @@ requiereRol([1, 2]);
                 <p class="catalog-subtitle">
                     Sumérgete en un archivo curado de conocimiento y narrativa. Desde clásicos olvidados hasta visiones contemporáneas.
                 </p>
+                <a class="catalog-back-link" href="../../biblioteca-digital/index.php">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Volver a Biblioteca Digital
+                </a>
             </header>
 
             <!-- Barra de búsqueda y filtros -->
             <section class="catalog-filter-bar">
                 <div class="search-input-wrapper">
                     <span class="material-symbols-outlined search-icon">search</span>
-                    <input type="text" class="catalog-search-input" placeholder="Buscar por título, autor o ISBN...">
-                </div>
-                <div class="filter-categories">
-                    <button class="filter-chip active" type="button">General</button>
-                    <button class="filter-chip" type="button">Filosofía</button>
-                    <button class="filter-chip" type="button">Ciencias</button>
-                    <button class="filter-chip" type="button">Artes</button>
-                    <button class="filter-chip" type="button">Historia</button>
+                    <input type="search" class="catalog-search-input" placeholder="Buscar por libro, autor, categoría o ISBN..." aria-label="Buscar por libro, autor, categoría o ISBN">
                 </div>
             </section>
+            <section class="filters-section" aria-label="Filtros del catálogo">
+            <?php include __DIR__ . '/../../../shared/layouts/catalog-filters.php'; ?>
+            </section>
 
-            <!-- Grid de Libros (Renderizado dinámicamente por catalogo.js) -->
+            
+
             <section class="bookshelf-grid" id="bookshelf-grid"></section>
 
-            <!-- Paginación (Renderizada dinámicamente por catalogo.js) -->
             <nav class="pagination-container" aria-label="Navegación de páginas"></nav>
 
         </div>
@@ -90,6 +91,7 @@ requiereRol([1, 2]);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../../shared/js/components/navbar.js"></script>
     <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+    <script src="../../../shared/js/components/catalog-filters.js"></script>
     <script src="../../../shared/js/global.js"></script>
     <script src="catalogo.js"></script>
 </body>

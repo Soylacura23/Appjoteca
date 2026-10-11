@@ -61,9 +61,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Panel de notificaciones
-   ──────────────────────────────────────────────── */
+/* Panel de notificaciones */
 .notification-container {
     position: fixed;
     top: calc(var(--topbar-h) + 10px);
@@ -252,9 +250,7 @@
     font-weight: 500;
     color: rgba(255, 255, 255, 0.55);
     line-height: 1.45;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
     transition: color var(--ease-fast);
 }
 
@@ -272,11 +268,40 @@
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.28);
     line-height: 1.55;
+    display: block;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.notification-desc.is-collapsed {
     display: -webkit-box;
-    line-clamp: 4;
-    -webkit-line-clamp: 2;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.notification-desc.is-expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+}
+
+.notification-expand {
+    align-self: flex-start;
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--primary);
+    font: inherit;
+    font-size: 0.625rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notification-expand:hover {
+    text-decoration: underline;
 }
 
 
@@ -341,19 +366,10 @@
     opacity: 1;
 }
 
-.notification-item.expanded .notification-title,
-.notification-item:hover .notification-title {
+.notification-item.expanded .notification-title {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
-}
-
-.notification-item.expanded .notification-desc,
-.notification-item:hover .notification-desc {
-    display: block;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-    overflow: visible;
 }
 
 .notification-item.expanded {
@@ -438,28 +454,17 @@
     transition: opacity 0.2s ease, max-height 0.22s ease;
 }
 
-/* Texto completo al expandir / hover */
-.notification-item.expanded .notification-title,
-.notification-item:hover .notification-title {
+/* Título completo al expandir la notificación */
+.notification-item.expanded .notification-title {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
 }
 
-.notification-item.expanded .notification-desc,
-.notification-item:hover .notification-desc {
-    display: block;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-    overflow: visible;
-}
-
 .notification-item.expanded .notification-item-content {
     background: rgba(255, 255, 255, 0.03);
 }
-/* ────────────────────────────────────────────────
-   Responsive
-   ──────────────────────────────────────────────── */
+/* Responsive */
 @media (max-width: 399px) {
     .notification-container {
         right: 8px;

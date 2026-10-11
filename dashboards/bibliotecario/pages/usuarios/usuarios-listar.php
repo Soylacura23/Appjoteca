@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../../../backend/config/auth.php';
 require_once __DIR__ . '/../../../../backend/Database/conexion.php';
 
 require_once __DIR__ . '/../../../../backend/config/verify-csrf.php';
+requiereRol([3]);
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -19,7 +20,21 @@ $diccionario_roles = [
 
 $resultado = mysqli_query(
     $connection,
-    "SELECT id_usuario, id_rol, nombre_apellido, nombre_usuario, correo_institucional, documento, foto_perfil, foto_documento, biografia, estado, fecha_registro
+    "SELECT id_usuario, id_rol, nombre_apellido, nombre_usuario, correo_institucional, documento, foto_perfil, foto_documento, biografia, estado, fecha_registro,
+            (SELECT r.id_reserva
+             FROM reservas r
+             WHERE r.fk_id_usuario_reserva = usuarios.id_usuario
+               AND r.estado = 'activa'
+             ORDER BY r.fecha_reserva ASC, r.id_reserva ASC
+             LIMIT 1) AS id_reserva_pendiente,
+            (SELECT MIN(p.id_prestamo)
+             FROM prestamos p
+             JOIN reservas r ON r.id_reserva = p.id_reserva
+             WHERE r.fk_id_usuario_reserva = usuarios.id_usuario
+               AND p.estado IN ('activo', 'vencido')
+             GROUP BY r.id_reserva
+             ORDER BY MIN(p.fecha_devolucion_prevista) ASC
+             LIMIT 1) AS id_prestamo_activo
      FROM usuarios
      WHERE id_rol IN (1, 2)"
 );
@@ -37,7 +52,8 @@ if ($resultado) {
             'correo'         => $fila['correo_institucional'],
             'documento'      => $fila['documento'],
             'foto_perfil'    => $foto,
-            'foto_documento' => $fila['foto_documento'],
+            'id_reserva_pendiente' => $fila['id_reserva_pendiente'] ? (int) $fila['id_reserva_pendiente'] : null,
+            'id_prestamo_activo' => $fila['id_prestamo_activo'] ? (int) $fila['id_prestamo_activo'] : null,
             'biografia'      => $fila['biografia'],
             'estado'         => $fila['estado'] == 1 ? 'activo' : 'inactivo',
             'fecha_creacion' => $fila['fecha_registro']
@@ -53,6 +69,4 @@ if ($resultado) {
 
     echo json_encode(['ok' => false, 'error' => 'Error en la base de datos: ' . $error_msg], JSON_UNESCAPED_UNICODE);
 }
-
-
 

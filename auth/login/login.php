@@ -1,7 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+if (!file_exists(__DIR__ . '/../../install.lock')) {
+    header('Location: ../../install/install.php');
+    exit;
 }
+
+require_once __DIR__ . '/../../backend/config/security.php';
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -66,7 +69,11 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
         <form id="login-form" class="login-form" novalidate autocomplete="on"
               action="../../backend/auth/login-send.php" method="POST">
 
-          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+          <div class="sec-email-field" aria-hidden="true">
+            <label for="middle-name-field">Deja este campo vacío</label>
+            <input type="text" id="middle-name-field" name="middle_name" tabindex="-1" autocomplete="off">
+          </div>
           <input type="hidden" name="return_to" value="<?php
             $return_to = $_GET['return_to'] ?? '';
             echo in_array($return_to, ['catalog', 'history'], true)

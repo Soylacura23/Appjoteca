@@ -1,7 +1,7 @@
 <?php
 // back.php - Endpoint del catálogo público
 
-ini_set('display_errors', 0);          // No mostrar errores en pantalla (rompe el JSON)
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
@@ -34,15 +34,17 @@ try {
     $page      = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $materiaId = isset($_GET['materia']) ? (int)$_GET['materia'] : 0;
     $busqueda  = trim($_GET['query'] ?? '');
-    $limite    = 10;
+    $estado    = trim($_GET['availability'] ?? '');
+    $orden     = trim($_GET['sort'] ?? 'recommended');
+    $limite    = min(30, max(1, (int) ($_GET['limit'] ?? 10)));
 
     // Listado paginado del modelo
     $resultado = $modelo->listarLibrosPaginado(
         $page,
         $limite,
-        '',             
+        $estado,
         $materiaId,
-        'date-desc',
+        $orden,
         $busqueda
     );
 
@@ -61,7 +63,10 @@ try {
             'categoria'   => $libro['materia'] ?? 'Sin materia',
             'isbn'        => $libro['isbn'] ?? '',
             'disponibles' => (int) ($libro['disponibles'] ?? 0),
+            'reservados'  => (int) ($libro['reservados'] ?? 0),
+            'prestados'   => (int) ($libro['prestados'] ?? 0),
             'total'       => (int) ($libro['total_ejemplares'] ?? 0),
+            'sinopsis'    => $libro['sinopsis'] ?? '',
         ];
     }
 

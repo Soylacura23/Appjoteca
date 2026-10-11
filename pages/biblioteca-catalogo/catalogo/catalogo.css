@@ -1,7 +1,4 @@
-/* ================================================================
-   catalogo.css — Estilos para el Catálogo de Libros (AppJoteca)
-   Diseño nativo responsive utilizando variables CSS del sistema.
-   ================================================================ */
+/* catalogo.css — Estilos para el Catálogo de Libros (AppJoteca) */
 
 /* ── Layout General ── */
 .catalog-main {
@@ -43,6 +40,39 @@
     line-height: 1.6;
 }
 
+.catalog-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--sp-md);
+    color: var(--outline);
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    transition: color var(--ease-fast);
+}
+
+.catalog-back-link:hover {
+    color: var(--primary);
+}
+
+.catalog-back-link:focus-visible {
+    color: var(--primary);
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+}
+
+.catalog-back-link .material-symbols-outlined {
+    font-size: 18px;
+    transition: transform var(--ease-fast);
+}
+
+.catalog-back-link:hover .material-symbols-outlined {
+    transform: translateX(-4px);
+}
+
 /* ── Barra de búsqueda y Filtros ── */
 .catalog-filter-bar {
     background: rgba(31, 31, 31, 0.6);
@@ -55,6 +85,14 @@
     gap: var(--sp-sm);
     margin-bottom: var(--sp-2xl);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.shared-catalog-filters {
+    margin-bottom: calc(var(--sp-2xl) + var(--sp-md));
+}
+
+.catalog-filter-bar {
+    margin-bottom: var(--sp-md);
 }
 
 .search-input-wrapper {
@@ -137,6 +175,21 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
+}
+
+.catalog-book-stock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 9px;
+    margin-top: 9px;
+    color: rgba(226, 226, 226, 0.62);
+    font-size: 0.68rem;
+}
+
+.catalog-book-status {
+    flex-basis: 100%;
+    color: var(--primary, #f2ca50);
+    font-weight: 700;
 }
 
 .book-cover-wrap {

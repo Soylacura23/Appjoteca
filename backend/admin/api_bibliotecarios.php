@@ -24,9 +24,7 @@ $rolesPermitidos = [
 
 try {
 
-// ════════════════════════════════════
 // LISTAR BIBLIOTECARIOS
-// ════════════════════════════════════
 if ($action === 'listar') {
     $sql = "SELECT id_usuario, documento, nombre_apellido, correo_institucional, fecha_registro
             FROM usuarios
@@ -44,9 +42,7 @@ if ($action === 'listar') {
     exit;
 }
 
-// ════════════════════════════════════
 // LISTAR CUENTAS PENDIENTES (signup)
-// ════════════════════════════════════
 if ($action === 'listar_pendientes') {
     $sql = "SELECT u.id_usuario, u.documento, u.nombre_apellido, u.nombre_usuario,
                    u.correo_institucional, u.foto_documento, u.fecha_registro,
@@ -67,9 +63,7 @@ if ($action === 'listar_pendientes') {
     exit;
 }
 
-// ════════════════════════════════════
 // CONTAR PENDIENTES
-// ════════════════════════════════════
 if ($action === 'contar_pendientes') {
     $sql = "SELECT COUNT(*) AS total FROM usuarios WHERE estado = 'pendiente'";
     $query = $connection->prepare($sql);
@@ -80,9 +74,7 @@ if ($action === 'contar_pendientes') {
     exit;
 }
 
-// ════════════════════════════════════
 // APROBAR CUENTA PENDIENTE
-// ════════════════════════════════════
 if ($action === 'aprobar') {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
@@ -104,9 +96,7 @@ if ($action === 'aprobar') {
     exit;
 }
 
-// ════════════════════════════════════
 // RECHAZAR CUENTA PENDIENTE
-// ════════════════════════════════════
 if ($action === 'rechazar') {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
@@ -144,9 +134,7 @@ if ($action === 'rechazar') {
     exit;
 }
 
-// ════════════════════════════════════
 // CREAR USUARIO
-// ════════════════════════════════════
 if ($action === 'crear') {
     $rolRecibido      = trim($_POST['rol'] ?? '');
     $documento        = trim($_POST['documento'] ?? '');
@@ -281,9 +269,7 @@ if ($action === 'crear') {
     exit;
 }
 
-// ════════════════════════════════════
 // ELIMINAR BIBLIOTECARIO
-// ════════════════════════════════════
 if ($action === 'eliminar') {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
@@ -311,9 +297,7 @@ if ($action === 'eliminar') {
     exit;
 }
 
-// ════════════════════════════════════
 // LISTAR SOLICITUDES DE CAMBIO
-// ════════════════════════════════════
 if ($action === 'listar_solicitudes') {
     $sql = "SELECT s.id_solicitud, s.id_usuario, s.tipo, s.valor_actual, s.valor_nuevo,
                    s.estado, s.fecha_solicitud, s.comentario,
@@ -334,9 +318,7 @@ if ($action === 'listar_solicitudes') {
     exit;
 }
 
-// ════════════════════════════════════
 // RESOLVER SOLICITUD DE CAMBIO
-// ════════════════════════════════════
 if ($action === 'resolver_solicitud') {
     $id_solicitud = (int)($_POST['id_solicitud'] ?? 0);
     $decision     = $_POST['decision'] ?? ''; // aprobar | rechazar
@@ -348,7 +330,7 @@ if ($action === 'resolver_solicitud') {
     }
 
     // Traer la solicitud
-    $sql = "SELECT s.*, u.id_usuario
+    $sql = "SELECT s.id_usuario, s.tipo, s.valor_nuevo
             FROM solicitudes_cambio s
             INNER JOIN usuarios u ON u.id_usuario = s.id_usuario
             WHERE s.id_solicitud = ? AND s.estado = 'pendiente'
@@ -457,5 +439,5 @@ echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
 
 } catch (Exception $e) {
     error_log('api_bibliotecarios: ' . $e->getMessage());
-    echo json_encode(['status' => 'error', 'message' => 'Error interno del servidor', 'debug' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Error interno del servidor']);
 }

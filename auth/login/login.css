@@ -1,7 +1,4 @@
-/* ============================================================
-   login.css — Inicio de sesión · Appjoteca
-   App-shell sin scroll global · Card centrada · Coherente con signup
-   ============================================================ */
+/* login.css — Inicio de sesión · Appjoteca */
 
    * { box-sizing: border-box; }
 
@@ -25,9 +22,7 @@
      -moz-osx-font-smoothing: grayscale;
    }
    
-   /* ────────────────────────────────────────────────────────────
-      HEADER
-      ──────────────────────────────────────────────────────────── */
+   /* HEADER */
    .login-header {
      position: relative;
      height: 56px;
@@ -89,9 +84,7 @@
      transform: translateY(-1px);
    }
    
-   /* ────────────────────────────────────────────────────────────
-      SHELL
-      ──────────────────────────────────────────────────────────── */
+   /* SHELL */
    .login-body {
      display: flex;
      flex-direction: column;
@@ -112,9 +105,7 @@
      gap: 0;
    }
    
-   /* ────────────────────────────────────────────────────────────
-      PANEL FORMULARIO
-      ──────────────────────────────────────────────────────────── */
+   /* PANEL FORMULARIO */
    .login-form-panel {
      min-height: 0;
      display: flex;
@@ -163,9 +154,7 @@
      border-radius: 22px 22px 0 0;
    }
    
-   /* ────────────────────────────────────────────────────────────
-      WELCOME BADGE (sustituye stepper)
-      ──────────────────────────────────────────────────────────── */
+   /* WELCOME BADGE (sustituye stepper) */
    .welcome-badge {
      width: 56px;
      height: 56px;
@@ -193,9 +182,7 @@
      font-variation-settings: 'FILL' 0, 'wght' 500;
    }
    
-   /* ────────────────────────────────────────────────────────────
-      TÍTULO
-      ──────────────────────────────────────────────────────────── */
+   /* TÍTULO */
    .login-heading {
      display: flex;
      flex-direction: column;
@@ -223,9 +210,7 @@
      margin: 0;
    }
    
-   /* ────────────────────────────────────────────────────────────
-      FORM
-      ──────────────────────────────────────────────────────────── */
+   /* FORM */
    .login-form {
      display: flex;
      flex-direction: column;
@@ -351,9 +336,7 @@
    }
    .field-toggle-pass .material-symbols-outlined { font-size: 18px; }
    
-   /* ────────────────────────────────────────────────────────────
-      REMEMBER ME
-      ──────────────────────────────────────────────────────────── */
+   /* REMEMBER ME */
    .remember-row {
      display: flex;
      align-items: center;
@@ -415,9 +398,7 @@
      color: var(--on-surface-variant);
    }
    
-   /* ────────────────────────────────────────────────────────────
-      MENSAJES
-      ──────────────────────────────────────────────────────────── */
+   /* MENSAJES */
    .login-error,
    .login-success {
      display: flex;
@@ -461,9 +442,7 @@
      to   { opacity: 1; transform: translateY(0); }
    }
    
-   /* ────────────────────────────────────────────────────────────
-      BOTÓN PRINCIPAL
-      ──────────────────────────────────────────────────────────── */
+   /* BOTÓN PRINCIPAL */
    .btn-login {
      position: relative;
      width: 100%;
@@ -513,9 +492,7 @@
    }
    .btn-login:hover .btn-login-shine { left: 100%; }
    
-   /* ────────────────────────────────────────────────────────────
-      LINK A REGISTRO
-      ──────────────────────────────────────────────────────────── */
+   /* LINK A REGISTRO */
    .login-register-link { text-align: center; padding-top: 12px; }
    .login-register-link p {
      font-family: var(--font-body);
@@ -531,9 +508,7 @@
    }
    .login-register-link a:hover { text-decoration: underline; opacity: 0.85; }
    
-   /* ────────────────────────────────────────────────────────────
-      PANEL VISUAL
-      ──────────────────────────────────────────────────────────── */
+   /* PANEL VISUAL */
    .login-visual {
      display: none;
      position: relative;
@@ -660,9 +635,7 @@
      background: rgba(255, 255, 255, 0.28);
    }
    
-   /* ────────────────────────────────────────────────────────────
-      RESPONSIVE — por ANCHO
-      ──────────────────────────────────────────────────────────── */
+   /* RESPONSIVE — por ANCHO */
    @media (min-width: 480px) {
      .login-header-container { padding: 0 24px; }
      .login-shell { padding: 20px 24px; }
@@ -710,9 +683,7 @@
      .login-card { max-width: 500px; }
    }
    
-   /* ────────────────────────────────────────────────────────────
-      RESPONSIVE — por ALTURA
-      ──────────────────────────────────────────────────────────── */
+   /* RESPONSIVE — por ALTURA */
    @media (max-height: 820px) {
      .login-card { padding: 22px 26px 22px; }
      .welcome-badge { width: 48px; height: 48px; margin-bottom: 10px; border-radius: 14px; }
@@ -766,9 +737,7 @@
      .welcome-badge { width: 36px; height: 36px; margin-bottom: 6px; }
    }
    
-   /* ────────────────────────────────────────────────────────────
-      MATERIAL SYMBOLS BASE
-      ──────────────────────────────────────────────────────────── */
+   /* MATERIAL SYMBOLS BASE */
    .material-symbols-outlined {
      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
      line-height: 1;

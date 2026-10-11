@@ -1,11 +1,4 @@
-/* ================================================================
-   theme.css — Variables Globales, Reset & Componentes Base
-   AppJoteca v2.0
-
-   Importar PRIMERO en todas las páginas de la biblioteca.
-   Contiene: custom properties, reset, overlay, botón de perfil,
-             menú off-canvas de perfil y scrollbar.
-   ================================================================ */
+/* theme.css — Variables Globales, Reset & Componentes Base */
    :root {
     /* ── Paleta ── */
     --background:                 #000000;
@@ -90,9 +83,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Reset & Base
-   ──────────────────────────────────────────────── */
+/* Reset & Base */
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -139,9 +130,7 @@ a {
 }
 
 
-/* ────────────────────────────────────────────────
-   Overlay Global (perfil + notificaciones)
-   ──────────────────────────────────────────────── */
+/* Overlay Global (perfil + notificaciones) */
 .overlay {
     position: fixed;
     inset: 0;
@@ -160,9 +149,7 @@ a {
 }
 
 
-/* ────────────────────────────────────────────────
-   Botón de Perfil
-   ──────────────────────────────────────────────── */
+/* Botón de Perfil */
 .profile-button {
     display: flex;
     align-items: center;
@@ -209,9 +196,7 @@ a {
 }
 
 
-/* ────────────────────────────────────────────────
-   Menú Off-Canvas de Perfil
-   ──────────────────────────────────────────────── */
+/* Menú Off-Canvas de Perfil */
 .menu-off-canva {
     position: fixed;
     top: 0;
@@ -355,9 +340,7 @@ a {
 }
 
 
-/* ────────────────────────────────────────────────
-   Scrollbar personalizado
-   ──────────────────────────────────────────────── */
+/* Scrollbar personalizado */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--background); }
 ::-webkit-scrollbar-thumb {

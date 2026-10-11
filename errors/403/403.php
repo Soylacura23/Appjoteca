@@ -30,7 +30,6 @@
         </a>
     </header>
 
-    <!-- Partículas dispersas (estilo barrera/seguridad) -->
     <div class="particles-container">
         <div class="particle" style="top: 22%; left: 18%; width: 6px; height: 6px;"></div>
         <div class="particle neon" style="top: 70%; left: 22%; width: 4px; height: 4px;"></div>
@@ -40,15 +39,11 @@
         <div class="particle shield-dot" style="top: 75%; left: 12%;"></div>
     </div>
 
-    <!-- Contenido Central -->
     <main class="error-content">
-        <!-- 403 Gigante de fondo -->
         <div class="huge-403">403</div>
         
-        <!-- Ilustración SVG: Libro cerrado + Candado/Anillo de seguridad -->
         <div class="illustration-wrapper">
             <svg class="svg-glow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Grupo del Libro Cerrado -->
                 <g id="closed-book" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <!-- Cubierta del libro cerrado (Isométrico tech) -->
                     <path d="M25 35 L50 22 L75 35 L75 65 L50 78 L25 65 Z" stroke="var(--blue-accent)" fill="rgba(8, 8, 8, 0.85)"/>

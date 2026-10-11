@@ -1,11 +1,6 @@
-/* ================================================================
-   navbar.css — Componente Barra de Navegación
-   AppJoteca v2.0
-   ================================================================ */
+/* navbar.css — Componente Barra de Navegación */
 
-/* ────────────────────────────────────────────────
-   Topbar base
-   ──────────────────────────────────────────────── */
+/* Topbar base */
    .topbar {
     position: fixed;
     top: 0;
@@ -31,9 +26,7 @@
     margin: 0 auto;
 }
 
-/* ────────────────────────────────────────────────
-   Logo
-   ──────────────────────────────────────────────── */
+/* Logo */
 .topbar-logo {
     display: flex;
     align-items: center;
@@ -62,9 +55,7 @@
     text-transform: uppercase;
 }
 
-/* ────────────────────────────────────────────────
-   Search (inline - solo en desktop/tablet)
-   ──────────────────────────────────────────────── */
+/* Search (inline - solo en desktop/tablet) */
 .topbar-search {
     display: none;
     flex: 1;
@@ -110,9 +101,7 @@
     font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
 }
 
-/* ────────────────────────────────────────────────
-   Nav Links
-   ──────────────────────────────────────────────── */
+/* Nav Links */
 .topbar-nav {
     display: none;
     align-items: center;
@@ -158,9 +147,7 @@
     font-weight: 700;
 }
 
-/* ────────────────────────────────────────────────
-   Botones de acción
-   ──────────────────────────────────────────────── */
+/* Botones de acción */
 .topbar-actions {
     display: flex;
     align-items: center;
@@ -198,9 +185,7 @@
     display: flex;
 }
 
-/* ────────────────────────────────────────────────
-   Búsqueda expandible en móvil
-   ──────────────────────────────────────────────── */
+/* Búsqueda expandible en móvil */
 .topbar-search-mobile {
     overflow: hidden;
     max-height: 0;
@@ -216,6 +201,8 @@
     max-height: 76px;
     padding: 12px 16px;
     border-top-color: rgba(255, 255, 255, 0.05);
+    overflow: visible;
+    z-index: 1001;
 }
 
 .topbar-search-mobile input {
@@ -245,9 +232,7 @@
     padding-top: 62px;
 }
 
-/* ================================================================
-   Responsive
-   ================================================================ */
+/* Responsive */
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {
@@ -343,9 +328,7 @@
 }
 
 
-/* ================================================================
-   Menú Hamburguesa — Botón
-   ================================================================ */
+/* Menú Hamburguesa — Botón */
 
 /* Visible sólo en móvil */
 .menu-toggle-btn {
@@ -360,9 +343,7 @@
 }
 
 
-/* ================================================================
-   Menú Móvil — Overlay + Drawer
-   ================================================================ */
+/* Menú Móvil — Overlay + Drawer */
 
 /* Bloquear scroll del body cuando el menú está abierto */
 body.menu-open {

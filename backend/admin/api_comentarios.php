@@ -4,8 +4,16 @@ ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
 require_once __DIR__ . '/../Database/conexion.php';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
+    exit;
+}
+
+requiereRol([4]);
 
 $action = $_POST['action'] ?? '';
 

@@ -4,6 +4,34 @@
 .hero-section{
   margin-bottom: 48px;
 }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(242, 202, 80, 0.42);
+  border-radius: 8px;
+  padding: 9px 13px;
+  background: rgba(242, 202, 80, 0.08);
+  color: var(--primary, #f2ca50);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: rgba(242, 202, 80, 0.16);
+  border-color: rgba(242, 202, 80, 0.7);
+}
+
+.history-more {
+  margin-top: 12px;
+  align-self: flex-start;
+}
 .hero-content{
   width: 100%;
 }
@@ -247,7 +275,7 @@ img.hero-background{
   border-left: 5px solid var(--error);
 }
 
-/* --- NUEVO: Ajuste para celulares --- */
+/* NUEVO: Ajuste para celulares */
 @media (max-width: 600px) {
   .stat-card {
     padding: 20px; /* Forzamos un espaciado fijo en móvil */

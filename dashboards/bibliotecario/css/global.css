@@ -1,6 +1,4 @@
-/* =========================================
-   SIDEBAR Y LAYOUT PRINCIPAL
-   ========================================= */
+/* SIDEBAR Y LAYOUT PRINCIPAL */
 .sidebar {
     position: fixed;
     left: 0;
@@ -124,9 +122,7 @@
     }
   }
   
-  /* =========================================
-   Comportamiento móvil del Sidebar
-   ========================================= */
+  /* Comportamiento móvil del Sidebar */
    @media (max-width: 1024px) {
     .sidebar {
       display: block !important; 

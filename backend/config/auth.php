@@ -1,21 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start([
-        'cookie_lifetime' => 0,                     
-        'cookie_path'     => '/Appjoteca',           
-        'cookie_domain'   => '/',            
-        'cookie_secure'   => false,                  
-        'cookie_httponly' => true,                   
-        'cookie_samesite' => 'Lax'                   
-    ]);
-}
+require_once __DIR__ . '/security.php';
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache"); 
 header("Expires: 0"); 
 
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: ../../auth/login/login.php");
+if ((int) ($_SESSION['usuario_id'] ?? 0) <= 0) {
+    header('Location: /Appjoteca/auth/login/login.php');
     exit();
 }
 
@@ -23,11 +14,11 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$mi_rol_num = $_SESSION['rol'];
+$mi_rol_num = (int) ($_SESSION['rol'] ?? 0);
 
 function requiereRol(array $roles) {
     global $mi_rol_num;
-    if (!in_array($mi_rol_num, $roles)) {
+    if (!in_array($mi_rol_num, $roles, true)) {
         http_response_code(403);
         require __DIR__ . '/../../errors/403/403.php';
         exit();

@@ -44,9 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return window.getCSRFToken ? window.getCSRFToken() : (document.querySelector('meta[name="csrf-token"]')?.content || '');
     }
 
-    // ════════════════════════════════════
     // 1. Foto de perfil (preview + confirmar + eliminar)
-    // ════════════════════════════════════
     if (avatarEditBtn && avatarInput) {
         avatarEditBtn.addEventListener('click', function () {
             avatarInput.click();
@@ -149,9 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 2. Guardar nombre de usuario
-    // ════════════════════════════════════
     if (saveUsernameBtn) {
         saveUsernameBtn.addEventListener('click', function () {
             const nuevo = usernameInput.value.trim();
@@ -187,9 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 3. Mostrar / ocultar contraseñas
-    // ════════════════════════════════════
     document.querySelectorAll('.toggle-password').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const input = document.getElementById(this.dataset.target);
@@ -206,9 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ════════════════════════════════════
     // 4. Fortaleza de contraseña
-    // ════════════════════════════════════
     if (newPass) {
         newPass.addEventListener('input', function () {
             const v = this.value;
@@ -244,9 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 5. Coincidencia de contraseñas
-    // ════════════════════════════════════
     if (confirmPass) {
         confirmPass.addEventListener('input', function () {
             if (!newPass.value || !this.value) {
@@ -264,9 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 6. Actualizar contraseña
-    // ════════════════════════════════════
     if (updatePassBtn) {
         updatePassBtn.addEventListener('click', function (e) {
             e.preventDefault();
@@ -322,9 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 7. Solicitudes al administrador
-    // ════════════════════════════════════
     requestBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             const tipo = this.dataset.request;
@@ -382,9 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ════════════════════════════════════
     // 8. Solicitar eliminación de cuenta
-    // ════════════════════════════════════
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', function () {
             Swal.fire({

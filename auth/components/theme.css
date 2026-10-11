@@ -1,10 +1,7 @@
-/* ============================================================
-   theme.css — Variables y base compartida para Login / Registro
-   Appjoteca · Sistema de Biblioteca Institucional
-   ============================================================ */
+/* theme.css — Variables y base compartida para Login / Registro */
 
    :root {
-    /* ── Colores superficie ─────────────────────────── */
+    /* Colores superficie */
     --background:                 #050505;
     --surface:                    #0a0a0a;
     --surface-container-lowest:   #050505;
@@ -15,7 +12,7 @@
     --surface-bright:             #1e1e1e;
     --surface-variant:            #222222;
   
-    /* ── Primario (dorado) ──────────────────────────── */
+    /* Primario (dorado) */
     --primary:             #f2ca50;
     --primary-dark:        #d4af37;
     --primary-fixed:       #ffe088;
@@ -24,26 +21,26 @@
     --on-primary-fixed:    #241a00;
     --primary-container:   #d4af37;
   
-    /* ── Texto ──────────────────────────────────────── */
+    /* Texto */
     --on-surface:          #e2e2e2;
     --on-surface-variant:  #d0c5af;
     --on-background:       #e2e2e2;
   
-    /* ── Bordes y outlines ──────────────────────────── */
+    /* Bordes y outlines */
     --outline:             #99907c;
     --outline-variant:     #4d4635;
   
-    /* ── Estado error ───────────────────────────────── */
+    /* Estado error */
     --error:               #ffb4ab;
     --error-container:     #93000a;
     --on-error-container:  #ffdad6;
   
-    /* ── Tipografía ─────────────────────────────────── */
+    /* Tipografía */
     --font-headline: "Noto Serif", Georgia, serif;
     --font-body:     "Manrope", system-ui, sans-serif;
     --font-label:    "Manrope", system-ui, sans-serif;
   
-    /* ── Espaciado ──────────────────────────────────── */
+    /* Espaciado */
     --sp-xs:  4px;
     --sp-sm:  8px;
     --sp-md:  16px;
@@ -54,7 +51,7 @@
     /* Padding horizontal global (responsive) */
     --px: 20px;
   
-    /* ── Radio de borde ─────────────────────────────── */
+    /* Radio de borde */
     --radius-sm:   2px;
     --radius-md:   4px;
     --radius-lg:   8px;
@@ -62,17 +59,17 @@
     --radius-2xl:  24px;
     --radius-full: 9999px;
   
-    /* ── Transiciones ───────────────────────────────── */
+    /* Transiciones */
     --transition-fast:   0.2s ease;
     --transition-medium: 0.3s ease;
     --transition-slow:   0.5s cubic-bezier(0.32, 0.72, 0, 1);
   
-    /* ── Sombras ────────────────────────────────────── */
+    /* Sombras */
     --shadow-primary:        0 4px 20px rgba(242, 202, 80, 0.15);
     --shadow-primary-strong: 0 8px 32px rgba(242, 202, 80, 0.28);
   }
   
-  /* ── Reset base ─────────────────────────────────────── */
+  /* Reset base */
   *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -115,7 +112,7 @@
     font-family: inherit;
   }
   
-  /* ── Material Symbols base ──────────────────────────── */
+  /* Material Symbols base */
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     line-height: 1;
@@ -124,7 +121,7 @@
     font-style: normal;
   }
   
-  /* ── Scrollbar ──────────────────────────────────────── */
+  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--background); }
   ::-webkit-scrollbar-thumb {
@@ -133,8 +130,18 @@
   }
   ::-webkit-scrollbar-thumb:hover { background: var(--outline-variant); }
   
-  /* ── Selección ──────────────────────────────────────── */
+  /* Selección */
   ::selection {
     background: rgba(242, 202, 80, 0.25);
     color: var(--primary);
   }
+/* Auxiliary field kept outside the visible form layout. */
+.sec-email-field {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}

@@ -175,9 +175,17 @@ El repositorio incluye un archivo llamado `appjoteca.sql` que contiene toda la e
    DB_USER=tu_usuario_de_mysql
    DB_PASS=tu_contraseña_de_mysql
    DB_NAME=nombre_de_tu_base_de_datos
+   SMTP_USER=cuenta-smtp
+   SMTP_PASS=clave-smtp
    ```
 
    > 💡 **Nota:** Si usas XAMPP por defecto, el usuario suele ser `root` y la contraseña se deja en blanco.
+
+### Seguridad de despliegue
+
+- La aplicación redirige a HTTPS fuera de `localhost` y configura cookies `Secure`, cabeceras de seguridad y HSTS cuando la petición ya usa TLS. En producción, termina TLS en Apache o en un proxy de confianza y configura la aplicación para que PHP reciba la conexión como HTTPS.
+- Configura `SMTP_USER` y `SMTP_PASS` únicamente en el entorno o en `.env` local, nunca en el código ni en el repositorio.
+- En producción, crea un usuario MySQL dedicado para la aplicación. Concédele solo los permisos DML que requieran sus consultas (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) sobre la base de datos de Appjoteca; reserva permisos DDL y administración para una cuenta separada usada durante migraciones. No despliegues con `root`.
 
 ### 5. Iniciar la Aplicación
 
@@ -229,4 +237,3 @@ Este proyecto cobra vida gracias al equipo de la Media Técnica en Desarrollo de
 ## 📄 Licencia
 
 Este proyecto fue desarrollado con fines académicos. Distribuido bajo la **Licencia Apache 2.0**. Para más detalles, consulta el archivo [LICENSE](LICENSE) correspondiente.
-

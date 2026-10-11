@@ -1,13 +1,4 @@
-/* ================================================================
-   related-section.css — Componente: Libros Relacionados
-   AppJoteca v2.0
-
-   Requiere: theme.css, book-card.css (estilos de .book-card)
-   ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Sección contenedora
-   ──────────────────────────────────────────────── */
+/* Sección contenedora */
    .related-section {
     margin-top: var(--sp-2xl, 64px);
     padding-top: var(--sp-2xl, 64px);
@@ -77,10 +68,51 @@
     gap: 28px 14px;
 }
 
+.related-grid .book-cover-wrapper {
+    width: 100%;
+    max-width: 200px;    
+    margin: 0 auto;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+    background: var(--surface-container-highest);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
 
-/* ════════════════════════════════════════════════
-   RESPONSIVE
-   ════════════════════════════════════════════════ */
+.related-grid .book-card:hover .book-cover-wrapper {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.75),
+                0 0 24px rgba(242, 202, 80, 0.08);
+}
+
+.related-grid .book-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.related-grid .book-card:hover .book-cover {
+    transform: scale(1.05);
+}
+
+.related-grid .book-info {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.related-grid .book-title {
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.related-grid .book-author {
+    font-size: 0.75rem;
+    color: var(--outline);
+}
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {
@@ -117,5 +149,14 @@
 @media (max-width: 399px) {
     .related-grid {
         gap: 18px 8px;
+    }
+}
+@media (max-width: 599px) {
+    .related-grid .book-cover-wrapper {
+        max-width: 100%;
+    }
+
+    .related-grid .book-title {
+        font-size: 0.8125rem;
     }
 }

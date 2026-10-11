@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let coautores = [];
     let portadaUrlTemp = null;
 
-    // ====================== HELPERS ======================
+    // HELPERS
     function toast(msg, tipo = 'info') {
         const iconos = { success: 'check_circle', error: 'error', info: 'info' };
         const div = document.createElement('div');
         div.className = 'toast ' + tipo;
         div.innerHTML = `
             <span class="material-symbols-outlined toast-icon">${iconos[tipo] || 'info'}</span>
-            <span class="toast-msg">${msg}</span>`;
+            <span class="toast-msg">${esc(msg)}</span>`;
         document.getElementById('toast-container').appendChild(div);
         setTimeout(() => {
             div.style.opacity = '0';
@@ -27,9 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function esc(texto) {
-        const d = document.createElement('div');
-        d.textContent = texto || '';
-        return d.innerHTML;
+        return String(texto ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     async function get(action, params = {}) {
@@ -45,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return res.json();
     }
 
-    // ====================== CATÁLOGOS ======================
+    // CATÁLOGOS
     async function cargarCatalogos() {
         try {
             const data = await get('catalogos');
@@ -54,14 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
             catalogos = data.data;
 
             llenarSelect('detail-category-input', catalogos.materias, 'Selecciona materia');
-            llenarSelect('detail-publisher-input', catalogos.editoriales, 'Selecciona o escribe');
             llenarSelect('detail-material-type', catalogos.tipos, 'Tipo de material');
             llenarSelect('detail-location-input', catalogos.colecciones, 'Selecciona colección');
-            llenarSelect('detail-language', catalogos.idiomas, 'Selecciona o escribe');
+            llenarDatalist('publisher-options', catalogos.editoriales);
+            llenarDatalist('language-options', catalogos.idiomas);
 
             const filtro = document.getElementById('filter-category');
-            filtro.innerHTML = '<option value="">Todas</option>' +
-                catalogos.materias.map(m => `<option value="${m.id}">${m.nombre}</option>`).join('');
+            filtro.replaceChildren(new Option('Todas', ''));
+            catalogos.materias.forEach(m => filtro.add(new Option(m.nombre, String(m.id))));
         } catch (e) {
             console.error(e);
             toast('No se pudieron cargar los catálogos', 'error');
@@ -71,11 +74,27 @@ document.addEventListener('DOMContentLoaded', function () {
     function llenarSelect(id, items, placeholder) {
         const sel = document.getElementById(id);
         if (!sel) return;
-        sel.innerHTML = (placeholder ? `<option value="">${placeholder}</option>` : '') +
-            items.map(it => `<option value="${it.id}">${it.nombre}</option>`).join('');
+        sel.replaceChildren();
+        if (placeholder) sel.add(new Option(placeholder, ''));
+        items.forEach(it => sel.add(new Option(it.nombre, String(it.id))));
     }
 
-    // ====================== LISTADO ======================
+    function llenarDatalist(id, items) {
+        const lista = document.getElementById(id);
+        if (!lista) return;
+        lista.replaceChildren(...items.map(item => {
+            const option = document.createElement('option');
+            option.value = item.nombre;
+            return option;
+        }));
+    }
+
+    function idCatalogoPorNombre(items, nombre) {
+        const encontrado = items.find(item => item.nombre.trim().toLocaleLowerCase() === nombre.trim().toLocaleLowerCase());
+        return encontrado ? String(encontrado.id) : '';
+    }
+
+    // LISTADO
     async function cargarLibros(pagina = 1) {
         paginaActual = pagina;
 
@@ -141,9 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const [txt, cls] = estadoDe(l);
             const portada = l.portada || 'assets/images/books/default-cover.jpg';
             return `
-            <article class="book-card" data-id="${l.id_libro}" role="listitem" tabindex="0">
+            <article class="book-card" data-id="${Number(l.id_libro) || 0}" role="listitem" tabindex="0">
                 <div class="book-image-wrap">
-                    <img src="/Appjoteca/${portada}" alt="Portada de ${esc(l.titulo)}" loading="lazy"
+                    <img src="/Appjoteca/${esc(portada)}" alt="Portada de ${esc(l.titulo)}" loading="lazy"
                          onerror="this.src='/Appjoteca/assets/images/books/default-cover.jpg'">
                 </div>
                 <div class="book-info">
@@ -156,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <h3 class="book-title">${esc(l.titulo)}</h3>
                     <p class="book-author">${esc(l.autores || 'Autor desconocido')}</p>
                     <div class="book-meta">
-                        <span class="book-copies"><strong>${l.disponibles || 0}</strong> / ${l.total_ejemplares || 0}</span>
+                        <span class="book-copies"><strong>${Number(l.disponibles) || 0}</strong> / ${Number(l.total_ejemplares) || 0}</span>
                         <span class="book-status-tag ${cls}">${txt}</span>
                     </div>
                 </div>
@@ -206,19 +225,13 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // ====================== DETALLE ======================
+    // DETALLE
     async function abrirDetalle(id = null) {
         esNuevo = (id === null);
         coautores = [];
         portadaUrlTemp = null;
         renderCoautores();
         document.getElementById('detail-cover-file').value = '';
-
-        // Limpiar textos libres
-        const edText = document.getElementById('detail-publisher-text');
-        const idText = document.getElementById('detail-language-text');
-        if (edText) edText.value = '';
-        if (idText) idText.value = '';
 
         if (esNuevo) {
             libroActual = null;
@@ -233,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
             resetCover();
             resetHealth();
             resetEjemplares();
+            mostrarHistorial([], 'Guarda el libro para comenzar a registrar su actividad.');
         } else {
             try {
                 const data = await get('obtener', { id: id });
@@ -250,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('book-detail-overlay').hidden = false;
         document.body.style.overflow = 'hidden';
+        if (!esNuevo && libroActual) cargarHistorial(libroActual.id_libro);
     }
 
     function fillForm(l) {
@@ -275,9 +290,11 @@ document.addEventListener('DOMContentLoaded', function () {
         actualizarContadorSinopsis();
 
         document.getElementById('detail-category-input').value  = l.id_materia || '';
-        document.getElementById('detail-publisher-input').value = l.id_editorial || '';
+        const editorial = catalogos.editoriales.find(item => String(item.id) === String(l.id_editorial));
+        document.getElementById('detail-publisher-input').value = editorial?.nombre || '';
         document.getElementById('detail-material-type').value   = l.id_tipo_material || '';
-        document.getElementById('detail-language').value        = l.idioma || '';
+        const idioma = catalogos.idiomas.find(item => String(item.id) === String(l.idioma_id || l.idioma));
+        document.getElementById('detail-language').value = idioma?.nombre || l.idioma || '';
 
         coautores = (l.autores_array || []).slice(1);
         renderCoautores();
@@ -294,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fillEjemplares(l.ejemplares || []);
     }
 
-    // ====================== GUARDAR ======================
+    // GUARDAR
     async function guardarLibro() {
         const titulo      = document.getElementById('detail-title-input').value.trim();
         const autor       = document.getElementById('detail-author-input').value.trim();
@@ -322,22 +339,20 @@ document.addEventListener('DOMContentLoaded', function () {
         fd.append('sinopsis', document.getElementById('detail-synopsis-input').value.trim());
         fd.append('id_coleccion', idColeccion);
 
-        // Editorial: select o texto libre
-        const edSelect = document.getElementById('detail-publisher-input');
-        const edText   = document.getElementById('detail-publisher-text');
-        if (edSelect && edSelect.value) {
-            fd.append('id_editorial', edSelect.value);
-        } else if (edText && edText.value.trim()) {
-            fd.append('editorial_texto', edText.value.trim());
+        const editorial = document.getElementById('detail-publisher-input').value.trim();
+        const idEditorial = idCatalogoPorNombre(catalogos.editoriales, editorial);
+        if (idEditorial) {
+            fd.append('id_editorial', idEditorial);
+        } else if (editorial) {
+            fd.append('editorial_texto', editorial);
         }
 
-        // Idioma: select o texto libre
-        const idSelect = document.getElementById('detail-language');
-        const idText   = document.getElementById('detail-language-text');
-        if (idSelect && idSelect.value) {
-            fd.append('idioma_id', idSelect.value);
-        } else if (idText && idText.value.trim()) {
-            fd.append('idioma_texto', idText.value.trim());
+        const idioma = document.getElementById('detail-language').value.trim();
+        const idIdioma = idCatalogoPorNombre(catalogos.idiomas, idioma);
+        if (idIdioma) {
+            fd.append('idioma_id', idIdioma);
+        } else if (idioma) {
+            fd.append('idioma_texto', idioma);
         }
 
         [autor, ...coautores].forEach(a => fd.append('autores[]', a));
@@ -372,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ====================== ELIMINAR ======================
+    // ELIMINAR
     async function eliminarLibro() {
         if (!libroActual) return;
 
@@ -402,7 +417,56 @@ document.addEventListener('DOMContentLoaded', function () {
         libroActual = null;
     }
 
-    // ====================== PORTADA ======================
+    function mostrarHistorial(movimientos, vacio = 'No hay actividad registrada para este libro.') {
+        const timeline = document.getElementById('history-timeline');
+        if (!movimientos.length) {
+            timeline.innerHTML = `<div class="history-empty"><span class="material-symbols-outlined">history</span><p>${esc(vacio)}</p></div>`;
+            return;
+        }
+
+        const etiquetas = {
+            reservado: ['Reservado', 'event-reserved'],
+            reserva_rechazada: ['Reserva rechazada', 'event-cancelled'],
+            reserva_cancelada: ['Reserva cancelada', 'event-cancelled'],
+            prestado: ['Prestado', 'event-loaned'],
+            vencido: ['Préstamo vencido', 'event-cancelled'],
+            devuelto: ['Devuelto', 'event-returned']
+        };
+        timeline.innerHTML = movimientos.map(movimiento => {
+            const [etiqueta, clase] = etiquetas[movimiento.actividad] || ['Actividad', ''];
+            const fecha = movimiento.fecha ? new Date(movimiento.fecha.replace(' ', 'T')).toLocaleDateString() : 'Fecha desconocida';
+            return `
+                <article class="history-event ${clase}">
+                    <div class="history-event-heading">
+                        <span class="history-event-label">${esc(etiqueta)}</span>
+                        <time>${esc(fecha)}</time>
+                    </div>
+                    <div class="history-event-detail">${esc(movimiento.usuario || 'Usuario')} · ${esc(movimiento.detalle || '')} · ${Number(movimiento.cantidad) || 1} ${Number(movimiento.cantidad) === 1 ? 'ejemplar' : 'ejemplares'}</div>
+                    ${movimiento.observacion ? `<div class="history-event-note">${esc(movimiento.observacion)}</div>` : ''}
+                </article>`;
+        }).join('');
+    }
+
+    async function cargarHistorial(idLibro) {
+        const timeline = document.getElementById('history-timeline');
+        timeline.innerHTML = '<div class="history-loading"><span class="skeleton-line"></span><span class="skeleton-line"></span></div>';
+        try {
+            const data = await get('historial', { id: idLibro });
+            if (data.status !== 'success' || !Array.isArray(data.data)) {
+                throw new Error(data.mensaje || 'No se pudo cargar el historial del libro');
+            }
+            if (libroActual && String(libroActual.id_libro) === String(idLibro)) {
+                mostrarHistorial(data.data);
+            }
+        } catch (error) {
+            console.error(error);
+            if (libroActual && String(libroActual.id_libro) === String(idLibro)) {
+                mostrarHistorial([], 'No se pudo cargar el historial. Intenta abrir el libro nuevamente.');
+            }
+        }
+    }
+
+    // PORTADA
     function resetCover() {
         document.getElementById('detail-cover-img').hidden = true;
         document.getElementById('detail-cover-img').src = '';
@@ -426,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function () {
         grid.innerHTML = portadas.map((p, i) => `
             <button type="button" class="cover-option" data-url="${esc(p.url)}">
                 <img src="${esc(p.url)}" alt="${esc(p.titulo)}" loading="lazy">
-                <span>${esc(p.titulo)}${p.anio ? ' (' + p.anio + ')' : ''}</span>
+                <span>${esc(p.titulo)}${p.anio ? ' (' + esc(p.anio) + ')' : ''}</span>
             </button>
         `).join('');
 
@@ -444,7 +508,19 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.hidden = false;
     }
 
-    // ====================== COAUTORES ======================
+    function mostrarCargaPortadas() {
+        const modal = document.getElementById('cover-select-modal');
+        const grid = document.getElementById('cover-select-grid');
+        grid.innerHTML = Array.from({ length: 6 }, () => `
+            <div class="cover-skeleton" aria-hidden="true">
+                <span class="cover-skeleton-image"></span>
+                <span class="cover-skeleton-line"></span>
+            </div>
+        `).join('');
+        modal.hidden = false;
+    }
+
+    // COAUTORES
     function renderCoautores() {
         const lista = document.getElementById('coauthors-list');
         lista.innerHTML = coautores.map((c, i) => `
@@ -460,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ====================== SALUD / EJEMPLARES ======================
+    // SALUD / EJEMPLARES
     function resetHealth() {
         ['health-total', 'health-available', 'health-borrowed', 'health-out'].forEach(id => {
             const el = document.getElementById(id);
@@ -497,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('exemplars-tbody').innerHTML = ejemplares.map(e => `
             <tr>
-                <td class="exemplar-id">EJ-${String(e.id_ejemplar).padStart(4, '0')}</td>
+                <td class="exemplar-id">EJ-${String(Number(e.id_ejemplar) || 0).padStart(4, '0')}</td>
                 <td>${esc(e.estado)}</td>
             </tr>`).join('');
     }
@@ -507,22 +583,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (cont) cont.textContent = document.getElementById('detail-synopsis-input').value.length;
     }
 
-    // ====================== EVENTOS ======================
-
-    // Búsqueda expandible móvil (mismo comportamiento que las demás páginas)
-    const searchToggle = document.getElementById('search-toggle-btn');
-    const searchMobile = document.getElementById('topbar-search-mobile');
-    if (searchToggle && searchMobile) {
-        searchToggle.addEventListener('click', () => {
-            const isOpen = searchMobile.classList.toggle('open');
-            searchToggle.setAttribute('aria-expanded', isOpen);
-            searchMobile.setAttribute('aria-hidden', !isOpen);
-            if (isOpen) {
-                const input = searchMobile.querySelector('input');
-                if (input) input.focus();
-            }
-        });
-    }
+    // EVENTOS
 
     document.getElementById('add-book-btn').addEventListener('click', () => abrirDetalle());
     document.getElementById('empty-add-btn').addEventListener('click', () => abrirDetalle());
@@ -580,41 +641,48 @@ document.addEventListener('DOMContentLoaded', function () {
     // Buscar varias portadas
     document.getElementById('btn-buscar-portada')?.addEventListener('click', async () => {
         const titulo = document.getElementById('detail-title-input').value.trim();
-        if (!titulo) return toast('Escribe el título primero', 'error');
+        const isbn = document.getElementById('detail-isbn-input').value.trim();
+        const autor = document.getElementById('detail-author-input').value.trim();
+        if (!titulo && !isbn) return toast('Escribe el título o el ISBN primero', 'error');
 
-        toast('Buscando portadas...', 'info');
+        const boton = document.getElementById('btn-buscar-portada');
+        boton.disabled = true;
+        mostrarCargaPortadas();
         try {
-            const data = await get('buscar_portada', { titulo });
+            const data = await get('buscar_portada', { titulo, isbn, autor });
             if (data.status === 'success' && data.data?.portadas?.length) {
                 mostrarSelectorPortadas(data.data.portadas);
             } else {
+                document.getElementById('cover-select-modal').hidden = true;
                 toast(data.mensaje || 'No se encontraron portadas', 'error');
             }
         } catch (e) {
+            document.getElementById('cover-select-modal').hidden = true;
             toast('Error al buscar portadas', 'error');
+        } finally {
+            boton.disabled = false;
         }
     });
 
     // Generar sinopsis
     document.getElementById('btn-generar-sinopsis')?.addEventListener('click', async () => {
         const titulo = document.getElementById('detail-title-input').value.trim();
-        if (!titulo) return toast('Escribe el título primero', 'error');
+        const isbn = document.getElementById('detail-isbn-input').value.trim();
+        const autor = document.getElementById('detail-author-input').value.trim();
+        if (!titulo && !isbn) return toast('Escribe el título o el ISBN primero', 'error');
 
         let lang = 'es';
-        const idIdioma = document.getElementById('detail-language').value;
-        if (idIdioma) {
-            const found = catalogos.idiomas.find(i => String(i.id) === String(idIdioma));
-            if (found) {
-                const n = found.nombre.toLowerCase();
-                if (n.includes('inglés') || n.includes('english')) lang = 'en';
-                else if (n.includes('francés')) lang = 'fr';
-                else if (n.includes('portugués')) lang = 'pt';
-            }
-        }
+        const nombreIdioma = document.getElementById('detail-language').value.toLocaleLowerCase();
+        if (nombreIdioma.includes('inglés') || nombreIdioma.includes('english')) lang = 'en';
+        else if (nombreIdioma.includes('francés') || nombreIdioma.includes('français')) lang = 'fr';
+        else if (nombreIdioma.includes('portugués') || nombreIdioma.includes('português')) lang = 'pt';
+        else if (nombreIdioma.includes('alemán') || nombreIdioma.includes('deutsch')) lang = 'de';
 
+        const boton = document.getElementById('btn-generar-sinopsis');
+        boton.disabled = true;
         toast('Generando sinopsis...', 'info');
         try {
-            const data = await get('generar_sinopsis', { titulo, idioma: lang });
+            const data = await get('generar_sinopsis', { titulo, isbn, autor, idioma: lang });
             if (data.status === 'success' && data.data?.sinopsis) {
                 document.getElementById('detail-synopsis-input').value = data.data.sinopsis;
                 actualizarContadorSinopsis();
@@ -624,6 +692,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (e) {
             toast('Error al generar sinopsis', 'error');
+        } finally {
+            boton.disabled = false;
         }
     });
 
@@ -653,7 +723,14 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('cover-select-modal').hidden = true;
     });
 
-    // ====================== INICIO ======================
-    cargarCatalogos();
+    // INICIO
+    const parametrosBusqueda = new URLSearchParams(window.location.search);
+    const idLibroSolicitado = Number(parametrosBusqueda.get('open_book'));
+    if (Number.isInteger(idLibroSolicitado) && idLibroSolicitado > 0) {
+        cargarCatalogos().then(() => abrirDetalle(idLibroSolicitado));
+        window.history.replaceState({}, '', window.location.pathname);
+    } else {
+        cargarCatalogos();
+    }
     cargarLibros(1);
 });

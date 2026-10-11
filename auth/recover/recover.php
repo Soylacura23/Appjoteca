@@ -1,7 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+if (!file_exists(__DIR__ . '/../../install.lock')) {
+    header('Location: ../../install/install.php');
+    exit;
 }
+
+require_once __DIR__ . '/../../backend/config/security.php';
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -11,7 +14,7 @@ if (empty($_SESSION['csrf_token'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
+  <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
   <title>Recuperar Acceso en AppJoteca</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,9 +31,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 <body>
 
-  <!-- ════════════════════════════════════════════════════════
-       HEADER FIJO
-       ════════════════════════════════════════════════════════ -->
+  <!-- HEADER FIJO -->
   <header class="recover-header" role="banner">
     <div class="recover-header-container">
          <a href="../../index.php" class="logo-link">
@@ -43,9 +44,7 @@ if (empty($_SESSION['csrf_token'])) {
     </div>
   </header>
 
-  <!-- ════════════════════════════════════════════════════════
-       BARRA DE REGRESO (debajo del header fijo)
-       ════════════════════════════════════════════════════════ -->
+  <!-- BARRA DE REGRESO (debajo del header fijo) -->
   <div class="back-bar">
     <a href="../login/login.php" class="btn-back" aria-label="Volver a iniciar sesión">
       <span class="material-symbols-outlined">arrow_back</span>
@@ -53,9 +52,7 @@ if (empty($_SESSION['csrf_token'])) {
     </a>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       SHELL PRINCIPAL — Single global scroll
-       ════════════════════════════════════════════════════════ -->
+  <!-- SHELL PRINCIPAL — Single global scroll -->
   <main class="recover-shell" role="main">
 
     <!-- ── Panel del formulario (izquierda en desktop, arriba en móvil) ── -->
@@ -71,6 +68,10 @@ if (empty($_SESSION['csrf_token'])) {
         <!-- ── Formulario ── -->
         <form id="recover-form" class="recover-form" novalidate autocomplete="on" action="../../backend/auth/procesarecover.php" method="POST">
 
+          <div class="sec-email-field" aria-hidden="true">
+            <label for="middle-name-field">Deja este campo vacío</label>
+            <input type="text" id="middle-name-field" name="middle_name" tabindex="-1" autocomplete="off">
+          </div>
           
           <!-- ── PASO 1: Correo institucional ── -->
           <section class="recover-step" id="step-1" aria-label="Paso 1: Identifica tu cuenta">

@@ -50,9 +50,9 @@ async function loadSuggestedBooks() {
 
     // Inyectar HTML de las tarjetas
     container.innerHTML = books.map(book => `
-      <article class="book-card" data-id="${book.id || ''}">
+      <article class="book-card" data-id="${Number(book.id) || 0}">
         <div class="book-cover">
-          <img src="${book.portada_url || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800'}" 
+          <img src="${escapeHtml(book.portada_url || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800')}"
                alt="${escapeHtml(book.titulo)}" 
                loading="lazy">
         </div>

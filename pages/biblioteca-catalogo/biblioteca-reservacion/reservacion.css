@@ -1,14 +1,6 @@
-/* ================================================================
-   reservacion.css — Página de Reservación
-   AppJoteca v2.0
+/* reservacion.css — Página de Reservación */
 
-   Requiere: theme.css, navbar.css, notifications.css,
-             footer.css, recommended-books.css
-   ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Layout principal
-   ──────────────────────────────────────────────── */
+/* Layout principal */
    .reservacion-main {
     padding-top: var(--topbar-h, 62px);
     min-height: 100vh;
@@ -21,9 +13,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Botón volver
-   ──────────────────────────────────────────────── */
+/* Botón volver */
 .back-btn {
     display: inline-flex;
     align-items: center;
@@ -56,9 +46,7 @@
 }
 
 
-/* ════════════════════════════════════════════════
-   LAYOUT: Portada aside + Formulario
-   ════════════════════════════════════════════════ */
+/* LAYOUT: Portada aside + Formulario */
 .reservation-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -462,9 +450,76 @@
     margin: 0;
 }
 
-/* ════════════════════════════════════════════════
-   RESPONSIVE
-   ════════════════════════════════════════════════ */
+/* Bloque de reserva pendiente */
+.pending-note {
+    font-family: var(--font-body, "Manrope", sans-serif);
+    font-size: 0.875rem;
+    color: var(--on-surface-variant, rgba(255,255,255,0.65));
+    line-height: 1.65;
+    margin-bottom: var(--sp-md, 16px);
+    padding: 14px 16px;
+    background: rgba(242, 202, 80, 0.04);
+    border-left: 3px solid rgba(242, 202, 80, 0.5);
+    border-radius: 8px;
+}
+
+.pending-note strong {
+    color: var(--primary, #f2ca50);
+}
+
+.reservation-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-md, 16px);
+    padding: var(--sp-md, 16px);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    margin-bottom: var(--sp-md, 16px);
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.summary-label {
+    font-family: var(--font-body, "Manrope", sans-serif);
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--outline, rgba(255,255,255,0.35));
+}
+
+.summary-value {
+    font-family: var(--font-body, "Manrope", sans-serif);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--on-surface, #e2e2e2);
+}
+
+/* Botón cancelar reserva (reutiliza estilo btn-secondary) */
+.btn-cancelar-reserva {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-cancelar-reserva .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* Badge unavailable (por si no lo tenías) */
+.aside-badge.unavailable {
+    background: rgba(255, 180, 171, 0.08);
+    color: var(--error, #ffb4ab);
+    border: 1px solid rgba(255, 180, 171, 0.18);
+}
+/* RESPONSIVE */
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {
@@ -573,5 +628,43 @@
 
     .rules-link {
         padding-top: 0;
+    }
+}
+
+@media (max-width: 899px) {
+    body > .topbar {
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+
+    body > .topbar .topbar-inner {
+        display: flex;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-width: 0;
+    }
+
+    body > .topbar .logo-link {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    body > .topbar .logo-link img {
+        width: auto;
+        max-width: 100%;
+    }
+
+    body > .topbar .topbar-actions {
+        flex: 0 0 auto;
+        min-width: max-content;
+    }
+
+    body > .topbar .menu-toggle-btn {
+        display: flex;
+        flex: 0 0 40px;
+        position: relative;
+        z-index: 1;
     }
 }

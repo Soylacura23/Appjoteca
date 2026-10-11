@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../backend/config/security.php';
 
 $footer_role = isset($_SESSION['usuario_id']) ? (int) ($_SESSION['rol'] ?? 0) : 0;
 $footer_base = '/Appjoteca/';

@@ -22,7 +22,7 @@
 
     var usuarioSeleccionado = null;
   
-    /* ── Tabulator ─────────────────────────────────────────────── */
+    /* Tabulator */
   
     var tabla = new Tabulator('#users-table', {
       layout: 'fitColumns',
@@ -92,17 +92,16 @@
           hozAlign: "center",
           formatter: function(cell) {
             var d = cell.getData();
-            
-            if (!d.acciones || d.acciones === null) {
-              return '<span class="acciones-placeholder">No hay nada de acciones aquí.</span>';
+            var buttons = [];
+            if (d.id_reserva_pendiente) {
+              buttons.push('<button class="btn-icon btn-user-reservation" data-id="' + d.id_reserva_pendiente + '" title="Ver solicitud pendiente" aria-label="Ver solicitud pendiente"><span class="material-symbols-outlined">event</span></button>');
             }
-            
-            return `
-              <div class="acciones-btns">
-                <button class="btn-icon btn-accept" title="Aceptar"><i class="fa-solid fa-check"></i></button>
-                <button class="btn-icon btn-reject" title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
-              </div>
-            `;
+            if (d.id_prestamo_activo) {
+              buttons.push('<button class="btn-icon btn-user-loan" data-id="' + d.id_prestamo_activo + '" title="Ver préstamo y devolver" aria-label="Ver préstamo y devolver"><span class="material-symbols-outlined">assignment_return</span></button>');
+            }
+            return buttons.length
+              ? '<div class="acciones-btns">' + buttons.join('') + '</div>'
+              : '<span class="acciones-placeholder">Sin acciones pendientes</span>';
           },
           
           cellClick: function(e, cell) {
@@ -110,31 +109,13 @@
             if (!target) return;
 
             e.stopPropagation();
-
-            var id_usuario = cell.getData().id;
-            var accion = target.classList.contains('btn-accept') ? 'aceptar' : 'rechazar';
-
-            
-            fetch('procesar-accion.php', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': window.getCSRFToken()
-               },
-              body: new URLSearchParams({ id: id_usuario, accion: accion })
-            })
-            .then(respuesta => respuesta.json())
-            .then(data => {
-              if (data.ok) {
-                alerta('success', '¡Éxito!', 'La acción fue procesada correctamente.');
-                // Opcional: Recargar la tabla o actualizar la fila actual
-              } else {
-                alerta('error', 'Error', data.error);
-              }
-            })
-            .catch(error => {
-              console.error(error);
-              alerta('error', 'Error', 'Fallo de conexión.');
-            });
+            var id = Number(target.dataset.id);
+            var baseUrl = '../reservaciones/reservaciones.php';
+            if (target.classList.contains('btn-user-reservation')) {
+              window.location.href = baseUrl + '?reserva=' + encodeURIComponent(id);
+            } else if (target.classList.contains('btn-user-loan')) {
+              window.location.href = baseUrl + '?prestamo=' + encodeURIComponent(id);
+            }
           }
         }
       ]
@@ -157,28 +138,6 @@
       }
   });
         
-    /* ── Cargar usuarios desde el backend ──────────────────────── */
-  
-    fetch('usuarios-listar.php')
-    .then(function (respuesta) {
-      if (!respuesta.ok) {
-        throw new Error('El servidor respondió con un error.');
-      }
-      return respuesta.json();
-    })
-      .then(function (data) {
-        if (data.ok) {
-          tabla.setData(data.usuarios);
-          actualizarStats(data.usuarios);
-        } else {
-          alerta('error', 'No se cargaron los usuarios', (data.error || 'Error desconocido'));
-        }
-      })
-    .catch(function (error) {
-      alerta('error', 'Error de conexión', 'No se pudo obtener la lista de usuarios.');
-      console.error(error);
-    });
-
   function abrirDesdeUrl() {
     var params = new URLSearchParams(window.location.search);
     var idUrl = params.get('id');
@@ -220,7 +179,7 @@
       console.error(error);
     });
   
-    /* ── Click en una fila: abrir overlay con los datos ────────── */
+    /* Click en una fila: abrir overlay con los datos */
   
     tabla.on('rowClick', function (e, row) {
       abrirOverlay(row.getData());
@@ -276,7 +235,7 @@
       usuarioSeleccionado = null;
     }
   
-    /* ── Eliminar usuario ──────────────────────────────────────── */
+    /* Eliminar usuario */
   
     function mostrarConfirmacion() {
       if (!usuarioSeleccionado) return;
@@ -316,7 +275,7 @@
         });
     }
   
-    /* ── Filtros y búsqueda ────────────────────────────────────── */
+    /* Filtros y búsqueda */
   
     function aplicarFiltros() {
       var rol = filtroRol.value;
@@ -340,7 +299,7 @@
     buscador.addEventListener('input', aplicarFiltros);
     buscadorMovil.addEventListener('input', aplicarFiltros);
   
-    /* ── Estadísticas ──────────────────────────────────────────── */
+    /* Estadísticas */
   
     function actualizarStats(lista) {
       var activos = 0;
@@ -359,7 +318,7 @@
       statDocentes.textContent = docentes;
     }
   
-    /* ── Eventos ───────────────────────────────────────────────── */
+    /* Eventos */
   
     botonCerrarDetalle.addEventListener('click', cerrarOverlay);
     fondoDetalle.addEventListener('click', cerrarOverlay);

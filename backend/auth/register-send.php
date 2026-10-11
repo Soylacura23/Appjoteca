@@ -8,9 +8,23 @@ header('Content-Type: application/json; charset=utf-8');
 
 require __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
+require_once __DIR__ . '/../helpers/RateLimiter.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
+    exit;
+}
+
+if (!empty($_POST['middle_name'])) {
+    echo json_encode(['status' => 'success', 'message' => 'Solicitud recibida.']);
+    exit;
+}
+
+$limiter = new RateLimiter($connection, 5, 3600);
+if (!$limiter->check('register:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+    http_response_code(429);
+    echo json_encode(['status' => 'error', 'message' => 'Demasiados intentos. Inténtalo más tarde.']);
     exit;
 }
 

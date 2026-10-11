@@ -3,33 +3,13 @@ require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    define('BASE_URL', '/Appjoteca/');
-
-    $sql = "SELECT foto_documento FROM usuarios WHERE id_usuario = ?";
-    $query = $connection->prepare($sql);
-    $query->bind_param('i', $mi_id);
-    $query->execute();
-    $usuario = $query->get_result()->fetch_assoc();
-    $query->close();
-
-    $foto_perfil = $_SESSION['foto_perfil'] ?? '';
-    $foto_actual = !empty($foto_perfil)
-        ? BASE_URL . $foto_perfil
-        : BASE_URL . 'assets/images/default-avatar.png';
-
-    $documento = $_SESSION['documento'] ?? '';
-    $foto_documento = !empty($usuario['foto_documento'])
-        ? BASE_URL . $usuario['foto_documento']
-        : BASE_URL . 'assets/images/documento_default.jpg';
-}
-
 header('Content-Type: application/json; charset=utf-8');
 
-$mi_id  = $_SESSION['usuario_id'] ?? null;
-$mi_rol = (int)($_SESSION['rol'] ?? 0);
+$mi_id  = (int) ($_SESSION['usuario_id'] ?? 0);
+$mi_rol = (int) ($_SESSION['rol'] ?? 0);
 
-if (!$mi_id || !in_array($mi_rol, [1, 2, 3, 4])) {
+if ($mi_id <= 0 || !in_array($mi_rol, [1, 2, 3, 4], true)) {
+    http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'No autorizado']);
     exit;
 }
@@ -39,6 +19,7 @@ define('UPLOAD_DIR', __DIR__ . '/../../uploads/profiles/photos/');
 define('DEFAULT_AVATAR', 'assets/images/default-avatar.png');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Método no permitido']);
     exit;
 }

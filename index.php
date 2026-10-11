@@ -1,7 +1,11 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { 
-    session_start(); 
+
+if (!file_exists(__DIR__ . '/install.lock')) {
+    header('Location: install/install.php');
+    exit;
 }
+
+require_once __DIR__ . '/backend/config/security.php';
 
 require_once __DIR__ . '/backend/config/auth-check.php';
 
@@ -59,7 +63,7 @@ if ($query_autores = $connection->prepare($sql_autores)) {
 $autores_placeholder = max(2 - count($autores_destacados), 0);
 
 // Materias (Categorías)
-$sql_materias = "SELECT * FROM materias LIMIT 8";
+$sql_materias = "SELECT id_materia, nombre FROM materias LIMIT 8";
 $materias = [];
 if ($query_materias = $connection->prepare($sql_materias)) {
     $query_materias->execute();
@@ -70,7 +74,7 @@ if ($query_materias = $connection->prepare($sql_materias)) {
 }
 
 // Colecciones
-$sql_colecciones = "SELECT * FROM colecciones LIMIT 6";
+$sql_colecciones = "SELECT id_coleccion, nombre FROM colecciones LIMIT 6";
 $colecciones = [];
 if ($query_colecciones = $connection->prepare($sql_colecciones)) {
     $query_colecciones->execute();
@@ -227,11 +231,11 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
     <div class="categories-grid">
         <?php if (!empty($materias)): ?>
             <?php foreach ($materias as $index => $materia): 
-                $nombre_materia = htmlspecialchars($materia['nombre_materia'] ?? $materia['nombre'] ?? 'Categoría');
+                $nombre_materia = htmlspecialchars($materia['nombre_materia'] ?? $materia['nombre'] ?? 'Categoría', ENT_QUOTES, 'UTF-8');
                 $icono = $iconos_categorias[$index % count($iconos_categorias)];
             ?>
-            <div class="category-card" data-aos="zoom-in" data-aos-delay="<?= ($index % 8) * 60 ?>">
-                <div class="category-icon"><span class="material-symbols-outlined"><?= $icono ?></span></div>
+            <div class="category-card" data-aos="zoom-in" data-aos-delay="<?= (int) (($index % 8) * 60) ?>">
+                <div class="category-icon"><span class="material-symbols-outlined"><?= htmlspecialchars($icono, ENT_QUOTES, 'UTF-8') ?></span></div>
                 <h3><?= $nombre_materia ?></h3>
                 <p>Explora los archivos y registros de nuestra colección en <?= strtolower($nombre_materia) ?>.</p>
                 <span class="category-arrow">
@@ -269,22 +273,22 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
     <div class="stats-grid">
         <div class="stat" data-aos="fade-up" data-aos-delay="0">
             <div class="stat-icon"><span class="material-symbols-outlined">auto_stories</span></div>
-            <div class="stat-number"><?= $cantidad_libros ?></div>
+            <div class="stat-number"><?= (int) $cantidad_libros ?></div>
             <div class="stat-label">Libros registrados</div>
         </div>
         <div class="stat" data-aos="fade-up" data-aos-delay="100">
             <div class="stat-icon"><span class="material-symbols-outlined">category</span></div>
-            <div class="stat-number"><?= $cantidad_categorias ?></div>
+            <div class="stat-number"><?= (int) $cantidad_categorias ?></div>
             <div class="stat-label">Categorías</div>
         </div>
         <div class="stat" data-aos="fade-up" data-aos-delay="200">
             <div class="stat-icon"><span class="material-symbols-outlined">person</span></div>
-            <div class="stat-number"><?= $cantidad_autores ?></div>
+            <div class="stat-number"><?= (int) $cantidad_autores ?></div>
             <div class="stat-label">Autores registrados</div>
         </div>
         <div class="stat" data-aos="fade-up" data-aos-delay="300">
             <div class="stat-icon"><span class="material-symbols-outlined">collections_bookmark</span></div>
-            <div class="stat-number"><?= $cantidad_colecciones ?></div>
+            <div class="stat-number"><?= (int) $cantidad_colecciones ?></div>
             <div class="stat-label">Colecciones Curadas</div>
         </div>
     </div>
@@ -305,13 +309,13 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
         <?php foreach ($autores_destacados as $index => $autor): 
             $av = autor_avatar($autor['nombre_autor'] ?? 'Autor');
         ?>
-        <a href="#" class="author-card" data-aos="fade-up" data-aos-delay="<?= $index * 100 ?>">
-            <div class="author-avatar" style="background: <?= $av['grad'] ?>;">
-                <span><?= htmlspecialchars($av['ini']) ?></span>
+        <a href="#" class="author-card" data-aos="fade-up" data-aos-delay="<?= (int) ($index * 100) ?>">
+            <div class="author-avatar" style="background: <?= htmlspecialchars($av['grad'], ENT_QUOTES, 'UTF-8') ?>;">
+                <span><?= htmlspecialchars($av['ini'], ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="author-card-inner">
                 <span class="author-field">✦ Más Leído</span>
-                <h3 class="author-name"><?= htmlspecialchars($autor['nombre_autor'] ?? 'Autor') ?></h3>
+                <h3 class="author-name"><?= htmlspecialchars($autor['nombre_autor'] ?? 'Autor', ENT_QUOTES, 'UTF-8') ?></h3>
                 <span class="author-reveal">
                     <?= (int) ($autor['obras_disponibles'] ?? 0) ?> obras disponibles
                     <span class="material-symbols-outlined">arrow_forward</span>
@@ -321,7 +325,7 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
         <?php endforeach; ?>
 
         <?php for ($i = 0; $i < $autores_placeholder; $i++): ?>
-        <a href="#" class="author-card placeholder" data-aos="fade-up" data-aos-delay="<?= ($i + 2) * 100 ?>">
+        <a href="#" class="author-card placeholder" data-aos="fade-up" data-aos-delay="<?= (int) (($i + 2) * 100) ?>">
             <div class="author-avatar placeholder-avatar">
                 <span>?</span>
             </div>
@@ -348,11 +352,11 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
             <?php 
             $contador = 1;
             foreach ($colecciones as $index => $coleccion): 
-                $nombre_col = htmlspecialchars($coleccion['nombre_coleccion'] ?? $coleccion['nombre'] ?? 'Colección');
+                $nombre_col = htmlspecialchars($coleccion['nombre_coleccion'] ?? $coleccion['nombre'] ?? 'Colección', ENT_QUOTES, 'UTF-8');
                 $numero_str = str_pad($contador, 2, '0', STR_PAD_LEFT);
             ?>
-            <div class="collection-card" data-aos="fade-up" data-aos-delay="<?= $index * 80 ?>">
-                <span class="collection-number"><?= $numero_str ?></span>
+            <div class="collection-card" data-aos="fade-up" data-aos-delay="<?= (int) ($index * 80) ?>">
+                <span class="collection-number"><?= htmlspecialchars($numero_str, ENT_QUOTES, 'UTF-8') ?></span>
                 <div class="collection-icon">
                     <span class="material-symbols-outlined">collections_bookmark</span>
                 </div>

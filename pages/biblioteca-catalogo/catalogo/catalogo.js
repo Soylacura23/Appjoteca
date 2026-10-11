@@ -2,8 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Estado global del catálogo
     const estado = {
         paginaActual: 1,
-        materiaId: 0,          // 0 = todas las materias
-        materiaNombre: 'General',
+        materiaId: 0,
+        disponibilidad: '',
+        orden: 'recommended',
         busqueda: '',
         debounceTimer: null
     };
@@ -12,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.getElementById('bookshelf-grid') || document.querySelector('main section.grid, main .bookshelf-grid');
     const paginationContainer = document.querySelector('.pagination-container') || document.querySelector('footer');
     const searchInputs = document.querySelectorAll('.catalog-search-input, input[placeholder*="Buscar"]');
-    const filterContainer = document.querySelector('.filter-categories') || document.querySelector('section.filter-categories');
 
     inicializar();
 
@@ -33,7 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams({
                 page: estado.paginaActual,
                 materia: estado.materiaId,
-                query: estado.busqueda
+                query: estado.busqueda,
+                availability: estado.disponibilidad,
+                sort: estado.orden
             });
 
             const response = await fetch(`back.php?${params.toString()}`);
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.exito) {
                 if (data.materias && Array.isArray(data.materias)) {
-                    renderizarMaterias(data.materias);
+                    window.catalogFilters.setMaterias(data.materias);
                 }
                 renderizarTarjetas(data.libros);
                 renderizarPaginacion(data.totalPaginas, data.paginaActual);
@@ -59,58 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 4. Chips de materias (categorías) desde la BD
-    function renderizarMaterias(materias) {
-        if (!filterContainer) return;
-        if (filterContainer.dataset.loaded === 'true') return;
-
-        filterContainer.innerHTML = '';
-
-        // Chip "General" (todas)
-        const btnGeneral = crearChipMateria(0, 'General');
-        filterContainer.appendChild(btnGeneral);
-
-        materias.forEach(m => {
-            const btn = crearChipMateria(m.id, m.nombre);
-            filterContainer.appendChild(btn);
-        });
-
-        filterContainer.dataset.loaded = 'true';
-    }
-
-    function crearChipMateria(id, nombre) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'filter-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all';
-        btn.dataset.id = id;
-        btn.textContent = nombre;
-
-        if (Number(id) === Number(estado.materiaId)) {
-            btn.classList.add('active', 'bg-primary', 'text-on-primary');
-        } else {
-            btn.classList.add('bg-surface-container-high', 'text-on-surface-variant');
-        }
-
-        btn.addEventListener('click', () => {
-            // Quitar activo de todos
-            filterContainer.querySelectorAll('button').forEach(c => {
-                c.classList.remove('active', 'bg-primary', 'text-on-primary');
-                c.classList.add('bg-surface-container-high', 'text-on-surface-variant');
-            });
-
-            btn.classList.add('active', 'bg-primary', 'text-on-primary');
-            btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
-
-            estado.materiaId = Number(id);
-            estado.materiaNombre = nombre;
-            estado.paginaActual = 1;
-            cargarLibros();
-        });
-
-        return btn;
-    }
-
-    // 5. Tarjetas de libros
+    // 4. Tarjetas de libros
     function renderizarTarjetas(libros) {
         gridContainer.innerHTML = '';
 
@@ -139,6 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     rutaPortada = '../../../' + libro.portada;
                 }
             }
+            const status = libro.disponibles > 0
+                ? 'Disponible'
+                : libro.reservados > 0
+                    ? 'Reservado'
+                    : libro.prestados > 0
+                        ? 'Prestado'
+                        : 'No disponible';
 
             card.innerHTML = `
                 <div class="relative aspect-[2/3] mb-4 overflow-hidden rounded-lg book-glow book-cover-wrap">
@@ -159,6 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="font-body text-xs text-neutral-500 mt-1 uppercase tracking-tighter book-author">
                     ${escaparHTML(libro.autor)}
                 </p>
+                <div class="catalog-book-stock" aria-label="Estado y existencias">
+                    <span class="catalog-book-status">${status}</span>
+                    <span>Disponible: ${Number(libro.disponibles) || 0}</span>
+                    <span>Reservado: ${Number(libro.reservados) || 0}</span>
+                    <span>Prestado: ${Number(libro.prestados) || 0}</span>
+                    <span>Stock total: ${Number(libro.total) || 0}</span>
+                </div>
             `;
 
             card.addEventListener('click', () => {
@@ -171,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gridContainer.appendChild(fragmento);
     }
 
-    // 6. Paginación
+    // 5. Paginación
     function renderizarPaginacion(totalPaginas, paginaActual) {
         if (!paginationContainer) return;
 
@@ -233,8 +198,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 7. Eventos de búsqueda
+    // 6. Eventos de filtros y búsqueda
     function registrarEventos() {
+        document.addEventListener('catalog:applyFilters', (event) => {
+            estado.materiaId = Number(event.detail.materia) || 0;
+            estado.disponibilidad = event.detail.availability;
+            estado.orden = event.detail.sort || 'recommended';
+            estado.paginaActual = 1;
+            cargarLibros();
+        });
+
         searchInputs.forEach(input => {
             input.addEventListener('input', (e) => {
                 clearTimeout(estado.debounceTimer);
@@ -247,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 8. UI estados
+    // 7. UI estados
     function mostrarCargando() {
         gridContainer.innerHTML = `
             <div class="col-span-full flex justify-center items-center py-20 text-primary">
@@ -263,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
     }
 
-    // 9. Sanitización XSS
+    // 8. Sanitización XSS
     function escaparHTML(cadena) {
         if (!cadena) return '';
         return String(cadena)

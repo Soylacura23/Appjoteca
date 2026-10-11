@@ -1,4 +1,4 @@
-/* ── Layout ─────────────────────────────────────────────────── */
+/* Layout */
 .main-content {
   margin-left: var(--sidebar-w, var(--sidebar-width, 280px));
   margin-top: var(--topbar-h, var(--topbar-height, 64px));
@@ -40,7 +40,7 @@
   margin: 0;
 }
 
-/* ── Búsqueda móvil ─────────────────────────────────────────── */
+/* Búsqueda móvil */
 .icon-btn.search-toggle-btn { display: none; }
 
 .topbar-search-mobile {
@@ -80,7 +80,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Toolbar ────────────────────────────────────────────────── */
+/* Toolbar */
 .users-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -174,7 +174,7 @@
   border-color: var(--primary, #c9a84c);
 }
 
-/* ── Tabla (Tabulator) ─────────────────────────────────────────── */
+/* Tabla (Tabulator) */
 .users-section {
   flex: 1;
   min-width: 0;
@@ -444,7 +444,7 @@
 .status-active { color: #22c55e; }
 .status-inactive { color: #888; }
 
-/* ── Acciones de Tabulator ───────────────────────────────── */
+/* Acciones de Tabulator */
 .acciones-placeholder {
   font-size: 0.75rem;
   color: var(--on-surface-variant, #888);
@@ -469,6 +469,24 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: #fff;
+}
+
+.btn-user-reservation {
+  background: rgba(242, 202, 80, 0.14);
+  color: var(--primary, #f2ca50);
+  border: 1px solid rgba(242, 202, 80, 0.3);
+}
+
+.btn-user-loan {
+  background: rgba(34, 197, 94, 0.14);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.btn-user-reservation:hover,
+.btn-user-loan:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
 }
 
 .btn-accept {
@@ -531,7 +549,7 @@
   opacity: 0.45;
 }
 
-/* ── Overlay detalle ────────────────────────────────────────── */
+/* Overlay detalle */
 .user-detail-overlay {
 
   position: fixed;
@@ -897,7 +915,7 @@
   line-height: 1.4;
 }
 
-/* ── Modales ────────────────────────────────────────────────── */
+/* Modales */
 .confirm-modal {
   position: fixed;
   inset: 0;
@@ -1043,7 +1061,7 @@
   pointer-events: auto;
 }
 
-/* ── Responsive ───────────────────────────────────────────────── */
+/* Responsive */
 @media (max-width: 1024px) {
   .main-content {
     margin-left: 0;
@@ -1102,7 +1120,7 @@
   }
 }
 
-/* ──  tabulator ──────────────────────────── */
+/* tabulator */
 #users-table .tabulator-row {
   cursor: pointer;
 }

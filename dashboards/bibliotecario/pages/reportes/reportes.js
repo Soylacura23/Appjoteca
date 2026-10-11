@@ -1,12 +1,9 @@
-/* ============================================================
-   reportes.js — Página de Reportes · Appjoteca
-   Orden: DOM → funciones → llamadas
-   ============================================================ */
+/* reportes.js — Página de Reportes · Appjoteca */
 
    document.addEventListener('DOMContentLoaded', () => {
 
-    // ── 1. Referencias del DOM ───────────────────────────
-    const loadingEl   = document.getElementById('reportes-loading');
+    // 1. Referencias del DOM
+    const skeletonEl  = document.getElementById('reportes-skeleton');
     const contenidoEl = document.getElementById('reportes-contenido');
     const errorEl     = document.getElementById('reportes-error');
     const errorMsg    = document.getElementById('reportes-error-msg');
@@ -33,28 +30,28 @@
         'todo':'Todo el historial por día de la semana'
     };
 
-    // ── 2. Funciones de UI ───────────────────────────────
+    // 2. Funciones de UI
 
     function mostrarCarga() {
-        loadingEl.hidden = false;
+        skeletonEl.hidden = false;
         contenidoEl.hidden = true;
         errorEl.hidden = true;
     }
 
     function mostrarContenido() {
-        loadingEl.hidden = true;
+        skeletonEl.hidden = true;
         contenidoEl.hidden = false;
         errorEl.hidden = true;
     }
 
     function mostrarError(mensaje) {
-        loadingEl.hidden = true;
+        skeletonEl.hidden = true;
         contenidoEl.hidden = true;
         errorEl.hidden = false;
         if (errorMsg) errorMsg.textContent = mensaje || 'No se pudieron cargar los reportes.';
     }
 
-    // ── 3. Renderizar métricas ───────────────────────────
+    // 3. Renderizar métricas
 
     function renderMetricas(m) {
         const cards = [
@@ -90,7 +87,7 @@
         return Number(n).toLocaleString('es-CO');
     }
 
-    // ── 4. Gráfica con Chart.js ──────────────────────────
+    // 4. Gráfica con Chart.js
 
     function actualizarSubtitulo(etiqueta, periodo) {
         const el = document.getElementById('chart-subtitulo');
@@ -184,7 +181,7 @@
             });
     }
 
-    // ── 5. Insights (categoría, libro, editoriales) ──────
+    // 5. Insights (categoría, libro, editoriales)
 
     function renderInsights(data) {
         // Categoría
@@ -230,7 +227,7 @@
         });
     }
 
-    // ── 6. Alertas ───────────────────────────────────────
+    // 6. Alertas
 
     function renderAlertas(alertas) {
         alertsGrid.innerHTML = '';
@@ -255,11 +252,11 @@
             card.className = 'alert-card';
             card.innerHTML =
                 '<div class="alert-thumb">' +
-                    '<img src="' + portada + '" alt="' + escapeHtml(a.titulo) + '" onerror="this.src=\'' + PORTADA_DEFAULT + '\'">' +
+                    '<img src="' + escapeHtml(portada) + '" alt="' + escapeHtml(a.titulo) + '" onerror="this.src=\'' + PORTADA_DEFAULT + '\'">' +
                 '</div>' +
                 '<div class="alert-body">' +
                     '<h4 class="alert-title">' + escapeHtml(a.titulo) + '</h4>' +
-                    '<p class="alert-id">ID: ' + a.id_libro + '</p>' +
+                    '<p class="alert-id">ID: ' + Number(a.id_libro) + '</p>' +
                     '<span class="alert-badge ' + badgeClass + '">' + escapeHtml(a.motivo) + '</span>' +
                     '<p class="alert-meta">' + escapeHtml(a.detalle) + '</p>' +
                 '</div>';
@@ -267,23 +264,40 @@
         });
     }
 
-    // ── 7. Frase de la semana ────────────────────────────
+    // 7. Frase de la semana
 
     function renderFrase(texto) {
         const el = document.getElementById('frase-texto');
         if (el) el.textContent = texto || 'La lectura abre puertas.';
     }
 
-    // ── 8. Escape HTML básico ────────────────────────────
+    function cargarFrase() {
+        fetch(API_URL + '?tipo=frase')
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (data) {
+                if (data.ok) renderFrase(data.frase);
+            })
+            .catch(function (err) {
+                console.error('Frase de la semana:', err);
+            });
+    }
+
+    // 8. Escape HTML básico
 
     function escapeHtml(str) {
         if (!str) return '';
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
-    // ── 9. Cargar datos desde la API ─────────────────────
+    // 9. Cargar datos desde la API
 
     function cargarReportes() {
         mostrarCarga();
@@ -313,6 +327,7 @@
                 renderFrase(data.frase);
 
                 mostrarContenido();
+                cargarFrase();
             })
             .catch(function (err) {
                 console.error('Reportes:', err);
@@ -320,7 +335,7 @@
             });
     }
 
-    // ── 10. Eventos ──────────────────────────────────────
+    // 10. Eventos
 
     if (btnRefrescar) {
         btnRefrescar.addEventListener('click', function () {
@@ -360,18 +375,7 @@
         });
     }
 
-    // Búsqueda móvil
-    const searchToggle = document.getElementById('search-toggle-btn');
-    const searchMobile = document.getElementById('topbar-search-mobile');
-    if (searchToggle && searchMobile) {
-        searchToggle.addEventListener('click', function () {
-            const isOpen = searchMobile.classList.toggle('open');
-            searchToggle.setAttribute('aria-expanded', isOpen);
-            searchMobile.setAttribute('aria-hidden', !isOpen);
-        });
-    }
-
-    // ── 11. Inicio ───────────────────────────────────────
+    // 11. Inicio
     cargarReportes();
 
 });

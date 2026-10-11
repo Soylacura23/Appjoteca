@@ -1,14 +1,6 @@
-    /* ================================================================
-   biblioteca.css — Estilos Principales
-   AppJoteca v2.0
+    /* biblioteca.css — Estilos Principales */
 
-   Importa:   navbar.css      (barra de navegación)
-              book-cards.css  (tarjetas de libros)
-   ================================================================ */
-
-/* ────────────────────────────────────────────────
-   Variables globales
-   ──────────────────────────────────────────────── */
+/* Variables globales */
    :root {
     /* Paleta de color */
     --background:                 #000000;
@@ -48,9 +40,7 @@
     --px: 16px;
 }
 
-/* ────────────────────────────────────────────────
-   Reset & Base
-   ──────────────────────────────────────────────── */
+/* Reset & Base */
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -94,9 +84,7 @@ a {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ────────────────────────────────────────────────
-   Botones globales
-   ──────────────────────────────────────────────── */
+/* Botones globales */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -147,28 +135,32 @@ a {
 .btn-ver-todo {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 8px;
     font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 700;
+    font-size: 0.8125rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.4);
-    padding: 4px 0;
-    border-bottom: 1px solid transparent;
-    transition: color 0.25s ease, border-color 0.25s ease;
-    background: none;
+    letter-spacing: 0.08em;
+    color: var(--on-primary);
+    padding: 11px 17px;
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-full);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    background: var(--primary);
     cursor: pointer;
     flex-shrink: 0;
+    box-shadow: 0 5px 18px rgba(242, 202, 80, 0.2);
 }
 
 .btn-ver-todo:hover {
-    color: var(--primary);
-    border-bottom-color: rgba(242, 202, 80, 0.5);
+    transform: translateY(-2px);
+    background: #ffdb68;
+    box-shadow: 0 8px 24px rgba(242, 202, 80, 0.35);
 }
 
 .btn-ver-todo .material-symbols-outlined {
-    font-size: 15px;
+    font-size: 18px;
     font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 16;
     transition: transform 0.25s ease;
 }
@@ -177,9 +169,12 @@ a {
     transform: translateX(3px);
 }
 
-/* ────────────────────────────────────────────────
-   Hero Section
-   ──────────────────────────────────────────────── */
+.btn-ver-todo:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* Hero Section */
 .hero-section {
     position: relative;
     min-height: 520px;
@@ -259,9 +254,7 @@ a {
     opacity: 0.88;
 }
 
-/* ────────────────────────────────────────────────
-   Carrusel destacados
-   ──────────────────────────────────────────────── */
+/* Carrusel destacados */
 .carousel-wrapper {
     position: relative;
 }
@@ -445,9 +438,7 @@ a {
     overflow: hidden;
 }
 
-/* ────────────────────────────────────────────────
-   Sección de Filtros
-   ──────────────────────────────────────────────── */
+/* Sección de Filtros */
 .filters-section {
     padding: 0 var(--px) var(--sp-lg);
 }
@@ -517,9 +508,7 @@ a {
     align-items: center;
 }
 
-/* ────────────────────────────────────────────────
-   Sección Catálogo
-   ──────────────────────────────────────────────── */
+/* Sección Catálogo */
 .catalog-section {
     padding: 0 var(--px) var(--sp-2xl);
 }
@@ -593,9 +582,7 @@ a {
 
 
 
-/* ────────────────────────────────────────────────
-   FAB (Floating Action Button)
-   ──────────────────────────────────────────────── */
+/* FAB (Floating Action Button) */
 .fab-container {
     position: fixed;
     bottom: var(--sp-md);
@@ -635,9 +622,7 @@ a {
     font-size: 20px;
 }
 
-/* ────────────────────────────────────────────────
-   Scrollbar personalizado
-   ──────────────────────────────────────────────── */
+/* Scrollbar personalizado */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -656,9 +641,7 @@ a {
     background: var(--outline-variant);
 }
 
-/* ================================================================
-   RESPONSIVE
-   ================================================================ */
+/* RESPONSIVE */
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {

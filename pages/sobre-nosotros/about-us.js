@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ============ VANTA.JS — Fondo animado ============
+    // VANTA.JS — Fondo animado
     if (typeof VANTA !== 'undefined' && document.getElementById('vanta-bg')) {
         VANTA.NET({
             el: "#vanta-bg",
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============ AOS — Animaciones al scroll ============
+    // AOS — Animaciones al scroll
     if (typeof AOS !== 'undefined') {
         AOS.init({
             duration: 800,
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============ FORMULARIO ============
+    // FORMULARIO
     const feedbackForm = document.getElementById('feedbackForm');
 
     if (feedbackForm) {
@@ -84,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const honeypot = feedbackForm.querySelector('input[name="website_url_hp"]').value;
-            if (honeypot !== "") {
+            const auxiliaryField = feedbackForm.querySelector('input[name="middle_name"]').value;
+            if (auxiliaryField !== "") {
                 console.warn("Spam detectado.");
                 return;
             }
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============ HEADER SCROLL EFFECT ============
+    // HEADER SCROLL EFFECT
     const header = document.getElementById('mainHeader');
     if (header) {
         window.addEventListener('scroll', () => {

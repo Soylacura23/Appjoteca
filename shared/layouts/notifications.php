@@ -1,3 +1,10 @@
+<?php
+require_once __DIR__ . '/../../backend/config/security.php';
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
+<div id="app-csrf-token" hidden data-token="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>"></div>
 <div class="notification-container" id="notification-container" role="dialog" aria-label="Notificaciones" aria-hidden="true">
     <div class="notification-header">
         <h3 class="notification-header-title">

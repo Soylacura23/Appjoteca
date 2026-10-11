@@ -8,12 +8,12 @@
   
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   
-    /* ---------- AOS ---------- */
+    /* AOS */
     if (typeof AOS !== "undefined") {
         AOS.init({ duration: 800, once: true, offset: 80, easing: "ease-out-cubic" });
     }
   
-    /* ---------- Animaciones de Revelado (fallback) ---------- */
+    /* Animaciones de Revelado (fallback) */
     const revealTargets = document.querySelectorAll("[data-reveal]");
     if ("IntersectionObserver" in window && revealTargets.length) {
         const revealObserver = new IntersectionObserver(
@@ -32,7 +32,7 @@
         revealTargets.forEach((el) => el.classList.add("is-visible"));
     }
   
-    /* ---------- Parallax Ligero ---------- */
+    /* Parallax Ligero */
     const parallaxEls = document.querySelectorAll("[data-parallax]");
     const updateParallax = () => {
         if (reduceMotion || !parallaxEls.length) return;
@@ -48,7 +48,7 @@
         });
     };
   
-    /* ---------- Header scroll ---------- */
+    /* Header scroll */
     const header = document.getElementById("mainHeader");
     const updateHeader = () => {
         if (!header) return;
@@ -56,7 +56,7 @@
         else header.classList.remove("is-scrolled");
     };
   
-    /* ---------- SCROLL HORIZONTAL DE LIBROS ---------- */
+    /* SCROLL HORIZONTAL DE LIBROS */
     const booksScroll = document.getElementById("booksScroll");
     const booksTrack = document.getElementById("booksTrack");
     const booksViewport = booksScroll ? booksScroll.querySelector(".books-track-viewport") : null;
@@ -81,7 +81,7 @@
         if (booksTrack) booksTrack.style.transform = "";
     }
   
-    /* ---------- Bucle de Animación ---------- */
+    /* Bucle de Animación */
     let ticking = false;
     const onScrollOrResize = () => {
         if (!ticking) {
@@ -96,7 +96,7 @@
         }
     };
   
-    /* ---------- Renderizado de Tarjetas de Libros ---------- */
+    /* Renderizado de Tarjetas de Libros */
     const renderizarTarjetas = (libros = []) => {
         if (!booksTrack) return;
         if (!Array.isArray(libros) || libros.length === 0) {
@@ -142,7 +142,7 @@
         booksTrack.innerHTML = html;
     };
   
-    /* ---------- Libro de la semana ---------- */
+    /* Libro de la semana */
     const renderizarRecomendado = (libro) => {
         const container = document.getElementById("bookWeekContainer");
         if (!container || !libro) {
@@ -152,7 +152,9 @@
         const portada = libro.portada || "assets/images/books/default.jpg";
         const autor = escapeHTML(libro.autor || "Autor Desconocido");
         const titulo = escapeHTML(libro.titulo_libro || "Sin Título");
-        const resumen = escapeHTML(libro.resumen || "Una obra destacada y altamente solicitada por nuestra comunidad.");
+        const resumenOriginal = libro.resumen || "Una obra destacada y altamente solicitada por nuestra comunidad.";
+        const resumen = escapeHTML(resumenOriginal);
+        const resumenLargo = resumenOriginal.length > 280;
         container.innerHTML = `
         <div class="book-week-cover" data-aos="fade-right">
             <img src="${escapeHTML(portada)}" alt="${titulo}">
@@ -165,16 +167,27 @@
             </div>
             <h2 class="book-week-title">${titulo}</h2>
             <p class="book-week-author">Por ${autor}</p>
-            <p class="book-week-copy">${resumen}</p>
+            <p class="book-week-copy${resumenLargo ? ' is-collapsed' : ''}">${resumen}</p>
+            ${resumenLargo ? '<button class="book-week-toggle" type="button" aria-expanded="false">Ver más</button>' : ''}
             <a href="#" class="btn btn-primary btn-glow">
                 <span class="material-symbols-outlined">menu_book</span>
                 Descubrir la Obra
             </a>
         </div>`;
+        const toggle = container.querySelector(".book-week-toggle");
+        if (toggle) {
+            toggle.addEventListener("click", () => {
+                const expanded = toggle.getAttribute("aria-expanded") !== "true";
+                const copy = container.querySelector(".book-week-copy");
+                copy.classList.toggle("is-collapsed", !expanded);
+                toggle.setAttribute("aria-expanded", String(expanded));
+                toggle.textContent = expanded ? "Ver menos" : "Ver más";
+            });
+        }
         if (typeof AOS !== "undefined") AOS.refresh();
     };
   
-    /* ---------- Cargar Data ---------- */
+    /* Cargar Data */
     const loadLandingContent = async () => {
         try {
             const res = await fetch("backend/get_landing_books.php");

@@ -41,7 +41,7 @@ requiereRol([2]);
     <!-- NAVBAR TOPBAR -->
     <?php include __DIR__ . '/../../shared/layouts/topbar.php'; ?>
 
-    <?php include __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
+    <?php include_once __DIR__ . '/../../shared/layouts/menu-movil.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="dashboard-main">

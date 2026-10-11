@@ -1,12 +1,6 @@
-/* ================================================================
-   configuracion.css — Estilos de Configuración de Perfil Docente
-   AppJoteca v2.0
-   Mobile-first, responsive, sin Tailwind.
-   ================================================================ */
+/* configuracion.css — Estilos de Configuración de Perfil Docente */
 
-/* ────────────────────────────────────────────────
-   Layout General
-   ──────────────────────────────────────────────── */
+/* Layout General */
    .config-main {
     padding: calc(var(--topbar-h) + var(--sp-lg)) var(--px) var(--sp-2xl);
     min-height: 100vh;
@@ -54,9 +48,7 @@
     gap: var(--sp-xl);
 }
 
-/* ────────────────────────────────────────────────
-   Sidebar
-   ──────────────────────────────────────────────── */
+/* Sidebar */
 .config-sidebar {
     display: flex;
     flex-direction: column;
@@ -139,6 +131,39 @@
 
 .avatar-edit .material-symbols-outlined {
     font-size: 16px;
+}
+
+.avatar-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid rgba(255, 180, 171, 0.55);
+    border-radius: 50%;
+    background: rgba(12, 12, 12, 0.92);
+    color: var(--error, #ffb4ab);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.avatar-delete:hover {
+    background: rgba(147, 0, 10, 0.85);
+    transform: scale(1.08);
+}
+
+.avatar-delete[hidden],
+.avatar-actions [hidden] {
+    display: none;
+}
+
+.avatar-delete .material-symbols-outlined {
+    font-size: 17px;
 }
 
 .profile-info {
@@ -264,6 +289,36 @@
     transition: filter 0.4s ease;
 }
 
+.id-doc-placeholder {
+    min-height: 180px;
+    padding: var(--sp-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background:
+        radial-gradient(ellipse at center, rgba(242, 202, 80, 0.08), transparent 70%),
+        var(--surface-container-high);
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+}
+
+.id-doc-placeholder .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 30px;
+}
+
+.id-doc-placeholder p {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.id-doc-placeholder > span:last-child {
+    font-size: 0.6875rem;
+}
+
 .id-doc-blur-overlay {
     position: absolute;
     inset: 0;
@@ -329,9 +384,7 @@
     font-size: 14px;
 }
 
-/* ────────────────────────────────────────────────
-   Secciones de Configuración
-   ──────────────────────────────────────────────── */
+/* Secciones de Configuración */
 .config-content {
     display: flex;
     flex-direction: column;
@@ -829,9 +882,7 @@
     box-shadow: 0 4px 18px rgba(255, 180, 171, 0.2);
 }
 
-/* ────────────────────────────────────────────────
-   Overlay de Documento ID
-   ──────────────────────────────────────────────── */
+/* Overlay de Documento ID */
 .id-doc-overlay {
     position: fixed;
     inset: 0;
@@ -898,7 +949,7 @@
 
 /* ── Acciones de foto de perfil ── */
 .avatar-actions {
-    margin-top: 14px;
+    margin: -8px 0 var(--sp-md);
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -922,9 +973,7 @@
     color: var(--error, #ffb4ab) !important;
 }
 
-/* ────────────────────────────────────────────────
-   Animaciones
-   ──────────────────────────────────────────────── */
+/* Animaciones */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -936,9 +985,7 @@
     }
 }
 
-/* ────────────────────────────────────────────────
-   Responsive
-   ──────────────────────────────────────────────── */
+/* Responsive */
 
 /* Tablet 600px+ */
 @media (min-width: 600px) {

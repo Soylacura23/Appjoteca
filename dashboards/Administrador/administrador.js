@@ -36,9 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return respuesta.json();
     }
 
-    // ════════════════════════════════════
     // 1. Tabla Bibliotecarios
-    // ════════════════════════════════════
     const tablaBibliotecarios = new Tabulator('#tabla-bibliotecarios', {
         data: [],
         layout: 'fitColumns',
@@ -73,9 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
 
-    // ════════════════════════════════════
     // 2. Tabla Cuentas Pendientes (signup)
-    // ════════════════════════════════════
     const tablaPendientes = new Tabulator('#tabla-pendientes', {
         data: [],
         layout: 'fitColumns',
@@ -117,9 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
 
-    // ════════════════════════════════════
     // 3. Tabla Solicitudes de Cambio
-    // ════════════════════════════════════
     const tablaSolicitudes = new Tabulator('#tabla-solicitudes', {
         data: [],
         layout: 'fitColumns',
@@ -170,9 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
 
-    // ════════════════════════════════════
     // 4. Cargar datos
-    // ════════════════════════════════════
     async function cargarBibliotecarios() {
         try {
             const data = await peticion('listar');
@@ -226,9 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ════════════════════════════════════
     // 5. Confirmar acciones (cuentas)
-    // ════════════════════════════════════
     function confirmarAprobacion(id, nombre) {
         Swal.fire({
             title: '¿Aprobar usuario?',
@@ -321,9 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 6. Confirmar solicitudes de cambio
-    // ════════════════════════════════════
     function confirmarSolicitud(row, accion) {
         const esAprobar = accion === 'aprobar';
         const titulo = esAprobar ? '¿Aprobar solicitud?' : '¿Rechazar solicitud?';
@@ -374,9 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ════════════════════════════════════
     // 7. Tabs
-    // ════════════════════════════════════
     const tabs = document.querySelectorAll('.admin-tab');
     const panels = document.querySelectorAll('.admin-panel');
 
@@ -399,9 +385,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ════════════════════════════════════
+    const tabInicial = new URLSearchParams(window.location.search).get('tab');
+    if (tabInicial) {
+        const tabPendiente = Array.from(tabs).find(function (tab) {
+            return tab.dataset.tab === tabInicial;
+        });
+        if (tabPendiente) tabPendiente.click();
+    }
+
     // 8. Modal crear usuario
-    // ════════════════════════════════════
     const modal = document.getElementById('modalRegistro');
     const btnAbrir = document.getElementById('btnAbrirModal');
     const btnCerrar = document.getElementById('btnCerrarModal');

@@ -48,9 +48,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Stepper / Pestañas
-   ──────────────────────────────────────────────── */
+/* Stepper / Pestañas */
 .config-stepper {
     display: flex;
     gap: var(--sp-xs);
@@ -139,9 +137,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Contenido de cada paso
-   ──────────────────────────────────────────────── */
+/* Contenido de cada paso */
 .paso-content {
     display: none;
     padding: 0 var(--px) var(--sp-xl);
@@ -204,9 +200,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Formularios
-   ──────────────────────────────────────────────── */
+/* Formularios */
 .paso-form { display: flex; flex-direction: column; gap: var(--sp-sm); }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -299,9 +293,7 @@
 }
 
 
-/* ────────────────────────────────────────────────
-   Registros (Tabulator)
-   ──────────────────────────────────────────────── */
+/* Registros (Tabulator) */
 .registros-toolbar {
     display: flex;
     flex-direction: column;

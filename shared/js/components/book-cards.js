@@ -1,14 +1,9 @@
-/* ================================================================
-   book-cards.js — Lógica de Tarjetas de Libros
-   AppJoteca v2.0
-   ================================================================ */
+/* book-cards.js — Lógica de Tarjetas de Libros */
 
    (function () {
     'use strict';
 
-    /**
-     * Inicializa comportamiento interactivo en todas las .book-card
-     */
+
     function initBookCards() {
         const bookCards = document.querySelectorAll('.book-card');
 

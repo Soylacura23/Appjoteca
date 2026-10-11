@@ -13,7 +13,7 @@
     padding: 0 16px;
 }
 
-/* ---- Cabecera ---- */
+/* Cabecera */
 .config-page-header {
     margin-bottom: 20px;
 }
@@ -39,7 +39,7 @@
     margin: 0;
 }
 
-/* ---- Barra de acciones ---- */
+/* Barra de acciones */
 .admin-actions-bar {
     display: flex;
     justify-content: stretch;
@@ -80,9 +80,7 @@
     transform: translateY(0);
 }
 
-/* ---------------------------------------------------------
-   PESTAÑAS
-   --------------------------------------------------------- */
+/* PESTAÑAS */
 
 .admin-tabs-wrapper {
     position: relative;
@@ -145,9 +143,7 @@
     line-height: 1;
 }
 
-/* ---------------------------------------------------------
-   PANELES
-   --------------------------------------------------------- */
+/* PANELES */
 
 .admin-panel {
     display: none;
@@ -182,9 +178,7 @@
     background: rgba(242, 202, 80, 0.6);
 }
 
-/* ---------------------------------------------------------
-   BOTONES DE ACCIÓN (Aprobar / Rechazar / Eliminar)
-   --------------------------------------------------------- */
+/* BOTONES DE ACCIÓN (Aprobar / Rechazar / Eliminar) */
 
 .acciones-btns {
     display: inline-flex;
@@ -248,9 +242,7 @@
     transform: scale(0.96);
 }
 
-/* ---------------------------------------------------------
-   MODAL
-   --------------------------------------------------------- */
+/* MODAL */
 
 .modal-overlay {
     position: fixed;
@@ -325,7 +317,7 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* ---- Formularios del modal ---- */
+/* Formularios del modal */
 .form-grid {
     display: grid;
     gap: 14px;
@@ -485,9 +477,7 @@
     margin-top: 8px;
 }
 
-/* ---------------------------------------------------------
-   TABULATOR
-   --------------------------------------------------------- */
+/* TABULATOR */
 
 .tabulator,
 .tabulator-tableholder,
@@ -595,9 +585,7 @@
 .tipo-badge.documento  { background: rgba(120, 220, 180, 0.15); color: #78dcb4; }
 .tipo-badge.eliminacion { background: rgba(255, 180, 171, 0.15); color: #ffb4ab; }
 
-/* ---------------------------------------------------------
-   480px
-   --------------------------------------------------------- */
+/* 480px */
 @media (min-width: 480px) {
     .config-container {
         padding: 0 20px;
@@ -608,9 +596,7 @@
     }
 }
 
-/* ---------------------------------------------------------
-   640px
-   --------------------------------------------------------- */
+/* 640px */
 @media (min-width: 640px) {
     .config-page-title {
         font-size: 1.9rem;
@@ -630,9 +616,7 @@
     }
 }
 
-/* ---------------------------------------------------------
-   768px
-   --------------------------------------------------------- */
+/* 768px */
 @media (min-width: 768px) {
     .config-main {
         padding-top: 90px;
@@ -666,9 +650,7 @@
     }
 }
 
-/* ---------------------------------------------------------
-   900px
-   --------------------------------------------------------- */
+/* 900px */
 @media (min-width: 900px) {
     .config-container {
         padding: 0 28px;
@@ -684,9 +666,7 @@
     }
 }
 
-/* ---------------------------------------------------------
-   1024px
-   --------------------------------------------------------- */
+/* 1024px */
 @media (min-width: 1024px) {
     .config-main {
         padding-top: 96px;
@@ -701,18 +681,14 @@
     }
 }
 
-/* ---------------------------------------------------------
-   1280px
-   --------------------------------------------------------- */
+/* 1280px */
 @media (min-width: 1280px) {
     .config-container {
         padding: 0 32px;
     }
 }
 
-/* ---------------------------------------------------------
-   Reduced motion
-   --------------------------------------------------------- */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .btn-gold,
     .btn-danger-sm,

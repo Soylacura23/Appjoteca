@@ -38,7 +38,7 @@ requiereRol([3]);
 
 <?php include '../../../../shared/layouts/notifications.php'; ?>
 <?php include '../../../../shared/layouts/menu-off-canvas.php'; ?>
-<?php include '../../../../shared/layouts/menu-movil.php'; ?>
+<?php include_once __DIR__ . '/../../../../shared/layouts/menu-movil.php'; ?>
 
 <header class="topbar" role="banner">
     <div class="topbar-inner">
@@ -135,9 +135,58 @@ requiereRol([3]);
     </section>
 
     <!-- Estado de carga -->
-    <div id="reportes-loading" class="reportes-loading">
-        <span class="material-symbols-outlined spin">progress_activity</span>
-        <p>Cargando reportes...</p>
+    <div id="reportes-skeleton" class="reportes-skeleton" role="status" aria-label="Cargando reportes">
+        <span class="visually-hidden">Cargando reportes...</span>
+        <div class="skeleton-metrics" aria-hidden="true">
+            <?php for ($i = 0; $i < 7; $i++): ?>
+                <div class="skeleton-card">
+                    <span class="skeleton skeleton-icon"></span>
+                    <span class="skeleton skeleton-line skeleton-line-short"></span>
+                    <span class="skeleton skeleton-line skeleton-line-value"></span>
+                    <span class="skeleton skeleton-line skeleton-line-caption"></span>
+                </div>
+            <?php endfor; ?>
+        </div>
+        <div class="skeleton-analytics" aria-hidden="true">
+            <div class="skeleton-panel skeleton-chart">
+                <span class="skeleton skeleton-line skeleton-line-heading"></span>
+                <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                <span class="skeleton skeleton-chart-area"></span>
+            </div>
+            <div class="skeleton-insights">
+                <div class="skeleton-panel">
+                    <span class="skeleton skeleton-line skeleton-line-heading"></span>
+                    <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                    <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                </div>
+                <div class="skeleton-panel">
+                    <span class="skeleton skeleton-line skeleton-line-heading"></span>
+                    <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                </div>
+                <div class="skeleton-panel skeleton-publisher">
+                    <span class="skeleton skeleton-line skeleton-line-heading"></span>
+                    <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                    <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                </div>
+            </div>
+        </div>
+        <div class="skeleton-alerts" aria-hidden="true">
+            <?php for ($i = 0; $i < 3; $i++): ?>
+                <div class="skeleton-alert-card">
+                    <span class="skeleton skeleton-cover"></span>
+                    <span class="skeleton-alert-copy">
+                        <span class="skeleton skeleton-line skeleton-line-heading"></span>
+                        <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+                        <span class="skeleton skeleton-line skeleton-line-caption"></span>
+                    </span>
+                </div>
+            <?php endfor; ?>
+        </div>
+        <div class="skeleton-panel skeleton-quote" aria-hidden="true">
+            <span class="skeleton skeleton-line skeleton-line-heading"></span>
+            <span class="skeleton skeleton-line skeleton-line-quote"></span>
+            <span class="skeleton skeleton-line skeleton-line-subheading"></span>
+        </div>
     </div>
 
     <!-- Contenido (se llena con JS) -->

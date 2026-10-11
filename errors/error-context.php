@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../backend/config/security.php';
 
 $error_dashboard_urls = [
     1 => '/Appjoteca/dashboards/estudiante/index.php',

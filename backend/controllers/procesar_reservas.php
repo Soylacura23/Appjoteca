@@ -1,11 +1,8 @@
 <?php
-/**
- * Controlador POST — Procesar reservas y devoluciones
- * Acciones: aceptar | rechazar | devolver
- */
-
 header('Content-Type: application/json; charset=utf-8');
 
+require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/verify-csrf.php';
 require_once __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../models/reserva.php';
 require_once __DIR__ . '/../models/prestamo.php';
@@ -13,13 +10,17 @@ require_once __DIR__ . '/../models/notificacion.php';
 require_once __DIR__ . '/../models/historial.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'Método no permitido']);
     exit();
 }
 
+requiereRol([3, 4]);
+
 $accion      = $_POST['accion']      ?? '';
 $id_reserva  = (int) ($_POST['id_reserva']  ?? 0);
 $id_prestamo = (int) ($_POST['id_prestamo'] ?? 0);
+$cantidadDevolver = (int) ($_POST['cantidad'] ?? 1);
 $observacion = trim($_POST['observacion'] ?? '');
 
 $accionesValidas = ['aceptar', 'rechazar', 'devolver'];
@@ -34,7 +35,7 @@ $modeloPrestamo  = new Prestamo($connection);
 $modeloNotif     = new Notificacion($connection);
 $modeloHistorial = new Historial($connection);
 
-// ── ACEPTAR RESERVA ──────────────────────────────────────
+// ACEPTAR RESERVA
 if ($accion === 'aceptar') {
     if ($id_reserva <= 0) {
         echo json_encode(['ok' => false, 'error' => 'ID de reserva inválido']);
@@ -44,6 +45,10 @@ if ($accion === 'aceptar') {
     $detalle = $modeloReserva->obtenerDetalleReserva($id_reserva);
     if (!$detalle) {
         echo json_encode(['ok' => false, 'error' => 'Reserva no encontrada']);
+        exit();
+    }
+    if ($detalle['estado'] !== 'activa') {
+        echo json_encode(['ok' => false, 'error' => 'La reserva ya fue procesada.']);
         exit();
     }
 
@@ -83,7 +88,7 @@ if ($accion === 'aceptar') {
     exit();
 }
 
-// ── RECHAZAR RESERVA ─────────────────────────────────────
+// RECHAZAR RESERVA
 if ($accion === 'rechazar') {
     if ($id_reserva <= 0) {
         echo json_encode(['ok' => false, 'error' => 'ID de reserva inválido']);
@@ -93,6 +98,10 @@ if ($accion === 'rechazar') {
     $detalle = $modeloReserva->obtenerDetalleReserva($id_reserva);
     if (!$detalle) {
         echo json_encode(['ok' => false, 'error' => 'Reserva no encontrada']);
+        exit();
+    }
+    if ($detalle['estado'] !== 'activa') {
+        echo json_encode(['ok' => false, 'error' => 'La reserva ya fue procesada.']);
         exit();
     }
 
@@ -120,10 +129,14 @@ if ($accion === 'rechazar') {
     }
     exit();
 }
-// ── DEVOLVER PRÉSTAMO ────────────────────────────────────
+// DEVOLVER PRÉSTAMO
 if ($accion === 'devolver') {
     if ($id_prestamo <= 0) {
         echo json_encode(['ok' => false, 'error' => 'ID de préstamo inválido']);
+        exit();
+    }
+    if ($cantidadDevolver < 1) {
+        echo json_encode(['ok' => false, 'error' => 'La cantidad a devolver debe ser al menos 1.']);
         exit();
     }
 
@@ -134,13 +147,29 @@ if ($accion === 'devolver') {
         exit();
     }
 
-    $ok = $modeloPrestamo->registrarDevolucion($id_prestamo, $observacion ?: null);
+    $maximoDevolucion = (int) ($detalle['cantidad_devolver'] ?? 0);
+    if ($cantidadDevolver > $maximoDevolucion) {
+        echo json_encode([
+            'ok' => false,
+            'error' => "Solo puedes devolver hasta {$maximoDevolucion} ejemplar(es) de esta reserva."
+        ]);
+        exit();
+    }
+    $idsDevueltos = $modeloPrestamo->registrarDevolucionesRelacionadas(
+        $id_prestamo,
+        $cantidadDevolver,
+        $observacion ?: null
+    );
 
-    if ($ok) {
+    if (is_array($idsDevueltos) && count($idsDevueltos) === $cantidadDevolver) {
         $id_usuario = (int) $detalle['id_usuario'];
+        $cantidadTxt = count($idsDevueltos) === 1
+            ? '1 ejemplar'
+            : count($idsDevueltos) . ' ejemplares';
+        $idsTxt = implode(', #', $idsDevueltos);
 
         $modeloNotif->crear(
-            "Tu préstamo del libro «{$detalle['libro']}» fue marcado como devuelto.",
+            "Se registró la devolución de {$cantidadTxt} del libro «{$detalle['libro']}».",
             "/Appjoteca/pages/history/historial.php",
             $id_usuario
         );
@@ -148,11 +177,11 @@ if ($accion === 'devolver') {
         $modeloHistorial->registrar(
             $id_usuario,
             'devolucion',
-            'Devolución registrada',
-            "Préstamo #{$id_prestamo} · {$detalle['libro']}"
+            'Devoluciones registradas',
+            "{$cantidadTxt} · Préstamo(s) #{$idsTxt} · {$detalle['libro']}"
         );
 
-        echo json_encode(['ok' => true]);
+        echo json_encode(['ok' => true, 'cantidad' => count($idsDevueltos)]);
     } else {
         echo json_encode(['ok' => false, 'error' => 'No se pudo registrar la devolución.']);
     }

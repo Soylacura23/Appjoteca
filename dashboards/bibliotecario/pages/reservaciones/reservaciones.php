@@ -12,6 +12,7 @@ requiereRol([3]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Reservaciones · APPJOTECA</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
@@ -126,7 +127,7 @@ requiereRol([3]);
     </nav>
 </aside>
 
-<?php include '../../../../shared/layouts/menu-movil.php'; ?>
+<?php include_once __DIR__ . '/../../../../shared/layouts/menu-movil.php'; ?>
 
 <!-- Main Content -->
 <main id="main-content" class="main-content">
@@ -263,7 +264,7 @@ requiereRol([3]);
                 <span id="loan-user">—</span>
             </div>
             <div class="loan-overlay-field">
-                <label>Ejemplar</label>
+                <label>Ejemplares en este préstamo</label>
                 <span id="loan-ejemplar">—</span>
             </div>
             <div class="loan-overlay-field">
@@ -284,7 +285,7 @@ requiereRol([3]);
             </div>
         </div>
         <div class="loan-overlay-actions">
-            <button class="btn-return" id="loan-btn-devolver">Marcar como Devuelto</button>
+            <button class="btn-return" id="loan-btn-devolver">Devolver</button>
         </div>
     </div>
 </div>
@@ -292,6 +293,8 @@ requiereRol([3]);
 <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="/Appjoteca/shared/js/components/alert.js"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../../../shared/js/global.js"></script>
 <script src="reservaciones.js"></script>

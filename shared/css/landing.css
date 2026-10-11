@@ -25,9 +25,7 @@
     --gradient-gold: linear-gradient(135deg, #d4af37 0%, #b8962e 50%, #8a6d1e 100%);
   }
   
-  /* ==========================================================================
-     RESET & BASE
-     ========================================================================== */
+  /* RESET & BASE */
   * {
     margin: 0;
     padding: 0;
@@ -69,9 +67,7 @@
     background-clip: text;
   }
   
-  /* ==========================================================================
-     BOTONES
-     ========================================================================== */
+  /* BOTONES */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -153,9 +149,7 @@
     opacity: 0.9;
   }
   
-  /* ==========================================================================
-     SECTION HEADERS
-     ========================================================================== */
+  /* SECTION HEADERS */
   .section-header {
     margin-bottom: 3rem;
   }
@@ -198,9 +192,7 @@
     margin-top: 1rem;
   }
   
-  /* ==========================================================================
-     HERO CON IMAGEN DE FONDO
-     ========================================================================== */
+  /* HERO CON IMAGEN DE FONDO */
   .hero-header {
     position: relative;
     min-height: 100vh;
@@ -330,9 +322,7 @@
     50% { transform: translateX(-50%) translateY(10px); opacity: 0.5; }
   }
   
-  /* ==========================================================================
-     SCROLL HORIZONTAL DE LIBROS
-     ========================================================================== */
+  /* SCROLL HORIZONTAL DE LIBROS */
   .books-scroll {
     padding: 6rem 0;
     background: linear-gradient(180deg, var(--bg-base) 0%, #0d0a05 50%, var(--bg-base) 100%);
@@ -473,9 +463,7 @@
     font-size: 0.95rem;
   }
   
-  /* ==========================================================================
-     MARQUESINA
-     ========================================================================== */
+  /* MARQUESINA */
   .marquee-section {
     overflow: hidden;
     padding: 1.5rem 0;
@@ -541,9 +529,7 @@
     100% { transform: translateX(-50%); }
   }
   
-  /* ==========================================================================
-     CATEGORÍAS
-     ========================================================================== */
+  /* CATEGORÍAS */
   .categories {
     max-width: 1400px;
     margin: 0 auto;
@@ -649,9 +635,7 @@
     cursor: default;
   }
   
-  /* ==========================================================================
-     FILOSOFÍA
-     ========================================================================== */
+  /* FILOSOFÍA */
   .philosophy {
     position: relative;
     padding: 8rem 2rem;
@@ -704,9 +688,7 @@
     color: var(--text-secondary);
   }
   
-  /* ==========================================================================
-     ESTADÍSTICAS
-     ========================================================================== */
+  /* ESTADÍSTICAS */
   .stats {
     background: linear-gradient(180deg, var(--bg-surface) 0%, #0f0c08 100%);
     border-top: 1px solid rgba(212, 175, 55, 0.15);
@@ -788,9 +770,7 @@
     font-weight: 500;
   }
   
-  /* ==========================================================================
-     LIBRO DE LA SEMANA
-     ========================================================================== */
+  /* LIBRO DE LA SEMANA */
   .book-week {
     padding: 6rem 2rem;
     background-color: var(--bg-base);
@@ -872,10 +852,34 @@
     font-size: 1.05rem;
     margin-bottom: 1.5rem;
   }
+
+  .book-week-copy.is-collapsed {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    overflow: hidden;
+  }
+
+  .book-week-toggle {
+    align-self: flex-start;
+    margin-top: -1.25rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--primary-color);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .book-week-toggle:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   
-  /* ==========================================================================
-     AUTORES DESTACADOS
-     ========================================================================== */
+  /* AUTORES DESTACADOS */
   .authors {
     max-width: 1400px;
     margin: 0 auto;
@@ -973,9 +977,8 @@
     font-size: 1.3rem;
     color: var(--text-primary);
     line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   
   .author-reveal {
@@ -1008,9 +1011,7 @@
     border-color: rgba(212, 175, 55, 0.15);
   }
   
-  /* ==========================================================================
-     COLECCIONES
-     ========================================================================== */
+  /* COLECCIONES */
   .collections {
     max-width: 1400px;
     margin: 0 auto;
@@ -1115,9 +1116,7 @@
     cursor: default;
   }
   
-  /* ==========================================================================
-     TRANSICIÓN DIFUMINADA ANTES DEL CTA FINAL
-     ========================================================================== */
+  /* TRANSICIÓN DIFUMINADA ANTES DEL CTA FINAL */
   .section-transition {
     position: relative;
     height: 180px;
@@ -1158,9 +1157,7 @@
     opacity: 0.7;
   }
   
-  /* ==========================================================================
-     CTA FINAL
-     ========================================================================== */
+  /* CTA FINAL */
   .cta-final {
     position: relative;
     padding: 8rem 2rem;
@@ -1231,9 +1228,7 @@
     max-width: 500px;
   }
   
-  /* ==========================================================================
-     RESPONSIVE
-     ========================================================================== */
+  /* RESPONSIVE */
   @media (max-width: 900px) {
     .hero-title {
       letter-spacing: 2px;

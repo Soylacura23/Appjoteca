@@ -6,6 +6,7 @@
     const LIMITE_INICIAL = 5;
     const LIMITE_MAS = 10;
     const SWIPE_MIN = 80;
+    const csrfToken = document.getElementById('app-csrf-token')?.dataset.token || '';
 
     const panel     = document.getElementById('notification-container');
     const listaEl   = document.getElementById('notification-list');
@@ -18,14 +19,15 @@
     let offset = 0;
     let cargando = false;
 
-    /* ── Helpers ─────────────────────────────────── */
+    /* Helpers */
 
     function escaparHTML(texto) {
         return String(texto)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function tiempoRelativo(fechaStr) {
@@ -54,6 +56,8 @@
     function itemHTML(item) {
         const unread = item.leida ? '' : ' unread';
         const mensaje = item.mensaje || '';
+        const mensajeLargo = mensaje.length > 180;
+        const id = Number(item.id) || 0;
         const titulo = mensaje.length > 60
             ? mensaje.slice(0, 60) + '…'
             : mensaje;
@@ -61,7 +65,7 @@
         const fullAttr = escaparHTML(mensaje);
 
         return `
-            <div class="notification-item${unread}" data-id="${item.id}"${urlAttr} title="${fullAttr}">
+            <div class="notification-item${unread}" data-id="${id}"${urlAttr} title="${fullAttr}">
                 <div class="notification-item-content">
                     <span class="notification-dot"></span>
                     <div class="notification-icon">
@@ -69,7 +73,8 @@
                     </div>
                     <div class="notification-body">
                         <p class="notification-title">${escaparHTML(titulo)}</p>
-                        <p class="notification-desc">${escaparHTML(mensaje)}</p>
+                        <p class="notification-desc${mensajeLargo ? ' is-collapsed' : ''}">${escaparHTML(mensaje)}</p>
+                        ${mensajeLargo ? '<button type="button" class="notification-expand" aria-expanded="false">Ver más</button>' : ''}
                     </div>
                     <span class="notification-time">${tiempoRelativo(item.fecha)}</span>
                     <button type="button" class="notification-delete" aria-label="Eliminar notificación" title="Eliminar">
@@ -88,7 +93,7 @@
         if (btnMas) btnMas.style.display = 'none';
     }
 
-    /* ── API ─────────────────────────────────────── */
+    /* API */
 
     async function pedirListado(limite, desde, reemplazar) {
         if (cargando) return;
@@ -134,6 +139,7 @@
         const body = new FormData();
         body.append('accion', 'marcar_una');
         body.append('id_notificacion', id);
+        body.append('csrf_token', csrfToken);
 
         const res = await fetch(API, { method: 'POST', body, credentials: 'same-origin' });
         const data = await res.json();
@@ -143,6 +149,7 @@
     async function marcarTodas() {
         const body = new FormData();
         body.append('accion', 'marcar_todas');
+        body.append('csrf_token', csrfToken);
 
         const res = await fetch(API, { method: 'POST', body, credentials: 'same-origin' });
         const data = await res.json();
@@ -161,6 +168,7 @@
         const body = new FormData();
         body.append('accion', 'eliminar');
         body.append('id_notificacion', id);
+        body.append('csrf_token', csrfToken);
 
         try {
             const res = await fetch(API, { method: 'POST', body, credentials: 'same-origin' });
@@ -181,7 +189,7 @@
         }
     }
 
-    /* ── Eventos de la bandeja ───────────────────── */
+    /* Eventos de la bandeja */
 
     const observer = new MutationObserver(() => {
         if (panel.classList.contains('open') && listaEl.children.length === 0) {
@@ -231,18 +239,43 @@
             marcarUna(id);
         }
 
+        const btnExpandir = e.target.closest('.notification-expand');
+        if (btnExpandir) {
+            e.stopPropagation();
+            const desc = item.querySelector('.notification-desc');
+            const expandido = btnExpandir.getAttribute('aria-expanded') !== 'true';
+            if (desc) desc.classList.toggle('is-expanded', expandido);
+            btnExpandir.setAttribute('aria-expanded', String(expandido));
+            btnExpandir.textContent = expandido ? 'Ver menos' : 'Ver más';
+            return;
+        }
+
         if (!item.classList.contains('expanded')) {
             item.classList.add('expanded');
+            const btnExpandir = item.querySelector('.notification-expand');
+            const desc = item.querySelector('.notification-desc');
+            if (desc) desc.classList.add('is-expanded');
+            if (btnExpandir) {
+                btnExpandir.setAttribute('aria-expanded', 'true');
+                btnExpandir.textContent = 'Ver menos';
+            }
             return;
         }
 
         const url = item.getAttribute('data-url');
         if (url) {
-            window.location.href = url;
+            try {
+                const target = new URL(url, window.location.origin);
+                if (target.origin === window.location.origin && target.pathname.startsWith('/Appjoteca/')) {
+                    window.location.href = target.href;
+                }
+            } catch {
+                console.error('Enlace de notificación no válido.');
+            }
         }
     });
 
-    /* ── Swipe para eliminar (móvil) ─────────────── */
+    /* Swipe para eliminar (móvil) */
 
     let touchStartX = 0;
     let touchStartY = 0;

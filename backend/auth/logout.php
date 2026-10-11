@@ -1,14 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start([
-        'cookie_lifetime' => 0,
-        'cookie_path'     => '/Appjoteca',
-        'cookie_domain'   => '/',
-        'cookie_secure'   => true,
-        'cookie_httponly' => true,
-        'cookie_samesite' => 'Lax'
-    ]);
-}
+require_once __DIR__ . '/../config/security.php';
 
 if (isset($_SESSION['usuario_id'])) {
     require_once(__DIR__ . "/../Database/conexion.php"); 
@@ -39,8 +30,7 @@ if (ini_get('session.use_cookies')) {
 setcookie("remember_me", "", [
     'expires' => time() - 3600,
     'path' => '/Appjoteca',
-    'domain' => '/',
-    'secure' => false,
+    'secure' => true,
     'httponly' => true,
     'samesite' => 'Lax'
 ]);

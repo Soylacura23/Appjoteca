@@ -1,28 +1,39 @@
 <?php
 
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
+ini_set('log_errors', 1);
 
 require_once __DIR__ . '/../config/verify-csrf.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start([
-        'cookie_lifetime' => 0,                      
-        'cookie_path'     => '/Appjoteca',           
-        'cookie_domain'   => '/',
-        'cookie_secure'   => false,                  
-        'cookie_httponly' => true,                   
-        'cookie_samesite' => 'Lax'                 
-    ]);
+require("../Database/conexion.php");
+require_once __DIR__ . '/../helpers/RateLimiter.php';
+
+header('Content-Type: application/json; charset=utf-8');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Método no permitido.']);
+    exit;
 }
 
-require("../Database/conexion.php"); 
+if (!empty($_POST['middle_name'])) {
+    echo json_encode(['status' => 'error', 'message' => 'No se pudo iniciar sesión.']);
+    exit;
+}
+
+$limiter = new RateLimiter($connection, 10, 900);
+if (!$limiter->check('login:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+    http_response_code(429);
+    echo json_encode(['status' => 'error', 'message' => 'Demasiados intentos. Inténtalo más tarde.']);
+    exit;
+}
 
 if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['remember_me'])) {
     $token_cookie = $_COOKIE['remember_me'];
 
-    $sql_cookie = "SELECT * FROM usuarios WHERE remember_token = ?";
+    $sql_cookie = "SELECT id_usuario, nombre_usuario, nombre_apellido, id_rol, foto_perfil, documento
+                   FROM usuarios WHERE remember_token = ? AND estado = '1'";
     $query_cookie = $connection->prepare($sql_cookie);
 
     $query_cookie->bind_param("s", $token_cookie);
@@ -45,21 +56,26 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['remember_me'])) {
         $_SESSION['documento'] = $usuario_db['documento'];
 
     } else {
-        setcookie("remember_me", "", time() - 3600, "/Appjoteca", "localhost", false, true);
+        setcookie("remember_me", "", [
+            'expires' => time() - 3600,
+            'path' => '/Appjoteca',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
     }
 }
 
 
-header('Content-Type: application/json');
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    $user_input   = $_POST['usuario'] ?? ''; 
-    $pass_input   = $_POST['contrasena'] ?? ''; 
-
+    $user_input   = is_string($_POST['usuario'] ?? null) ? trim($_POST['usuario']) : '';
+    $pass_input   = is_string($_POST['contrasena'] ?? null) ? $_POST['contrasena'] : '';
 
 
-    $sql = "SELECT * FROM usuarios WHERE nombre_usuario = ? OR correo_institucional = ?";
+
+    $sql = "SELECT id_usuario, nombre_usuario, nombre_apellido, id_rol, foto_perfil,
+                   documento, password, estado
+            FROM usuarios WHERE nombre_usuario = ? OR correo_institucional = ?";
     $query = $connection->prepare($sql);
     $query->bind_param("ss", $user_input, $user_input);
     $query->execute();
@@ -69,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($resultado->num_rows < 1) {
         echo json_encode([
             'status' => 'error',
-            'message' => 'No existe la cuenta o está pendiente de aprobación por parte de un administrador.'
+            'message' => 'El usuario o la contraseña no son correctos.'
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -79,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($usuario_db['estado']) && strtolower($usuario_db['estado']) === 'pendiente') {
         echo json_encode([
             'status' => 'error',
-            'message' => 'No existe la cuenta o está pendiente de aprobación por parte de un administrador.'
+            'message' => 'El usuario o la contraseña no son correctos.'
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -112,7 +128,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             setcookie("remember_me", $token, [
                 'expires' => $expiracion,
                 'path' => '/Appjoteca',
-                'domain' => '/',
                 'secure' => true,       
                 'httponly' => true,      
                 'samesite' => 'Lax'
