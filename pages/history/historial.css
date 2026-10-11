@@ -599,7 +599,7 @@
       0 6px 28px rgba(242, 202, 80, 0.35),
       0 0 0 1px rgba(242, 202, 80, 0.3);
   }
-  
+
   .mobile-sidebar-toggle:active {
     transform: scale(0.95);
   }
@@ -629,6 +629,11 @@
   
     .historial-sidebar.mobile-open {
       transform: translateX(0);
+      z-index: var(--z-mobile-menu);
+    }
+
+    #overlay {
+      z-index: var(--z-mobile-overlay);
     }
   
     .historial-sidebar.expanded {

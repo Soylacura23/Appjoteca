@@ -255,7 +255,7 @@ function formatearFechaHistorial($fecha) {
                     <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80" alt="Pasillo de biblioteca" loading="lazy">
                     <div class="quote-overlay">
                         <span class="material-symbols-outlined quote-icon">format_quote</span>
-                        <p class="quote-text">"The library is a growing organism; your history is its lifeblood."</p>
+                        <p class="quote-text">"La biblioteca es un organismo creciente"</p>
                         <p class="quote-author">— S.R. Ranganathan</p>
                     </div>
                 </section>
@@ -266,14 +266,6 @@ function formatearFechaHistorial($fecha) {
 
     <!-- FOOTER -->
     <?php include '../../shared/layouts/footer.php'; ?>
-
-    <!-- FAB -->
-    <div class="fab-container">
-        <button class="fab" aria-label="Explorar el archivo">
-            <span class="material-symbols-outlined">auto_stories</span>
-            <span class="fab-text">Explorar</span>
-        </button>
-    </div>
 
     <!-- Scripts compartidos -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

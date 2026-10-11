@@ -1,5 +1,4 @@
    document.addEventListener('DOMContentLoaded', () => {
-    // Elementos del DOM
     const sidebar       = document.getElementById('historialSidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const mobileToggle  = document.getElementById('mobileSidebarToggle');
@@ -22,12 +21,14 @@
     // ── Mobile: abrir sidebar ──
     mobileToggle?.addEventListener('click', () => {
       sidebar.classList.add('mobile-open');
+      sidebarToggle.style.visibility = 'hidden';
       overlay.classList.add('show');
     });
   
     // ── Cerrar sidebar mobile ──
     const closeMobileSidebar = () => {
       sidebar.classList.remove('mobile-open');
+      sidebarToggle.style.visibility = 'visible';
       overlay.classList.remove('show');
     };
   
