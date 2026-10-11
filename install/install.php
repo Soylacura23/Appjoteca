@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (file_exists(__DIR__ . '/../install.lock.php')) {
+if (file_exists(__DIR__ . '/../install.lock')) {
     header('Location: ../index.php');
     exit;
 }
