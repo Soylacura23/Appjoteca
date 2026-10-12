@@ -310,7 +310,7 @@ $iconos_categorias = ['auto_stories', 'account_balance', 'psychology', 'science'
         <?php foreach ($autores_destacados as $index => $autor): 
             $av = autor_avatar($autor['nombre_autor'] ?? 'Autor');
         ?>
-        <a href="#" class="author-card" data-aos="fade-up" data-aos-delay="<?= (int) ($index * 100) ?>">
+        <a href="auth/login/login.php?return_to=author&amp;id=<?= (int) $autor['id_autor'] ?>" class="author-card" data-aos="fade-up" data-aos-delay="<?= (int) ($index * 100) ?>">
             <div class="author-avatar" style="background: <?= htmlspecialchars($av['grad'], ENT_QUOTES, 'UTF-8') ?>;">
                 <span><?= htmlspecialchars($av['ini'], ENT_QUOTES, 'UTF-8') ?></span>
             </div>

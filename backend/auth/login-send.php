@@ -164,6 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $rol = (int) $usuario_db['id_rol'];
         $url_destino = $destinos[$rol] ?? '../../index.php';
         $return_to = $_POST['return_to'] ?? '';
+        $return_id = filter_var($_POST['return_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if ($return_to === 'catalog') {
             $url_destino = $rol === 3
@@ -171,6 +172,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 : '../../pages/biblioteca-digital/index.php';
         } elseif ($return_to === 'history' && in_array($rol, [1, 2], true)) {
             $url_destino = '../../pages/history/historial.php';
+        } elseif ($return_id !== false && $return_to === 'book' && in_array($rol, [1, 2, 3], true)) {
+            $url_destino = $rol === 3
+                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php?open_book=' . $return_id
+                : '../../pages/biblioteca-catalogo/vista-libro/book-view.php?id=' . $return_id;
+        } elseif ($return_id !== false && $return_to === 'author' && in_array($rol, [1, 2, 3], true)) {
+            $url_destino = $rol === 3
+                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php?autor=' . $return_id
+                : '../../pages/biblioteca-catalogo/catalogo/catalogo.php?autor=' . $return_id;
         }
 
         echo json_encode([

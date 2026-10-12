@@ -40,7 +40,7 @@ class libro
     }
 
     /* ── Listado paginado (inventario) ── */
-    public function listarLibrosPaginado($pagina, $porPagina, $estado = '', $idMateria = 0, $orden = 'title-asc', $busqueda = '')
+    public function listarLibrosPaginado($pagina, $porPagina, $estado = '', $idMateria = 0, $orden = 'title-asc', $busqueda = '', $idAutor = 0)
     {
         $where  = ["l.fecha_eliminacion_libro IS NULL"];
         $params = [];
@@ -49,6 +49,15 @@ class libro
         if ($idMateria > 0) {
             $where[]  = "l.id_materia = ?";
             $params[] = $idMateria;
+            $types   .= 'i';
+        }
+
+        if ($idAutor > 0) {
+            $where[] = "EXISTS (
+                            SELECT 1 FROM libro_autor la_filtro
+                            WHERE la_filtro.id_libro = l.id_libro AND la_filtro.id_autor = ?
+                        )";
+            $params[] = $idAutor;
             $types   .= 'i';
         }
 

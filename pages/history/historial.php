@@ -255,8 +255,8 @@ function formatearFechaHistorial($fecha) {
                     <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80" alt="Pasillo de biblioteca" loading="lazy">
                     <div class="quote-overlay">
                         <span class="material-symbols-outlined quote-icon">format_quote</span>
-                        <p class="quote-text">"La biblioteca es un organismo creciente"</p>
-                        <p class="quote-author">— S.R. Ranganathan</p>
+                        <p class="quote-text">"Un libro abierto es un cerebro que habla; cerrado, un amigo que espera; olvidado, un alma que perdona; destruido, un corazón que llora"</p>
+                        <p class="quote-author">— Proverbio hindú</p>
                     </div>
                 </section>
 

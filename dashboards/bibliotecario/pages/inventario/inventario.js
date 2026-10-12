@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let esNuevo = false;
     let coautores = [];
     let portadaUrlTemp = null;
+    const parametrosBusqueda = new URLSearchParams(window.location.search);
+    const idAutorSolicitado = Number(parametrosBusqueda.get('autor')) || 0;
 
     // HELPERS
     function toast(msg, tipo = 'info') {
@@ -107,7 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 pagina: pagina,
                 estado: estado,
                 materia: materia,
-                orden: orden
+                orden: orden,
+                autor: idAutorSolicitado
             });
 
             if (data.status !== 'success') {
@@ -724,7 +727,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // INICIO
-    const parametrosBusqueda = new URLSearchParams(window.location.search);
     const idLibroSolicitado = Number(parametrosBusqueda.get('open_book'));
     if (Number.isInteger(idLibroSolicitado) && idLibroSolicitado > 0) {
         cargarCatalogos().then(() => abrirDetalle(idLibroSolicitado));

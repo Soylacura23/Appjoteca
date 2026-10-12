@@ -87,12 +87,18 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
             <label for="middle-name-field">Deja este campo vacío</label>
             <input type="text" id="middle-name-field" name="middle_name" tabindex="-1" autocomplete="off">
           </div>
-          <input type="hidden" name="return_to" value="<?php
-            $return_to = $_GET['return_to'] ?? '';
-            echo in_array($return_to, ['catalog', 'history'], true)
-              ? htmlspecialchars($return_to, ENT_QUOTES, 'UTF-8')
-              : '';
-          ?>">
+          <?php
+            $return_to = is_string($_GET['return_to'] ?? null) ? $_GET['return_to'] : '';
+            $return_id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $return_to_allowed = ['catalog', 'history', 'book', 'author'];
+            if (!in_array($return_to, $return_to_allowed, true)
+                || (in_array($return_to, ['book', 'author'], true) && $return_id === false)) {
+              $return_to = '';
+              $return_id = '';
+            }
+          ?>
+          <input type="hidden" name="return_to" value="<?= htmlspecialchars($return_to, ENT_QUOTES, 'UTF-8') ?>">
+          <input type="hidden" name="return_id" value="<?= $return_id === false ? '' : (int) $return_id ?>">
 
           <!-- Usuario -->
           <div class="field-group">

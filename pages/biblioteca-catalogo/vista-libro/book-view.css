@@ -296,6 +296,7 @@ body{
 .synopsis-text.is-collapsed {
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    line-clamp: 7;
     -webkit-line-clamp: 7;
     overflow: hidden;
 }

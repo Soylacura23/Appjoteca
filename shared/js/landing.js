@@ -176,7 +176,7 @@
             <p class="book-week-author">Por ${autor}</p>
             <p class="book-week-copy${resumenLargo ? ' is-collapsed' : ''}">${resumen}</p>
             ${resumenLargo ? '<button class="book-week-toggle" type="button" aria-expanded="false">Ver más</button>' : ''}
-            <a href="#" class="btn btn-primary btn-glow">
+            <a href="/Appjoteca/auth/login/login.php?return_to=book&amp;id=${encodeURIComponent(libro.id_libro)}" class="btn btn-primary btn-glow">
                 <span class="material-symbols-outlined">menu_book</span>
                 Descubrir la Obra
             </a>

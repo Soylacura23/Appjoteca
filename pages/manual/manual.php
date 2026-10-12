@@ -41,7 +41,7 @@ require_once __DIR__ . '/../../backend/config/security.php';
             </ul>
         </nav>
         <div class="header-actions">
-            <a href="auth/login/login.php" class="btn btn-primary btn-header">
+            <a href="../../auth/login/login.php" class="btn btn-primary btn-header">
                 <span class="material-symbols-outlined">login</span>
                 Acceder
             </a>

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         disponibilidad: '',
         orden: 'recommended',
         busqueda: '',
+        idAutor: Number(new URLSearchParams(window.location.search).get('autor')) || 0,
         debounceTimer: null
     };
 
@@ -35,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 materia: estado.materiaId,
                 query: estado.busqueda,
                 availability: estado.disponibilidad,
-                sort: estado.orden
+                sort: estado.orden,
+                autor: estado.idAutor
             });
 
             const response = await fetch(`back.php?${params.toString()}`);

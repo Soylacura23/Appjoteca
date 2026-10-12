@@ -1,6 +1,4 @@
 <?php
-// back.php - Endpoint del catálogo público
-
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
@@ -8,12 +6,10 @@ error_reporting(E_ALL);
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-    // Cambia estas rutas si tu estructura es distinta
     require_once __DIR__ . '/../../../backend/config/auth.php';
     require_once __DIR__ . '/../../../backend/Database/conexion.php';
     require_once __DIR__ . '/../../../backend/models/libro.php';
 
-    // Verificar sesión
     $mi_id = $_SESSION['usuario_id'] ?? null;
 
     if (!$mi_id) {
@@ -36,6 +32,7 @@ try {
     $busqueda  = trim($_GET['query'] ?? '');
     $estado    = trim($_GET['availability'] ?? '');
     $orden     = trim($_GET['sort'] ?? 'recommended');
+    $idAutor   = max(0, (int) ($_GET['autor'] ?? 0));
     $limite    = min(30, max(1, (int) ($_GET['limit'] ?? 10)));
 
     // Listado paginado del modelo
@@ -45,7 +42,8 @@ try {
         $estado,
         $materiaId,
         $orden,
-        $busqueda
+        $busqueda,
+        $idAutor
     );
 
     // Materias (categorías)

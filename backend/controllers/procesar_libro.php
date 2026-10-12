@@ -208,9 +208,10 @@ switch ($action) {
         $filtroMateria = (int)($_GET['materia'] ?? 0);
         $orden         = $_GET['orden']   ?? 'title-asc';
         $busqueda      = trim($_GET['q']  ?? '');
+        $filtroAutor   = max(0, (int)($_GET['autor'] ?? 0));
 
         $resultado = $modelo->listarLibrosPaginado(
-            $pagina, $porPagina, $filtroEstado, $filtroMateria, $orden, $busqueda
+            $pagina, $porPagina, $filtroEstado, $filtroMateria, $orden, $busqueda, $filtroAutor
         );
         responder('success', '', $resultado);
         break;
