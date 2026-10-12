@@ -94,5 +94,6 @@ require_once __DIR__ . '/../../backend/config/security.php';
 
     <script src="../../shared/js/menu.js" onerror="this.remove()"></script>
     <script src="manual.js"></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

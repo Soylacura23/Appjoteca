@@ -298,5 +298,6 @@ requiereRol([3]);
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../../../shared/js/global.js"></script>
 <script src="reservaciones.js"></script>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

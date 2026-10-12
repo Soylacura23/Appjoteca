@@ -301,5 +301,6 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
    <script src="../../shared/js/components/password-strength.js"></script>
   <script src="signup.js"></script>
+  <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

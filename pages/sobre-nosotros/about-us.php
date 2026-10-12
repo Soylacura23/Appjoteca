@@ -321,5 +321,6 @@ if (empty($_SESSION['csrf_token'])) {
 
     <script src="../../shared/js/menu.js"></script>
     <script src="about-us.js"></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

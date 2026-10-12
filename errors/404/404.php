@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Recurso Perdido | AppJoteca</title>
-    
+
     <base href="/Appjoteca/errors/404/">
     
     <link rel="stylesheet" href="../../shared/css/theme.css">
@@ -64,5 +64,6 @@
 
     <script src="404.js" defer></script>
 
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

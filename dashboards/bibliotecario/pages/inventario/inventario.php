@@ -561,5 +561,6 @@ requiereRol([3]);
 
 <script src="../../../../shared/js/global.js"></script>
 <script src="inventario.js"></script>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

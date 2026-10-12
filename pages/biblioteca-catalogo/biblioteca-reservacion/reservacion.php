@@ -310,5 +310,6 @@ $edicionLabel = trim(($edicion !== '' ? $edicion : 'Edición') . ($anio ? ' · '
 
   <!-- Script propio -->
   <script src="reservacion.js"></script>
+  <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

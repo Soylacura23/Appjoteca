@@ -253,5 +253,6 @@ $connection->close();
             <button type="submit">Crear administrador</button>
         </form>
     </div>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

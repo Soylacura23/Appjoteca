@@ -382,5 +382,6 @@ requiereRol([3]);
     <script src="../../../../shared/js/global.js"></script>
 
     <script src="configuracion-catalogo.js"></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

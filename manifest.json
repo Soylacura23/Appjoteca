@@ -1,0 +1,53 @@
+{
+  "name": "AppJoteca",
+  "short_name": "AppJoteca",
+  "description": "El Legado de la Humanidad - Biblioteca digital",
+  "start_url": "/Appjoteca/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "shared/images/favicon.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "shared/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "shared/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+
+  "shortcuts": [
+  {
+    "name": "Inicio",
+    "short_name": "Inicio",
+    "description": "Ir al inicio de AppJoteca",
+    "url": "/Appjoteca/",
+    "icons": [{ "src": "/Appjoteca/shared/images/icon-192.png", "sizes": "192x192" }]
+  },
+  {
+    "name": "Catálogo",
+    "short_name": "Catálogo",
+    "description": "Ver el catálogo de libros",
+    "url": "/Appjoteca/pages/biblioteca-digital/index.php",
+    "icons": [{ "src": "/Appjoteca/shared/images/icon-192.png", "sizes": "192x192" }]
+  },
+  {
+    "name": "Sobre Nosotros",
+    "short_name": "Nosotros",
+    "description": "Conoce AppJoteca",
+    "url": "/Appjoteca/pages/sobre-nosotros/about-us.php",
+    "icons": [{ "src": "/Appjoteca/shared/images/icon-192.png", "sizes": "192x192" }]
+  }
+]
+}

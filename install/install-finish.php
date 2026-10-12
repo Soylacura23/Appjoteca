@@ -88,5 +88,6 @@ session_destroy();
         <p>Recomendación: elimina o renombra <code>install.php</code> y <code>create-admin.php</code>.</p>
         <a href="/Appjoteca/index.php">Ir a la aplicación</a>
     </div>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

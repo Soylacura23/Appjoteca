@@ -94,5 +94,6 @@ requiereRol([1, 2]);
     <script src="../../../shared/js/components/catalog-filters.js"></script>
     <script src="../../../shared/js/global.js"></script>
     <script src="catalogo.js"></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

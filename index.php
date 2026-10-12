@@ -403,5 +403,6 @@ if (file_exists('shared/layouts/footer.php')) {
 
 <script src="shared/js/menu.js" onerror="this.remove()"></script>
 <script src="shared/js/landing.js"></script>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

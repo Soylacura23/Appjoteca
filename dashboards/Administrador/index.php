@@ -211,5 +211,6 @@ requiereRol([4]);
 <script src="../../shared/js/global.js"></script>
 <script src="administrador.js"></script>
 
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

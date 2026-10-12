@@ -394,5 +394,6 @@ $foto_documento_es_pdf = str_ends_with(
 <script src="../../shared/js/global.js"></script>
 <script src="configuracion.js"></script>
 
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

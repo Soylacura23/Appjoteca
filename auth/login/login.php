@@ -217,5 +217,6 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
   <script src="login.js"></script>
   
+  <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

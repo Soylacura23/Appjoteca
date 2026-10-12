@@ -457,5 +457,6 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 <script src="../../../../shared/js/global.js"></script>
 <script src="ajustes.js"></script>
 
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

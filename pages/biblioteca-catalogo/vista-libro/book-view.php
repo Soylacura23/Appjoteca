@@ -24,7 +24,7 @@ $libro = $modeloLibro->obtenerLibro($id_libro);
 
 if (!$libro) {
     http_response_code(404);
-    echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Libro no encontrado</title></head><body style="background:#000;color:#e2e2e2;font-family:sans-serif;padding:40px;text-align:center;"><h1>Libro no encontrado</h1><a href="/Appjoteca/pages/biblioteca-catalogo/catalogo/catalogo.php" style="color:#f2ca50;">Volver al catálogo</a></body></html>';
+    echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Libro no encontrado</title><link rel="icon" type="image/png" href="/Appjoteca/shared/images/favicon.png" sizes="48x48"><link rel="manifest" href="/Appjoteca/manifest.json"><meta name="theme-color" content="#1a1a2e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="AppJoteca"></head><body style="background:#000;color:#e2e2e2;font-family:sans-serif;padding:40px;text-align:center;"><h1>Libro no encontrado</h1><a href="/Appjoteca/pages/biblioteca-catalogo/catalogo/catalogo.php" style="color:#f2ca50;">Volver al catálogo</a><script src="/Appjoteca/shared/js/register-sw.js"></script></body></html>';
     exit;
 }
 
@@ -47,6 +47,8 @@ if (!empty($_SESSION['usuario_id'])) {
 }
 
 $librosRelacionados = $modeloLibro->obtenerRelacionados($id_libro, 4);
+
+requiereRol([1, 2]); 
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -261,5 +263,6 @@ $librosRelacionados = $modeloLibro->obtenerRelacionados($id_libro, 4);
     <script src="../../../shared/js/global.js"></script>
     <script src="book-view.js"></script>
 
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

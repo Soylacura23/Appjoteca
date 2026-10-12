@@ -27,5 +27,6 @@ require_once __DIR__ . '/../../backend/config/security.php';
         </div>
     </main>
     <?php include __DIR__ . '/../../shared/layouts/footer.php'; ?>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

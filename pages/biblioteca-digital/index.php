@@ -8,6 +8,8 @@ $base_url = '/Appjoteca/';
 $modeloLibro = new libro($connection);
 $librosCarrusel = $modeloLibro->listarLibrosPaginado(1, 5, '', 0, 'recommended')['libros'];
 $librosCatalogo = $modeloLibro->listarLibrosPaginado(1, 8, '', 0, 'recommended')['libros'];
+
+requiereRol([1, 2]);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -196,5 +198,6 @@ $librosCatalogo = $modeloLibro->listarLibrosPaginado(1, 8, '', 0, 'recommended')
     <script src="../../shared/js/global.js"></script>
     <script src="biblioteca.js"></script>
 
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

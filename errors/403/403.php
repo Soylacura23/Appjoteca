@@ -84,5 +84,6 @@
 
     
     <script src="403.js" defer></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

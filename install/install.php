@@ -37,6 +37,7 @@ if ($step === 'composer') {
         <p>Ejecuta en la raíz del proyecto:</p>
         <pre>composer install</pre>
         <a href="?step=composer">Reintentar</a>
+        <script src="/Appjoteca/shared/js/register-sw.js"></script>
     </body>
     </html>
 <?php
@@ -92,6 +93,7 @@ if ($step === 'env') {
             <?php endforeach; ?>
         </ul>
         <a href="?step=env">Reintentar</a>
+        <script src="/Appjoteca/shared/js/register-sw.js"></script>
     </body>
     </html>
 <?php
@@ -129,6 +131,7 @@ if ($step === 'connection') {
         <p class="error"><?= htmlspecialchars($error) ?></p>
         <p>Revisa <code>DB_HOST</code>, <code>DB_USER</code> y <code>DB_PASS</code>.</p>
         <a href="?step=connection">Reintentar</a>
+        <script src="/Appjoteca/shared/js/register-sw.js"></script>
     </body>
     </html>
     <?php
@@ -217,6 +220,7 @@ if ($step === 'database') {
         <p style="margin-top: 20px; color: #666;">
             O ejecuta manualmente <code>/Appjoteca/sql/schema.sql</code> y recarga esta página.
         </p>
+        <script src="/Appjoteca/shared/js/register-sw.js"></script>
     </body>
     </html>
     <?php

@@ -279,5 +279,6 @@ if (empty($_SESSION['csrf_token'])) {
  
    <script src="../../shared/js/components/password-strength.js"></script>
   <script src="recover.js"></script>
+  <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

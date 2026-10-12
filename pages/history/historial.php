@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../backend/Database/conexion.php';
 require_once __DIR__ . '/../../backend/models/historial.php';
 require_once __DIR__ . '/../../backend/models/prestamo.php';
 
-requiereRol([1, 2, 3]);
+requiereRol([1, 2]);
 
 $id_usuario = (int) $_SESSION['usuario_id'];
 $historialModel = new Historial($connection);
@@ -275,5 +275,6 @@ function formatearFechaHistorial($fecha) {
     <script src="../../shared/js/global.js"></script>
     <script src="historial.js"></script>
 
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

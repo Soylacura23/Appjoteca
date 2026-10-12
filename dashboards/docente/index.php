@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 
-// Control de acceso exclusivo para Docentes (Rol 2)
 requiereRol([2]);
 ?>
 <!DOCTYPE html>
@@ -245,5 +244,6 @@ requiereRol([2]);
     <script src="/Appjoteca/shared/js/components/notifications.js"></script>
     <script src="../../shared/js/global.js"></script>
     <script src="docente.js"></script>
+    <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

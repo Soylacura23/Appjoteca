@@ -234,5 +234,6 @@ $historial = $modeloHistorial->obtenerRecientes(5);
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../shared/js/global.js"></script>
 <script src="js/dashboard.js"></script>
+<script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>
