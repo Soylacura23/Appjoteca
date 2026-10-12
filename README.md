@@ -1,5 +1,5 @@
 
-  <img src="shared/images/logo-appjoteca.png" width="30%">
+  <img src="shared/images/logo-appjoteca.svg" width="30%">
 
 
   # AppJoteca

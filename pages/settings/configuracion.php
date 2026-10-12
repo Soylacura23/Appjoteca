@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 requiereRol([1, 2, 4]);
 
+$es_admin = (int) ($_SESSION['rol'] ?? 0) === 4;
 $documento = $_SESSION['documento'] ?? '';
 $foto_actual = $mi_foto;
 $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
@@ -24,6 +25,10 @@ $consultaFotoDocumento->close();
 if (!empty($datosDocumento['foto_documento'])) {
     $foto_documento = BASE_URL . ltrim($datosDocumento['foto_documento'], '/');
 }
+$foto_documento_es_pdf = str_ends_with(
+    strtolower((string) parse_url($foto_documento, PHP_URL_PATH)),
+    '.pdf'
+);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -127,7 +132,14 @@ if (!empty($datosDocumento['foto_documento'])) {
                     </div>
                     <div class="id-doc-preview" id="idDocPreview">
                         <?php if ($foto_documento !== ''): ?>
-                            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento ID" id="idDocImage" loading="lazy">
+                            <?php if ($foto_documento_es_pdf): ?>
+                                <div class="id-doc-pdf-preview">
+                                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                                    <span>Documento PDF</span>
+                                </div>
+                            <?php else: ?>
+                                <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento ID" id="idDocImage" loading="lazy">
+                            <?php endif; ?>
                             <div class="id-doc-blur-overlay">
                                 <span class="material-symbols-outlined">visibility_off</span>
                                 <span>Click para visualizar</span>
@@ -258,11 +270,11 @@ if (!empty($datosDocumento['foto_documento'])) {
                 <section class="config-section" data-section="requests">
                     <div class="section-header">
                         <div class="section-icon section-icon--blue">
-                            <span class="material-symbols-outlined">support_agent</span>
+                            <span class="material-symbols-outlined"><?= $es_admin ? 'manage_accounts' : 'support_agent'; ?></span>
                         </div>
                         <div class="section-title-group">
-                            <h3>Solicitudes al Bibliotecario</h3>
-                            <p>Gestione cambios que requieren aprobación institucional</p>
+                            <h3><?= $es_admin ? 'Actualización directa' : 'Solicitudes al Administrador'; ?></h3>
+                            <p><?= $es_admin ? 'Actualice sus datos personales con validación inmediata.' : 'Los cambios serán revisados por el administrador.'; ?></p>
                         </div>
                     </div>
                     <div class="section-body">
@@ -272,16 +284,16 @@ if (!empty($datosDocumento['foto_documento'])) {
                                     <div class="request-icon request-icon--blue">
                                         <span class="material-symbols-outlined">alternate_email</span>
                                     </div>
-                                    <span class="request-status">SOLICITUD</span>
+                                    <span class="request-status"><?= $es_admin ? 'CAMBIO DIRECTO' : 'SOLICITUD'; ?></span>
                                 </div>
                                 <div class="request-card-body">
                                     <h4>Cambio de Correo Institucional</h4>
                                     <p>Actualice su dirección de correo electrónico institucional.</p>
                                 </div>
                                 <div class="request-card-footer">
-                                    <button class="btn-outline" data-request="email" type="button">
+                                    <button class="btn-outline" data-request="email" data-direct="<?= $es_admin ? 'true' : 'false'; ?>" type="button">
                                         <span class="material-symbols-outlined">send</span>
-                                        Solicitar cambio
+                                        <?= $es_admin ? 'Actualizar dato' : 'Solicitar cambio'; ?>
                                     </button>
                                 </div>
                             </article>
@@ -291,16 +303,16 @@ if (!empty($datosDocumento['foto_documento'])) {
                                     <div class="request-icon request-icon--purple">
                                         <span class="material-symbols-outlined">badge</span>
                                     </div>
-                                    <span class="request-status">SOLICITUD</span>
+                                    <span class="request-status"><?= $es_admin ? 'CAMBIO DIRECTO' : 'SOLICITUD'; ?></span>
                                 </div>
                                 <div class="request-card-body">
                                     <h4>Cambio de Nombre y Apellidos</h4>
                                     <p>Solicite la actualización de su nombre completo registrado.</p>
                                 </div>
                                 <div class="request-card-footer">
-                                    <button class="btn-outline" data-request="nombre" type="button">
+                                    <button class="btn-outline" data-request="nombre" data-direct="<?= $es_admin ? 'true' : 'false'; ?>" type="button">
                                         <span class="material-symbols-outlined">send</span>
-                                        Solicitar cambio
+                                        <?= $es_admin ? 'Actualizar dato' : 'Solicitar cambio'; ?>
                                     </button>
                                 </div>
                             </article>
@@ -310,16 +322,16 @@ if (!empty($datosDocumento['foto_documento'])) {
                                     <div class="request-icon request-icon--green">
                                         <span class="material-symbols-outlined">contact_page</span>
                                     </div>
-                                    <span class="request-status">SOLICITUD</span>
+                                    <span class="request-status"><?= $es_admin ? 'CAMBIO DIRECTO' : 'SOLICITUD'; ?></span>
                                 </div>
                                 <div class="request-card-body">
                                     <h4>Cambio de Documento y Foto</h4>
                                     <p>Actualice su número de documento y la fotografía del documento físico.</p>
                                 </div>
                                 <div class="request-card-footer">
-                                    <button class="btn-outline" data-request="documento" type="button">
+                                    <button class="btn-outline" data-request="documento" data-direct="<?= $es_admin ? 'true' : 'false'; ?>" type="button">
                                         <span class="material-symbols-outlined">send</span>
-                                        Solicitar cambio
+                                        <?= $es_admin ? 'Actualizar dato' : 'Solicitar cambio'; ?>
                                     </button>
                                 </div>
                             </article>
@@ -358,7 +370,11 @@ if (!empty($datosDocumento['foto_documento'])) {
             <span class="material-symbols-outlined">close</span>
         </button>
         <div class="id-doc-overlay-content">
-            <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de Identidad" id="idDocOverlayImg">
+            <?php if ($foto_documento_es_pdf): ?>
+                <iframe src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" title="Documento de identidad en PDF"></iframe>
+            <?php else: ?>
+                <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de Identidad" id="idDocOverlayImg">
+            <?php endif; ?>
         </div>
     </div>
 <?php endif; ?>

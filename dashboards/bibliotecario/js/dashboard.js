@@ -7,14 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyMore = document.querySelector('.history-more');
     if (historyMore) historyMore.href = reservationsUrl;
 
-    const formatearAcciones = (cell) => {
+    const formatearAcciones = () => {
         return `
-            <button class="btn-accept" style="cursor:pointer; color:green; border:none; background:transparent;">
-                <span class="material-symbols-outlined check">check</span>
+            <div class="reservation-actions">
+            <button class="btn-accept" type="button" aria-label="Aprobar reserva" title="Aprobar reserva">
+                <span class="material-symbols-outlined">check</span>
             </button>
-            <button class="btn-reject" style="cursor:pointer; color:red; border:none; background:transparent; margin-left:10px;">
-                <span class="material-symbols-outlined reject">close</span>
+            <button class="btn-reject" type="button" aria-label="Rechazar reserva" title="Rechazar reserva">
+                <span class="material-symbols-outlined">close</span>
             </button>
+            </div>
         `;
     };
 
@@ -50,22 +52,35 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const table = new Tabulator("#reservas-table", {
-        ajaxURL: "api/get_reservaciones.php?tipo=solicitudes&page=1&limit=5",
+        ajaxURL: "/Appjoteca/dashboards/bibliotecario/api/get_reservaciones.php?tipo=solicitudes",
         ajaxConfig: { method: 'GET' },
         layout: "fitColumns",
         placeholder: "No hay reservas pendientes.",
-        pagination: false,
-        ajaxResponse: (url, params, response) => response.data || [],
+        pagination: true,
+        paginationMode: "remote",
+        paginationSize: 5,
+        paginationSizeSelector: [5, 10, 20],
+        paginationDataSent: { page: "page", size: "limit" },
+        responsiveLayout: "collapse",
+        responsiveLayoutCollapseStartOpen: false,
+        ajaxResponse: (url, params, response) => ({
+            data: response.data || [],
+            last_page: response.pages || 1
+        }),
         columns: [
-            { title: "USUARIO", field: "usuario", widthGrow: 2 },
-            { title: "LIBRO", field: "libro", widthGrow: 2 },
-            { title: "SOLICITADO EN", field: "fecha_reserva", widthGrow: 1 },
-            { title: "EJEMPLARES", field: "cantidad", width: 110, hozAlign: "center" },
+            { title: "ID", field: "id_reserva", width: 70, minWidth: 60, hozAlign: "center", responsive: 0 },
+            { title: "USUARIO", field: "usuario", minWidth: 120, widthGrow: 2, responsive: 1 },
+            { title: "LIBRO", field: "libro", minWidth: 130, widthGrow: 2, responsive: 2 },
+            { title: "SOLICITADO EN", field: "fecha_reserva", minWidth: 105, widthGrow: 1, responsive: 3 },
+            { title: "EJEMPLARES", field: "cantidad", width: 100, minWidth: 85, hozAlign: "center", responsive: 4 },
             {
                 title: "ACCIÓN",
+                field: "acciones",
                 formatter: formatearAcciones,
                 hozAlign: "center",
-                width: 100,
+                width: 105,
+                minWidth: 95,
+                responsive: 0,
                 headerSort: false,
                 cellClick: (e, cell) => {
                     const btn = e.target.closest('button');
@@ -79,7 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-        ]
+        ],
+        rowFormatter: (row) => {
+            const labels = {
+                id_reserva: "Reserva",
+                usuario: "Usuario",
+                libro: "Libro",
+                fecha_reserva: "Solicitado",
+                cantidad: "Ejemplares",
+                acciones: "Acciones"
+            };
+            row.getCells().forEach((cell, index) => {
+                const element = cell.getElement();
+                const label = labels[cell.getColumn().getField()] || "";
+                if (label) element.setAttribute("data-label", label);
+            });
+        }
     });
 
 });

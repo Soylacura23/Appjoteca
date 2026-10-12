@@ -585,7 +585,9 @@ CREATE TABLE `solicitudes_cambio` (
   `fecha_solicitud` datetime NOT NULL DEFAULT current_timestamp(),
   `fecha_resolucion` datetime DEFAULT NULL,
   `id_admin_resuelve` int(11) DEFAULT NULL,
-  `comentario` text DEFAULT NULL
+  `comentario` text DEFAULT NULL,
+  `archivo_nuevo` varchar(512) DEFAULT NULL,
+  `archivo_mime` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

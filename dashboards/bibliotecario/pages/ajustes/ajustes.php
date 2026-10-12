@@ -1,9 +1,23 @@
 <?php
 require_once __DIR__ . '/../../../../backend/config/auth.php';
 require_once __DIR__ . '/../../../../backend/config/user_context.php';
+require_once __DIR__ . '/../../../../backend/Database/conexion.php';
 requiereRol([3]);
 
 $documento = $mi_documento ?? '';
+$foto_documento = '';
+$consultaDocumento = $connection->prepare('SELECT foto_documento FROM usuarios WHERE id_usuario = ?');
+if (!$consultaDocumento) {
+    throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
+}
+$consultaDocumento->bind_param('i', $mi_id);
+$consultaDocumento->execute();
+$fotoDocumento = $consultaDocumento->get_result()->fetch_assoc()['foto_documento'] ?? '';
+$consultaDocumento->close();
+if ($fotoDocumento !== '') {
+    $foto_documento = '/Appjoteca/' . ltrim($fotoDocumento, '/');
+}
+$foto_documento_es_pdf = str_ends_with(strtolower($foto_documento), '.pdf');
 $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
     && strpos($_SESSION['foto_perfil'], 'default-avatar') === false;
 ?>
@@ -177,6 +191,44 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
                         </button>
                     </div>
                 </div>
+                <div class="id-doc-card">
+                    <div class="id-doc-header">
+                        <span class="material-symbols-outlined">contact_page</span>
+                        <span>Documento de identidad</span>
+                    </div>
+                    <div class="id-doc-preview" id="idDocPreview">
+                        <?php if ($foto_documento !== ''): ?>
+                            <?php if ($foto_documento_es_pdf): ?>
+                                <div class="id-doc-pdf-preview">
+                                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                                    <span>Documento PDF</span>
+                                </div>
+                            <?php else: ?>
+                                <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto actual del documento" loading="lazy">
+                            <?php endif; ?>
+                            <div class="id-doc-blur-overlay">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                                <span>Click para visualizar</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="id-doc-placeholder" role="status">
+                                <span class="material-symbols-outlined">image_not_supported</span>
+                                <p>No hay foto de documento registrada.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($foto_documento !== ''): ?>
+                        <a class="id-doc-footer" href="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                            <span>Ver documento actual</span>
+                        </a>
+                    <?php else: ?>
+                        <div class="id-doc-footer">
+                            <span class="material-symbols-outlined">lock</span>
+                            <span>Se agrega al solicitar el cambio de documento</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </aside>
 
             <!-- CONTENIDO -->
@@ -346,7 +398,7 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
                                 </div>
                                 <div class="request-card-body">
                                     <h4>Cambio de Documento</h4>
-                                    <p>Actualice su número de documento.</p>
+                                    <p>Indique el nuevo número y adjunte una foto o PDF del documento.</p>
                                 </div>
                                 <div class="request-card-footer">
                                     <button class="btn-outline" data-request="documento" type="button">
@@ -384,6 +436,20 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 
 </main>
 </div>
+<?php if ($foto_documento !== ''): ?>
+    <div class="id-doc-overlay" id="idDocOverlay" aria-hidden="true">
+        <button class="id-doc-overlay-close" id="idDocOverlayClose" type="button" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="id-doc-overlay-content">
+            <?php if ($foto_documento_es_pdf): ?>
+                <iframe src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" title="Documento de identidad en PDF"></iframe>
+            <?php else: ?>
+                <img src="<?= htmlspecialchars($foto_documento, ENT_QUOTES, 'UTF-8'); ?>" alt="Documento de identidad">
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
 <?php include '../../../../shared/layouts/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

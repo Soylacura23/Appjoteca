@@ -50,7 +50,7 @@ function formatearFechaHistorial($fecha) {
     <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
     <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
-<body>
+<body class="page-historial">
 
     <!-- OVERLAY GLOBAL -->
     <div id="overlay" class="overlay" aria-hidden="true"></div>

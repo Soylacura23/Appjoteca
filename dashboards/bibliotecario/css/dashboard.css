@@ -317,8 +317,8 @@ img.hero-background{
 }
 .reservation-table-container{
   width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  min-width: 0;
+  overflow: hidden;
 }
 .reservation{
   width: 100%;
@@ -352,8 +352,7 @@ img.hero-background{
 
 @media (max-width: 1024px){
   .reservation-table-container{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 .reservation thead tr:nth-child(2) th:first-child, .reservation tbody tr td:first-child {
   position: sticky;
@@ -724,4 +723,128 @@ position: relative;
 .noti.hide {
   opacity: 0;
   transform: translateX(20px);
+}
+
+.reservation-table-container .tabulator {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(242, 202, 80, 0.14);
+  border-radius: 12px;
+  background: #0d0d0d;
+  color: #e2e2e2;
+  font-family: var(--font-body);
+}
+
+.reservation-table-container .tabulator-header,
+.reservation-table-container .tabulator-col,
+.reservation-table-container .tabulator-footer {
+  background: #141414 !important;
+  color: var(--primary) !important;
+  border-color: rgba(242, 202, 80, 0.14) !important;
+}
+
+.reservation-table-container .tabulator-row,
+.reservation-table-container .tabulator-row.tabulator-row-even {
+  background: #0d0d0d !important;
+  color: #e2e2e2 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.reservation-table-container .tabulator .tabulator-row:hover {
+  background: #202020 !important;
+}
+
+.reservation-table-container .tabulator-cell {
+  border-right-color: rgba(255, 255, 255, 0.05) !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.reservation-table-container .tabulator-page,
+.reservation-table-container .tabulator-page-size {
+  color: #e2e2e2 !important;
+  background: #1a1a1a !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.reservation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.reservation-actions button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.reservation-actions .btn-accept {
+  color: #72d9a8;
+  background: rgba(65, 180, 125, 0.14);
+  border-color: rgba(65, 180, 125, 0.28);
+}
+
+.reservation-actions .btn-reject {
+  color: #ff9d97;
+  background: rgba(245, 100, 100, 0.12);
+  border-color: rgba(245, 100, 100, 0.24);
+}
+
+.reservation-actions button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 767px) {
+  .reservation-table-container .tabulator-header {
+    display: none;
+  }
+
+  .reservation-table-container .tabulator-row {
+    display: block;
+    height: auto !important;
+    padding: 8px 12px;
+  }
+
+  .reservation-table-container .tabulator-cell {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 34px;
+    padding: 6px 0 !important;
+    border: 0 !important;
+    gap: 12px;
+  }
+
+  .reservation-table-container .tabulator-cell::before {
+    content: attr(data-label);
+    flex: 0 0 92px;
+    color: var(--primary);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .reservation-table-container .tabulator-cell.tabulator-responsive-collapse-toggle {
+    justify-content: flex-start;
+  }
+
+  .reservation-table-container .tabulator-responsive-collapse {
+    padding-left: 0 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .reservation-table-container .tabulator-paginator {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
 }

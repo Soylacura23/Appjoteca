@@ -1,17 +1,27 @@
-/* catalogo.css — Página de Detalle de Libro */
-
+html,
+body{
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+}
 
 /* Layout principal */
    .catalogo-main {
     padding-top: var(--topbar-h);
     min-height: 100vh;
-}
+       min-width: 0;
+       max-width: 100%;
+       overflow-x: hidden;
+       overflow-x: clip;
+   }
 
-.catalogo-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: var(--sp-xl) var(--px) var(--sp-2xl);
-}
+   .catalogo-inner {
+       max-width: 1280px;
+       min-width: 0;
+       margin: 0 auto;
+       padding: var(--sp-xl) var(--px) var(--sp-2xl);
+   }
 
 
 /* Breadcrumb / Botón volver */
@@ -50,11 +60,14 @@
 /* Hero del libro — cuadrícula principal */
 .book-hero {
     display: grid;
-    /* En celulares se mantiene en 1 columna */
     grid-template-columns: 1fr;
     gap: var(--sp-lg);
     align-items: start;
     margin-bottom: var(--sp-2xl);
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 /* ── Columna portada ── */
@@ -121,6 +134,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-width: 0;
 }
 
 .book-meta-row {
@@ -188,6 +202,7 @@
     color: #e8e8e8;
     line-height: 1.06;
     letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
 }
 
 .book-author-main {
@@ -198,6 +213,7 @@
     color: var(--primary);
     letter-spacing: -0.01em;
     margin-top: -8px;
+    overflow-wrap: anywhere;
 }
 
 
@@ -677,6 +693,14 @@
 }
 
 @media (max-width: 899px) {
+    .catalogo-main,
+    .catalogo-inner,
+    .book-hero,
+    .book-details-col {
+        min-width: 0;
+        max-width: 100%;
+    }
+
     body > .topbar {
         left: 0;
         right: 0;
@@ -703,12 +727,15 @@
 
     body > .topbar .topbar-actions {
         flex: 0 0 auto;
-        min-width: max-content;
+        min-width: 0;
+        gap: 0;
     }
 
     body > .topbar .menu-toggle-btn {
         display: flex;
-        flex: 0 0 40px;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
         position: relative;
         z-index: 1;
     }

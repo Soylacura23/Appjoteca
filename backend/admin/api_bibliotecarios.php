@@ -4,6 +4,8 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
 require_once __DIR__ . '/../Database/conexion.php';
+require_once __DIR__ . '/../helpers/Validator.php';
+require_once __DIR__ . '/../helpers/DocumentUpload.php';
 
 // Solo admin
 $mi_rol = (int)($_SESSION['rol'] ?? 0);
@@ -300,6 +302,7 @@ if ($action === 'eliminar') {
 // LISTAR SOLICITUDES DE CAMBIO
 if ($action === 'listar_solicitudes') {
     $sql = "SELECT s.id_solicitud, s.id_usuario, s.tipo, s.valor_actual, s.valor_nuevo,
+                   s.archivo_nuevo, s.archivo_mime,
                    s.estado, s.fecha_solicitud, s.comentario,
                    u.nombre_usuario, u.nombre_apellido, u.correo_institucional
             FROM solicitudes_cambio s
@@ -321,20 +324,23 @@ if ($action === 'listar_solicitudes') {
 // RESOLVER SOLICITUD DE CAMBIO
 if ($action === 'resolver_solicitud') {
     $id_solicitud = (int)($_POST['id_solicitud'] ?? 0);
-    $decision     = $_POST['decision'] ?? ''; // aprobar | rechazar
-    $comentario   = trim($_POST['comentario'] ?? '');
+    $decision     = is_string($_POST['decision'] ?? null) ? $_POST['decision'] : '';
+    $comentario   = is_string($_POST['comentario'] ?? null) ? trim($_POST['comentario']) : '';
 
     if ($id_solicitud <= 0 || !in_array($decision, ['aprobar', 'rechazar'], true)) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
 
+    $connection->begin_transaction();
+
     // Traer la solicitud
-    $sql = "SELECT s.id_usuario, s.tipo, s.valor_nuevo
+    $sql = "SELECT s.id_usuario, s.tipo, s.valor_nuevo, s.archivo_nuevo, s.archivo_mime
             FROM solicitudes_cambio s
             INNER JOIN usuarios u ON u.id_usuario = s.id_usuario
             WHERE s.id_solicitud = ? AND s.estado = 'pendiente'
-            LIMIT 1";
+            LIMIT 1
+            FOR UPDATE";
     $query = $connection->prepare($sql);
     $query->bind_param('i', $id_solicitud);
     $query->execute();
@@ -342,11 +348,14 @@ if ($action === 'resolver_solicitud') {
     $query->close();
 
     if (!$sol) {
+        $connection->rollback();
         echo json_encode(['status' => 'error', 'message' => 'Solicitud no encontrada o ya resuelta']);
         exit;
     }
 
     $nuevo_estado = ($decision === 'aprobar') ? 'aprobada' : 'rechazada';
+    $archivoParaBorrar = null;
+    $fotoAnterior = null;
 
     // Si se aprueba, aplicar el cambio
     if ($decision === 'aprobar') {
@@ -355,8 +364,11 @@ if ($action === 'resolver_solicitud') {
         $uid   = (int)$sol['id_usuario'];
 
         if ($tipo === 'email') {
-            if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(['status' => 'error', 'message' => 'El correo nuevo no es válido']);
+            $validator = new Validator();
+            $validator->requerido($valor, 'correo')->email($valor)->longitud($valor, 5, 60, 'correo');
+            if ($validator->falla()) {
+                $connection->rollback();
+                echo json_encode(['status' => 'error', 'message' => $validator->primero()]);
                 exit;
             }
             // Verificar que no esté en uso
@@ -366,6 +378,7 @@ if ($action === 'resolver_solicitud') {
             $query->execute();
             if ($query->get_result()->num_rows > 0) {
                 $query->close();
+                $connection->rollback();
                 echo json_encode(['status' => 'error', 'message' => 'Ese correo ya está en uso']);
                 exit;
             }
@@ -378,8 +391,13 @@ if ($action === 'resolver_solicitud') {
             $query->close();
 
         } elseif ($tipo === 'nombre') {
-            if ($valor === '') {
-                echo json_encode(['status' => 'error', 'message' => 'El nombre no puede estar vacío']);
+            $validator = new Validator();
+            $validator->requerido($valor, 'nombre y apellidos')
+                ->longitud($valor, 3, 100, 'nombre y apellidos')
+                ->regex($valor, '/^[\p{L}\p{M} .\'-]+$/u', 'El nombre solicitado no es válido.');
+            if ($validator->falla()) {
+                $connection->rollback();
+                echo json_encode(['status' => 'error', 'message' => $validator->primero()]);
                 exit;
             }
             $sql = "UPDATE usuarios SET nombre_apellido = ? WHERE id_usuario = ?";
@@ -389,21 +407,45 @@ if ($action === 'resolver_solicitud') {
             $query->close();
 
         } elseif ($tipo === 'documento') {
-            // Admin puede dejar documento vacío; otros no deberían llegar aquí vacíos
+            $validator = new Validator();
+            $validator->requerido($valor, 'documento')
+                ->longitud($valor, 1, 25, 'documento')
+                ->regex($valor, '/^[0-9-]+$/', 'El documento solicitado no es válido.');
+            if ($validator->falla()) {
+                $connection->rollback();
+                echo json_encode(['status' => 'error', 'message' => $validator->primero()]);
+                exit;
+            }
+
             $sql = "SELECT id_usuario FROM usuarios WHERE documento = ? AND id_usuario != ? AND documento != '' LIMIT 1";
             $query = $connection->prepare($sql);
             $query->bind_param('si', $valor, $uid);
             $query->execute();
             if ($query->get_result()->num_rows > 0) {
                 $query->close();
+                $connection->rollback();
                 echo json_encode(['status' => 'error', 'message' => 'Ese documento ya está registrado']);
                 exit;
             }
             $query->close();
 
-            $sql = "UPDATE usuarios SET documento = ? WHERE id_usuario = ?";
+            $rutaArchivo = $sol['archivo_nuevo'] ?? '';
+            if ($rutaArchivo === '' || empty($sol['archivo_mime'])) {
+                $connection->rollback();
+                echo json_encode(['status' => 'error', 'message' => 'La solicitud no tiene un documento adjunto válido.']);
+                exit;
+            }
+
+            $sql = 'SELECT foto_documento FROM usuarios WHERE id_usuario = ?';
             $query = $connection->prepare($sql);
-            $query->bind_param('si', $valor, $uid);
+            $query->bind_param('i', $uid);
+            $query->execute();
+            $fotoAnterior = $query->get_result()->fetch_assoc()['foto_documento'] ?? null;
+            $query->close();
+
+            $sql = "UPDATE usuarios SET documento = ?, foto_documento = ? WHERE id_usuario = ?";
+            $query = $connection->prepare($sql);
+            $query->bind_param('ssi', $valor, $rutaArchivo, $uid);
             $query->execute();
             $query->close();
 
@@ -420,11 +462,34 @@ if ($action === 'resolver_solicitud') {
     // Actualizar la solicitud
     $sql = "UPDATE solicitudes_cambio
             SET estado = ?, fecha_resolucion = NOW(), id_admin_resuelve = ?, comentario = ?
-            WHERE id_solicitud = ?";
+            WHERE id_solicitud = ? AND estado = 'pendiente'";
     $query = $connection->prepare($sql);
     $query->bind_param('sisi', $nuevo_estado, $mi_id, $comentario, $id_solicitud);
     $query->execute();
+    if ($query->affected_rows !== 1) {
+        $query->close();
+        $connection->rollback();
+        echo json_encode(['status' => 'error', 'message' => 'La solicitud ya fue resuelta por otro administrador.']);
+        exit;
+    }
     $query->close();
+
+    if ($decision === 'rechazar') {
+        $archivoParaBorrar = $sol['archivo_nuevo'] ?? null;
+    }
+
+    $connection->commit();
+
+    if ($archivoParaBorrar !== null && $archivoParaBorrar !== ''
+        && !DocumentUpload::deleteManaged($archivoParaBorrar)) {
+        error_log('No se pudo eliminar documento rechazado de solicitud #' . $id_solicitud);
+        echo json_encode(['status' => 'error', 'message' => 'La solicitud se rechazó, pero no se pudo eliminar el archivo adjunto.']);
+        exit;
+    }
+    if ($fotoAnterior && $decision === 'aprobar' && $fotoAnterior !== ($sol['archivo_nuevo'] ?? null)
+        && !DocumentUpload::deleteManaged($fotoAnterior)) {
+        error_log('No se pudo eliminar documento anterior del usuario #' . (int)$sol['id_usuario']);
+    }
 
     $msg = ($decision === 'aprobar')
         ? 'Solicitud aprobada y cambio aplicado'
@@ -438,6 +503,7 @@ if ($action === 'resolver_solicitud') {
 echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
 
 } catch (Exception $e) {
+    $connection->rollback();
     error_log('api_bibliotecarios: ' . $e->getMessage());
     echo json_encode(['status' => 'error', 'message' => 'Error interno del servidor']);
 }

@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const requestBtns    = document.querySelectorAll('[data-request]');
     const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    const idPreview      = document.getElementById('idDocPreview');
+    const idOverlay      = document.getElementById('idDocOverlay');
+    const idOverlayClose = document.getElementById('idDocOverlayClose');
 
     // Guarda la foto original por si cancela el preview
     let fotoOriginal = avatarImg ? avatarImg.src : '';
@@ -42,6 +45,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getToken() {
         return window.getCSRFToken ? window.getCSRFToken() : (document.querySelector('meta[name="csrf-token"]')?.content || '');
+    }
+
+    if (idPreview && idOverlay) {
+        idPreview.addEventListener('click', function () {
+            Swal.fire({
+                title: '¿Visualizar documento?',
+                text: 'Este documento contiene información personal privada.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Visualizar',
+                cancelButtonText: 'Volver',
+                reverseButtons: true,
+                background: '#121212',
+                color: '#e2e2e2',
+                confirmButtonColor: '#f2ca50',
+                cancelButtonColor: 'rgba(255,255,255,0.1)'
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+                idOverlay.classList.add('active');
+                idOverlay.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeDocumentOverlay() {
+            idOverlay.classList.remove('active');
+            idOverlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        idOverlayClose?.addEventListener('click', closeDocumentOverlay);
+        idOverlay.addEventListener('click', function (event) {
+            if (event.target === idOverlay) closeDocumentOverlay();
+        });
     }
 
     // 1. Foto de perfil (preview + confirmar + eliminar)
@@ -314,18 +351,29 @@ document.addEventListener('DOMContentLoaded', function () {
     requestBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             const tipo = this.dataset.request;
+            let archivoDocumento = null;
 
             const titulos = {
                 email: 'Cambio de Correo',
                 nombre: 'Cambio de Nombre y Apellidos',
-                documento: 'Cambio de Documento'
+                documento: 'Cambio de Documento y Foto'
             };
 
             Swal.fire({
                 title: 'Solicitar ' + (titulos[tipo] || 'cambio'),
-                input: 'text',
-                inputLabel: 'Escribe el nuevo valor',
-                inputPlaceholder: 'Nuevo valor...',
+                input: tipo === 'email' ? 'email' : 'text',
+                inputLabel: tipo === 'documento' ? 'Nuevo número de documento' : 'Escribe el nuevo valor',
+                inputPlaceholder: tipo === 'email' ? 'correo@institucion.edu' : 'Nuevo valor...',
+                inputAttributes: { maxlength: tipo === 'nombre' ? '100' : (tipo === 'documento' ? '25' : '60') },
+                customClass: tipo === 'documento' ? { popup: 'change-document-swal' } : undefined,
+                html: tipo === 'documento' ? `
+                    <label class="change-document-upload" for="changeDocumentFile">
+                        <span class="material-symbols-outlined">upload_file</span>
+                        <span>Adjunta la foto del documento o un PDF (máximo 10 MB)</span>
+                        <input id="changeDocumentFile" class="change-document-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Selecciona una imagen o PDF del documento">
+                    </label>
+                    <p class="change-document-file-name" id="changeDocumentFileName">Ningún archivo seleccionado</p>
+                ` : undefined,
                 showCancelButton: true,
                 confirmButtonText: 'Enviar solicitud',
                 cancelButtonText: 'Cancelar',
@@ -334,9 +382,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 color: '#e2e2e2',
                 confirmButtonColor: '#f2ca50',
                 cancelButtonColor: 'rgba(255,255,255,0.1)',
+                didOpen: function () {
+                    const fileInput = document.getElementById('changeDocumentFile');
+                    fileInput?.addEventListener('change', function () {
+                        archivoDocumento = this.files[0] || null;
+                        const name = document.getElementById('changeDocumentFileName');
+                        if (name) name.textContent = archivoDocumento ? archivoDocumento.name : 'Ningún archivo seleccionado';
+                    });
+                },
                 inputValidator: function (value) {
                     if (!value || !value.trim()) {
                         return 'Debes escribir un valor';
+                    }
+                    if (tipo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+                        return 'Escribe un correo electrónico válido';
+                    }
+                    if (tipo === 'nombre' && !/^[\p{L}\p{M} .'-]{3,100}$/u.test(value.trim())) {
+                        return 'Escribe un nombre válido de 3 a 100 caracteres';
+                    }
+                    if (tipo === 'documento') {
+                        if (!/^[0-9-]{1,25}$/.test(value.trim())) return 'El documento solo puede contener números y guiones';
+                        if (!archivoDocumento) return 'Adjunta la foto o el PDF del documento nuevo';
+                        if (archivoDocumento.size > 10 * 1024 * 1024) return 'El archivo no puede superar 10 MB';
                     }
                 }
             }).then(function (result) {
@@ -346,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 formData.append('accion', 'solicitar_cambio');
                 formData.append('tipo', tipo);
                 formData.append('valor_nuevo', result.value.trim());
+                if (archivoDocumento) formData.append('archivo_documento', archivoDocumento);
                 formData.append('csrf_token', getToken());
 
                 fetch(ENDPOINT, {

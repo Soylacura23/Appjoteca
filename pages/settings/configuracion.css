@@ -284,6 +284,20 @@
     width: 100%;
     height: 180px;
     object-fit: cover;
+}
+
+.id-doc-pdf-preview {
+    display: grid;
+    place-content: center;
+    gap: 8px;
+    height: 180px;
+    color: var(--primary);
+    text-align: center;
+    background: linear-gradient(145deg, rgba(242, 202, 80, 0.12), rgba(0, 0, 0, 0.65));
+}
+
+.id-doc-pdf-preview .material-symbols-outlined {
+    font-size: 42px;
     display: block;
     filter: blur(8px) grayscale(0.4);
     transition: filter 0.4s ease;
@@ -945,6 +959,108 @@
     width: 100%;
     height: auto;
     display: block;
+}
+
+.id-doc-overlay-content iframe {
+    display: block;
+    width: 100%;
+    height: min(82vh, 900px);
+    border: 0;
+    border-radius: inherit;
+    background: #fff;
+}
+
+.change-document-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin: 12px 0 0;
+    padding: 14px;
+    border: 1px dashed rgba(242, 202, 80, 0.38);
+    border-radius: 12px;
+    background: rgba(242, 202, 80, 0.055);
+    color: #e2e2e2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.change-document-upload > .material-symbols-outlined {
+    align-self: center;
+    color: var(--primary);
+    font-size: 24px;
+}
+
+.change-document-file-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    color: #e2e2e2;
+    font: inherit;
+    font-size: 0.8rem;
+}
+
+.change-document-file-input::file-selector-button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    border: 1px solid rgba(242, 202, 80, 0.35);
+    border-radius: 8px;
+    background: rgba(242, 202, 80, 0.12);
+    color: var(--primary);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.change-document-swal {
+    width: min(34rem, calc(100vw - 1.5rem)) !important;
+    max-height: calc(100vh - 1rem);
+    overflow-y: auto;
+}
+
+@supports (height: 100dvh) {
+    .change-document-swal {
+        max-height: calc(100dvh - 1rem);
+    }
+}
+
+.change-document-swal .swal2-html-container {
+    width: 100%;
+    margin: 0.75rem 0 0;
+    overflow: visible;
+}
+
+.change-document-file-name {
+    margin: 8px 2px 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+    .change-document-swal {
+        padding: 1rem;
+    }
+
+    .change-document-swal .swal2-title {
+        padding: 0 0.25rem;
+        font-size: 1.2rem;
+    }
+
+    .change-document-swal .swal2-input {
+        width: 100%;
+        margin: 0.75rem 0 0;
+        font-size: 0.95rem;
+    }
+
+    .change-document-upload {
+        padding: 12px;
+        font-size: 0.82rem;
+    }
+
+    .change-document-file-input {
+        font-size: 0.72rem;
+    }
 }
 
 /* ── Acciones de foto de perfil ── */

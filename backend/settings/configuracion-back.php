@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../Database/conexion.php';
 require_once __DIR__ . '/../config/verify-csrf.php';
+require_once __DIR__ . '/../helpers/Validator.php';
+require_once __DIR__ . '/../helpers/DocumentUpload.php';
+require_once __DIR__ . '/../models/notificacion.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -24,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$accion = $_POST['accion'] ?? '';
+$accion = is_string($_POST['accion'] ?? null) ? $_POST['accion'] : '';
+$archivoTemporalRelativo = null;
 
 try {
 
@@ -266,22 +270,44 @@ try {
 
     // ── 5. Solicitar cambio (email, nombre, documento, eliminacion) ──
     if ($accion === 'solicitar_cambio') {
-        $tipo  = $_POST['tipo'] ?? '';
-        $valor = trim($_POST['valor_nuevo'] ?? '');
+        $tipo = is_string($_POST['tipo'] ?? null) ? $_POST['tipo'] : '';
+        $valor = is_string($_POST['valor_nuevo'] ?? null) ? trim($_POST['valor_nuevo']) : '';
 
         $tipos_ok = ['email', 'nombre', 'documento', 'eliminacion'];
-        if (!in_array($tipo, $tipos_ok)) {
+        if (!in_array($tipo, $tipos_ok, true)) {
             echo json_encode(['success' => false, 'message' => 'Tipo de solicitud no válido']);
             exit;
         }
 
-        // Admin no necesita solicitar (excepto si quiere eliminarse con confirmación)
         if ($mi_rol === 4 && $tipo !== 'eliminacion') {
             echo json_encode(['success' => false, 'message' => 'Como administrador puedes cambiar esto directamente']);
             exit;
         }
 
-        // Evitar solicitudes duplicadas pendientes
+        $validator = new Validator();
+        if ($tipo === 'email') {
+            $validator->requerido($valor, 'correo')
+                ->email($valor)
+                ->longitud($valor, 5, 60, 'correo');
+        } elseif ($tipo === 'nombre') {
+            $validator->requerido($valor, 'nombre y apellidos')
+                ->longitud($valor, 3, 100, 'nombre y apellidos')
+                ->regex($valor, '/^[\p{L}\p{M} .\'-]+$/u', 'El nombre solo puede contener letras, espacios, puntos, apóstrofes y guiones.');
+        } elseif ($tipo === 'documento') {
+            $validator->requerido($valor, 'documento')
+                ->longitud($valor, 1, 25, 'documento')
+                ->regex($valor, '/^[0-9-]+$/', 'El documento solo puede contener números y guiones.');
+            if (!isset($_FILES['archivo_documento']) || $_FILES['archivo_documento']['error'] !== UPLOAD_ERR_OK) {
+                echo json_encode(['success' => false, 'message' => 'Adjunta una foto o PDF del documento nuevo.']);
+                exit;
+            }
+        }
+
+        if ($validator->falla()) {
+            echo json_encode(['success' => false, 'message' => $validator->primero(), 'errores' => $validator->errores()], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $sql = "SELECT id_solicitud FROM solicitudes_cambio 
                 WHERE id_usuario = ? AND tipo = ? AND estado = 'pendiente'";
         $query = $connection->prepare($sql);
@@ -294,7 +320,6 @@ try {
         }
         $query->close();
 
-        // Obtener valor actual
         $campo_map = [
             'email'     => 'correo_institucional',
             'nombre'    => 'nombre_apellido',
@@ -312,60 +337,148 @@ try {
             $query->close();
         }
 
-        if ($tipo !== 'eliminacion' && $valor === '') {
-            echo json_encode(['success' => false, 'message' => 'Debes indicar el nuevo valor']);
-            exit;
+        if ($tipo === 'email' || $tipo === 'documento') {
+            $campo = $tipo === 'email' ? 'correo_institucional' : 'documento';
+            $sql = "SELECT id_usuario FROM usuarios WHERE {$campo} = ? AND id_usuario != ? LIMIT 1";
+            $query = $connection->prepare($sql);
+            $query->bind_param('si', $valor, $mi_id);
+            $query->execute();
+            $duplicado = $query->get_result()->num_rows > 0;
+            $query->close();
+            if ($duplicado) {
+                echo json_encode(['success' => false, 'message' => $tipo === 'email' ? 'Ese correo ya está registrado.' : 'Ese documento ya está registrado.']);
+                exit;
+            }
         }
 
-        $sql = "INSERT INTO solicitudes_cambio (id_usuario, tipo, valor_actual, valor_nuevo) 
-                VALUES (?, ?, ?, ?)";
+        $archivo = null;
+        if ($tipo === 'documento') {
+            $archivo = DocumentUpload::store($_FILES['archivo_documento'], 'uploads/profiles/change-requests/');
+            $archivoTemporalRelativo = $archivo['path'];
+        }
+
+        $sql = "INSERT INTO solicitudes_cambio (id_usuario, tipo, valor_actual, valor_nuevo, archivo_nuevo, archivo_mime)
+                VALUES (?, ?, ?, ?, ?, ?)";
         $query = $connection->prepare($sql);
-        $query->bind_param('isss', $mi_id, $tipo, $valor_actual, $valor);
+        $rutaArchivo = $archivo['path'] ?? null;
+        $tipoArchivo = $archivo['mime'] ?? null;
+        $query->bind_param('isssss', $mi_id, $tipo, $valor_actual, $valor, $rutaArchivo, $tipoArchivo);
 
         if ($query->execute()) {
+            $archivoTemporalRelativo = null;
+            $idSolicitud = (int) $connection->insert_id;
+            $query->close();
+
+            $notificacion = new Notificacion($connection);
+            $administradores = $notificacion->obtenerUsuariosPorRol(4);
+            if ($administradores !== []) {
+                $nombreSolicitante = $_SESSION['nombre'] ?? $_SESSION['nombre_usuario'] ?? 'Usuario';
+                $creada = $notificacion->crear(
+                    "Nueva solicitud de {$tipo} #{$idSolicitud} de {$nombreSolicitante}.",
+                    "/Appjoteca/dashboards/Administrador/index.php?tab=solicitudes&focus_solicitud={$idSolicitud}",
+                    $administradores
+                );
+                if ($creada === false) {
+                    error_log('No se pudo crear notificación para la solicitud #' . $idSolicitud);
+                }
+            }
             echo json_encode(['success' => true, 'message' => 'Solicitud enviada correctamente. Espera la revisión.']);
         } else {
+            $query->close();
+            if ($archivo !== null && !DocumentUpload::deleteManaged($archivo['path'])) {
+                error_log('No se pudo eliminar archivo sin asociar: ' . $archivo['path']);
+            }
+            $archivoTemporalRelativo = null;
             echo json_encode(['success' => false, 'message' => 'Error al registrar la solicitud']);
         }
-        $query->close();
         exit;
     }
 
     // ── 6. Cambiar datos directos (solo Admin) ──
     if ($accion === 'update_directo' && $mi_rol === 4) {
-        $campo = $_POST['campo'] ?? '';
-        $valor = trim($_POST['valor'] ?? '');
+        $campo = is_string($_POST['campo'] ?? null) ? $_POST['campo'] : '';
+        $valor = is_string($_POST['valor'] ?? null) ? trim($_POST['valor']) : '';
 
         $permitidos = ['correo_institucional', 'nombre_apellido', 'documento'];
-        if (!in_array($campo, $permitidos)) {
+        if (!in_array($campo, $permitidos, true)) {
             echo json_encode(['success' => false, 'message' => 'Campo no permitido']);
             exit;
         }
 
-        // Documento puede quedar vacío solo para Admin
-        if ($campo !== 'documento' && $valor === '') {
-            echo json_encode(['success' => false, 'message' => 'El valor no puede estar vacío']);
+        $validator = new Validator();
+        if ($campo === 'correo_institucional') {
+            $validator->requerido($valor, 'correo')
+                ->email($valor)
+                ->longitud($valor, 5, 60, 'correo');
+        } elseif ($campo === 'nombre_apellido') {
+            $validator->requerido($valor, 'nombre y apellidos')
+                ->longitud($valor, 3, 100, 'nombre y apellidos')
+                ->regex($valor, '/^[\p{L}\p{M} .\'-]+$/u', 'El nombre solo puede contener letras, espacios, puntos, apóstrofes y guiones.');
+        } else {
+            $validator->requerido($valor, 'documento')
+                ->longitud($valor, 1, 25, 'documento')
+                ->regex($valor, '/^[0-9-]+$/', 'El documento solo puede contener números y guiones.');
+            if (!isset($_FILES['archivo_documento']) || $_FILES['archivo_documento']['error'] !== UPLOAD_ERR_OK) {
+                echo json_encode(['success' => false, 'message' => 'Adjunta una foto o PDF del documento nuevo.']);
+                exit;
+            }
+        }
+
+        if ($validator->falla()) {
+            echo json_encode(['success' => false, 'message' => $validator->primero(), 'errores' => $validator->errores()], JSON_UNESCAPED_UNICODE);
             exit;
         }
 
-        if ($campo === 'correo_institucional' && !filter_var($valor, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['success' => false, 'message' => 'Correo no válido']);
-            exit;
+        if ($campo === 'correo_institucional' || $campo === 'documento') {
+            $sql = "SELECT id_usuario FROM usuarios WHERE {$campo} = ? AND id_usuario != ? LIMIT 1";
+            $query = $connection->prepare($sql);
+            $query->bind_param('si', $valor, $mi_id);
+            $query->execute();
+            $duplicado = $query->get_result()->num_rows > 0;
+            $query->close();
+            if ($duplicado) {
+                echo json_encode(['success' => false, 'message' => $campo === 'correo_institucional' ? 'Ese correo ya está registrado.' : 'Ese documento ya está registrado.']);
+                exit;
+            }
         }
 
-        $sql = "UPDATE usuarios SET {$campo} = ? WHERE id_usuario = ?";
-        $query = $connection->prepare($sql);
-        $query->bind_param('si', $valor, $mi_id);
+        $archivo = null;
+        $fotoAnterior = null;
+        if ($campo === 'documento') {
+            $archivo = DocumentUpload::store($_FILES['archivo_documento'], 'uploads/profiles/documents/');
+            $archivoTemporalRelativo = $archivo['path'];
+            $query = $connection->prepare('SELECT foto_documento FROM usuarios WHERE id_usuario = ?');
+            $query->bind_param('i', $mi_id);
+            $query->execute();
+            $fotoAnterior = $query->get_result()->fetch_assoc()['foto_documento'] ?? null;
+            $query->close();
+
+            $query = $connection->prepare('UPDATE usuarios SET documento = ?, foto_documento = ? WHERE id_usuario = ?');
+            $query->bind_param('ssi', $valor, $archivo['path'], $mi_id);
+        } else {
+            $query = $connection->prepare("UPDATE usuarios SET {$campo} = ? WHERE id_usuario = ?");
+            $query->bind_param('si', $valor, $mi_id);
+        }
 
         if ($query->execute()) {
+            $query->close();
+            $archivoTemporalRelativo = null;
             if ($campo === 'correo_institucional') $_SESSION['correo'] = $valor;
             if ($campo === 'nombre_apellido') $_SESSION['nombre'] = $valor;
             if ($campo === 'documento') $_SESSION['documento'] = $valor;
+            if ($archivo !== null && $fotoAnterior && $fotoAnterior !== $archivo['path']
+                && !DocumentUpload::deleteManaged($fotoAnterior)) {
+                error_log('No se pudo eliminar foto de documento anterior de usuario #' . $mi_id);
+            }
             echo json_encode(['success' => true, 'message' => 'Dato actualizado correctamente']);
         } else {
+            $query->close();
+            if ($archivo !== null && !DocumentUpload::deleteManaged($archivo['path'])) {
+                error_log('No se pudo eliminar documento sin asociar: ' . $archivo['path']);
+            }
+            $archivoTemporalRelativo = null;
             echo json_encode(['success' => false, 'message' => 'Error al actualizar']);
         }
-        $query->close();
         exit;
     }
 
@@ -386,7 +499,29 @@ try {
 
     echo json_encode(['success' => false, 'message' => 'Acción no reconocida']);
 
+} catch (InvalidArgumentException $e) {
+    if ($archivoTemporalRelativo !== null) {
+        try {
+            if (!DocumentUpload::deleteManaged($archivoTemporalRelativo)) {
+                error_log('No se pudo limpiar documento tras error de validación: ' . $archivoTemporalRelativo);
+            }
+        } catch (Throwable $cleanupError) {
+            error_log('Error al limpiar documento temporal: ' . $cleanupError->getMessage());
+        }
+    }
+    http_response_code(422);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
+    if ($archivoTemporalRelativo !== null) {
+        try {
+            if (!DocumentUpload::deleteManaged($archivoTemporalRelativo)) {
+                error_log('No se pudo limpiar documento tras error de base de datos: ' . $archivoTemporalRelativo);
+            }
+        } catch (Throwable $cleanupError) {
+            error_log('Error al limpiar documento temporal: ' . $cleanupError->getMessage());
+        }
+    }
     error_log('configuracion-back error: ' . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Error interno del servidor', 'debug' => $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
 }

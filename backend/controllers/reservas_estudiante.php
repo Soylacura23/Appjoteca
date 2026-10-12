@@ -88,7 +88,7 @@ if ($accion === 'crear') {
             $ejemplaresTxt = $cantidad === 1 ? '1 ejemplar' : "{$cantidad} ejemplares";
             $notif->crear(
                 "Nueva solicitud de reserva #$id_reserva · «{$tituloLibro}» ({$ejemplaresTxt})",
-                "/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php",
+                "/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php?reserva={$id_reserva}",
                 $bibliotecarios
             );
         }

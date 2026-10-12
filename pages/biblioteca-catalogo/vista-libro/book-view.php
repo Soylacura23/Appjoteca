@@ -13,14 +13,12 @@ if (empty($_SESSION['csrf_token'])) {
 
 $base_url = '/Appjoteca/';
 
-// ── 1. Validar id ────────────────────────────────────────
 $id_libro = (int) ($_GET['id'] ?? 0);
 if ($id_libro <= 0) {
     header('Location: /Appjoteca/pages/biblioteca-catalogo/catalogo/catalogo.php');
     exit;
 }
 
-// ── 2. Obtener el libro desde el modelo ──────────────────
 $modeloLibro = new libro($connection);
 $libro = $modeloLibro->obtenerLibro($id_libro);
 
@@ -30,11 +28,8 @@ if (!$libro) {
     exit;
 }
 
-// ── 3. Disponibilidad (helper) ───────────────────────────
 $disp = disponibilidadLibro($libro);
-// $disp = ['disponible'=>bool, 'cantidad'=>int, 'texto'=>'Disponible|No disponible', 'clase'=>'available|unavailable']
 
-// ── 4. Datos del libro ───────────────────────────────────
 $titulo    = $libro['titulo'] ?? 'Sin título';
 $autores   = $libro['autores'] ?: 'Autor desconocido';
 $materia   = $libro['materia'] ?? 'General';
@@ -45,14 +40,12 @@ $anio      = $libro['publicacion_year'] ?? '';
 $edicionLabel = trim(($edicion !== '' ? $edicion : 'Edición') . ($anio ? ' · ' . $anio : ''));
 $portada   = urlPortada($libro['portada'] ?? '', $base_url);
 
-// ── 5. ¿Tiene reserva pendiente? ─────────────────────────
 $modeloReserva = new Reserva($connection);
 $reservaPendiente = null;
 if (!empty($_SESSION['usuario_id'])) {
     $reservaPendiente = $modeloReserva->obtenerPendienteDeUsuario((int) $_SESSION['usuario_id'], $id_libro);
 }
 
-// ── 6. Libros relacionados (modelo) ──────────────────────
 $librosRelacionados = $modeloLibro->obtenerRelacionados($id_libro, 4);
 ?>
 <!DOCTYPE html>

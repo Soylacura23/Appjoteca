@@ -184,6 +184,7 @@ $query->bind_param(
 );
 
 if ($query->execute()) {
+    $idUsuario = (int) $connection->insert_id;
     $query->close();
 
     require_once __DIR__ . '/../models/notificacion.php';
@@ -193,7 +194,7 @@ if ($query->execute()) {
     if (!empty($admins)) {
         $modeloNotif->crear(
             "Nueva solicitud de cuenta: $nombre ($usuario). Pendiente de aprobación.",
-            '/Appjoteca/dashboards/Administrador/index.php',
+            "/Appjoteca/dashboards/Administrador/index.php?tab=pendientes&focus_usuario={$idUsuario}",
             $admins
         );
     }

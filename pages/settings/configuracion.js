@@ -356,38 +356,80 @@ document.addEventListener('DOMContentLoaded', function () {
     requestBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
             const tipo = this.dataset.request;
+            const esDirecto = this.dataset.direct === 'true';
+            let archivoDocumento = null;
 
             const titulos = {
                 email: 'Cambio de Correo Institucional',
                 nombre: 'Cambio de Nombre y Apellidos',
-                documento: 'Cambio de Documento'
+                documento: 'Cambio de Documento y Foto'
             };
 
             Swal.fire({
-                title: 'Solicitar ' + (titulos[tipo] || 'cambio'),
-                input: 'text',
-                inputLabel: 'Escribe el nuevo valor',
-                inputPlaceholder: 'Nuevo valor...',
+                title: (esDirecto ? 'Actualizar ' : 'Solicitar ') + (titulos[tipo] || 'cambio'),
+                input: tipo === 'email' ? 'email' : 'text',
+                inputLabel: tipo === 'documento' ? 'Nuevo número de documento' : 'Escribe el nuevo valor',
+                inputPlaceholder: tipo === 'email' ? 'correo@institucion.edu' : 'Nuevo valor...',
+                inputAttributes: { maxlength: tipo === 'nombre' ? '100' : (tipo === 'documento' ? '25' : '60') },
+                customClass: tipo === 'documento' ? { popup: 'change-document-swal' } : undefined,
+                html: tipo === 'documento' ? `
+                    <label class="change-document-upload" for="changeDocumentFile">
+                        <span class="material-symbols-outlined">upload_file</span>
+                        <span>Adjunta la foto del documento o un PDF (máximo 10 MB)</span>
+                        <input id="changeDocumentFile" class="change-document-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Selecciona una imagen o PDF del documento">
+                    </label>
+                    <p class="change-document-file-name" id="changeDocumentFileName">Ningún archivo seleccionado</p>
+                ` : undefined,
                 showCancelButton: true,
-                confirmButtonText: 'Enviar solicitud',
+                confirmButtonText: esDirecto ? 'Guardar cambio' : 'Enviar solicitud',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
                 background: '#121212',
                 color: '#e2e2e2',
                 confirmButtonColor: '#f2ca50',
                 cancelButtonColor: 'rgba(255,255,255,0.1)',
+                didOpen: function () {
+                    const fileInput = document.getElementById('changeDocumentFile');
+                    fileInput?.addEventListener('change', function () {
+                        archivoDocumento = this.files[0] || null;
+                        const name = document.getElementById('changeDocumentFileName');
+                        if (name) name.textContent = archivoDocumento ? archivoDocumento.name : 'Ningún archivo seleccionado';
+                    });
+                },
                 inputValidator: function (value) {
                     if (!value || !value.trim()) {
                         return 'Debes escribir un valor';
+                    }
+                    if (tipo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+                        return 'Escribe un correo electrónico válido';
+                    }
+                    if (tipo === 'nombre' && !/^[\p{L}\p{M} .'-]{3,100}$/u.test(value.trim())) {
+                        return 'Escribe un nombre válido de 3 a 100 caracteres';
+                    }
+                    if (tipo === 'documento') {
+                        if (!/^[0-9-]{1,25}$/.test(value.trim())) return 'El documento solo puede contener números y guiones';
+                        if (!archivoDocumento) return 'Adjunta la foto o el PDF del documento nuevo';
+                        if (archivoDocumento.size > 10 * 1024 * 1024) return 'El archivo no puede superar 10 MB';
                     }
                 }
             }).then(function (result) {
                 if (!result.isConfirmed) return;
 
                 const formData = new FormData();
-                formData.append('accion', 'solicitar_cambio');
-                formData.append('tipo', tipo);
-                formData.append('valor_nuevo', result.value.trim());
+                const campoDirecto = {
+                    email: 'correo_institucional',
+                    nombre: 'nombre_apellido',
+                    documento: 'documento'
+                };
+                formData.append('accion', esDirecto ? 'update_directo' : 'solicitar_cambio');
+                if (esDirecto) {
+                    formData.append('campo', campoDirecto[tipo]);
+                    formData.append('valor', result.value.trim());
+                } else {
+                    formData.append('tipo', tipo);
+                    formData.append('valor_nuevo', result.value.trim());
+                }
+                if (archivoDocumento) formData.append('archivo_documento', archivoDocumento);
                 formData.append('csrf_token', getToken());
 
                 fetch(ENDPOINT, {
@@ -397,7 +439,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data.success) {
-                        alerta('success', 'Solicitud enviada', data.message);
+                        alerta('success', esDirecto ? 'Dato actualizado' : 'Solicitud enviada', data.message);
+                        if (tipo === 'documento') {
+                            const current = document.getElementById('displayDocument');
+                            if (esDirecto && current) current.textContent = 'DNI | ' + result.value.trim();
+                        }
                     } else {
                         alerta('error', 'Error', data.message);
                     }

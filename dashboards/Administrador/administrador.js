@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', function () {
             : (document.querySelector('meta[name="csrf-token"]')?.content || '');
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
     async function peticion(action, extra) {
         extra = extra || {};
         const formData = new FormData();
@@ -36,28 +48,61 @@ document.addEventListener('DOMContentLoaded', function () {
         return respuesta.json();
     }
 
+    function rowFormatterWithLabels(labels) {
+        const labelsByField = {
+            id_usuario: 'ID',
+            id_solicitud: 'ID',
+            documento: 'Documento',
+            nombre_apellido: 'Nombre',
+            correo_institucional: 'Correo',
+            fecha_registro: 'Fecha',
+            nombre_usuario: 'Usuario',
+            rol_nombre: 'Rol',
+            tipo: 'Tipo',
+            valor_actual: 'Valor actual',
+            valor_nuevo: 'Valor nuevo',
+            fecha_solicitud: 'Fecha',
+            acciones: 'Acciones'
+        };
+        return function (row) {
+            row.getCells().forEach(function (cell, index) {
+                const element = cell.getElement();
+                const field = cell.getColumn().getField();
+                const label = labelsByField[field] || labels[index];
+                if (label && !element.classList.contains('tabulator-responsive-collapse-toggle')) {
+                    element.setAttribute('data-label', label);
+                }
+            });
+        };
+    }
+
     // 1. Tabla Bibliotecarios
     const tablaBibliotecarios = new Tabulator('#tabla-bibliotecarios', {
+        index: 'id_usuario',
         data: [],
         layout: 'fitColumns',
         responsiveLayout: 'collapse',
+        responsiveLayoutCollapseStartOpen: false,
         placeholder: 'No se encontraron bibliotecarios registrados',
+        rowFormatter: rowFormatterWithLabels(['ID', 'Documento', 'Nombre', 'Correo', 'Alta', 'Acciones']),
         columns: [
-            { title: 'ID', field: 'id_usuario', width: 70, hozAlign: 'center' },
-            { title: 'Documento', field: 'documento' },
-            { title: 'Nombre y Apellido', field: 'nombre_apellido' },
-            { title: 'Correo', field: 'correo_institucional', widthGrow: 2,
+            { title: 'ID', field: 'id_usuario', width: 70, minWidth: 60, hozAlign: 'center', responsive: 0 },
+            { title: 'Documento', field: 'documento', minWidth: 110, responsive: 3 },
+            { title: 'Nombre y Apellido', field: 'nombre_apellido', minWidth: 130, responsive: 0 },
+            { title: 'Correo', field: 'correo_institucional', minWidth: 150, widthGrow: 2, responsive: 1,
                 tooltip: true },
-            { title: 'Fecha de Alta', field: 'fecha_registro', hozAlign: 'center' },
+            { title: 'Fecha de Alta', field: 'fecha_registro', minWidth: 100, hozAlign: 'center', responsive: 2 },
             {
                 title: 'Acciones',
+                field: 'acciones',
                 hozAlign: 'center',
-                width: 140,
-                minWidth: 120,
+                width: 110,
+                minWidth: 90,
+                responsive: 0,
                 formatter: function () {
                     return `<div class="acciones-btns">
                         <button class="btn-danger-sm action-delete-btn" type="button">
-                            <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </div>`;
                 },
@@ -73,30 +118,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2. Tabla Cuentas Pendientes (signup)
     const tablaPendientes = new Tabulator('#tabla-pendientes', {
+        index: 'id_usuario',
         data: [],
         layout: 'fitColumns',
         responsiveLayout: 'collapse',
+        responsiveLayoutCollapseStartOpen: false,
         placeholder: 'No hay usuarios pendientes por aprobar',
+        rowFormatter: rowFormatterWithLabels(['ID', 'Documento', 'Nombre', 'Usuario', 'Correo', 'Rol', 'Fecha', 'Acciones']),
         columns: [
-            { title: 'ID', field: 'id_usuario', width: 70, hozAlign: 'center' },
-            { title: 'Documento', field: 'documento' },
-            { title: 'Nombre', field: 'nombre_apellido' },
-            { title: 'Usuario', field: 'nombre_usuario' },
-            { title: 'Correo', field: 'correo_institucional' },
-            { title: 'Rol', field: 'rol_nombre', hozAlign: 'center' },
-            { title: 'Fecha', field: 'fecha_registro', hozAlign: 'center' },
+            { title: 'ID', field: 'id_usuario', width: 70, minWidth: 60, hozAlign: 'center', responsive: 0 },
+            { title: 'Documento', field: 'documento', minWidth: 110, responsive: 4 },
+            { title: 'Nombre', field: 'nombre_apellido', minWidth: 130, responsive: 0 },
+            { title: 'Usuario', field: 'nombre_usuario', minWidth: 110, responsive: 2 },
+            { title: 'Correo', field: 'correo_institucional', minWidth: 155, responsive: 3 },
+            { title: 'Rol', field: 'rol_nombre', minWidth: 95, hozAlign: 'center', responsive: 1 },
+            { title: 'Fecha', field: 'fecha_registro', minWidth: 100, hozAlign: 'center', responsive: 5 },
             {
                 title: 'Acciones',
+                field: 'acciones',
                 hozAlign: 'center',
-                width: 250,
-                minWidth: 240,
+                width: 155,
+                minWidth: 120,
+                responsive: 0,
                 formatter: function () {
                     return `<div class="acciones-btns">
-                        <button class="btn-approve-sm action-approve-btn" type="button">
-                            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Aprobar
+                        <button class="btn-approve-sm action-approve-btn" type="button" aria-label="Aprobar cuenta" title="Aprobar">
+                            <span class="material-symbols-outlined">check_circle</span>
                         </button>
-                        <button class="btn-danger-sm action-reject-btn" type="button">
-                            <span class="material-symbols-outlined" style="font-size:16px;">cancel</span> Rechazar
+                        <button class="btn-danger-sm action-reject-btn" type="button" aria-label="Rechazar cuenta" title="Rechazar">
+                            <span class="material-symbols-outlined">cancel</span>
                         </button>
                     </div>`;
                 },
@@ -115,49 +165,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 3. Tabla Solicitudes de Cambio
     const tablaSolicitudes = new Tabulator('#tabla-solicitudes', {
+        index: 'id_solicitud',
         data: [],
         layout: 'fitColumns',
         responsiveLayout: 'collapse',
+        responsiveLayoutCollapseStartOpen: false,
         placeholder: 'No hay solicitudes de cambio pendientes',
+        rowFormatter: rowFormatterWithLabels(['ID', 'Usuario', 'Nombre', 'Tipo', 'Valor actual', 'Valor nuevo', 'Fecha', 'Acciones']),
         columns: [
-            { title: 'ID', field: 'id_solicitud', width: 70, hozAlign: 'center' },
-            { title: 'Usuario', field: 'nombre_usuario' },
-            { title: 'Nombre', field: 'nombre_apellido' },
+            { title: 'ID', field: 'id_solicitud', width: 70, minWidth: 60, hozAlign: 'center', responsive: 0 },
+            { title: 'Usuario', field: 'nombre_usuario', minWidth: 110, responsive: 3 },
+            { title: 'Nombre', field: 'nombre_apellido', minWidth: 130, responsive: 1 },
             {
                 title: 'Tipo',
                 field: 'tipo',
                 hozAlign: 'center',
-                width: 120,
+                width: 110,
+                minWidth: 90,
+                responsive: 0,
                 formatter: function (cell) {
                     const t = cell.getValue() || '';
                     return '<span class="tipo-badge ' + t + '">' + t + '</span>';
                 }
             },
-            { title: 'Valor actual', field: 'valor_actual' },
-            { title: 'Valor nuevo', field: 'valor_nuevo' },
-            { title: 'Fecha', field: 'fecha_solicitud', hozAlign: 'center' },
+            { title: 'Valor actual', field: 'valor_actual', minWidth: 120, responsive: 4 },
+            { title: 'Valor nuevo', field: 'valor_nuevo', minWidth: 130, responsive: 3 },
+            { title: 'Fecha', field: 'fecha_solicitud', minWidth: 110, hozAlign: 'center', responsive: 5 },
             {
                 title: 'Acciones',
+                field: 'acciones',
                 hozAlign: 'center',
-                width: 250,
-                minWidth: 240,
+                width: 115,
+                minWidth: 95,
+                responsive: 0,
                 formatter: function () {
                     return `<div class="acciones-btns">
-                        <button class="btn-approve-sm action-sol-aprobar" type="button">
-                            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Aprobar
-                        </button>
-                        <button class="btn-danger-sm action-sol-rechazar" type="button">
-                            <span class="material-symbols-outlined" style="font-size:16px;">cancel</span> Rechazar
+                        <button class="btn-review-sm action-sol-revisar" type="button" aria-label="Revisar solicitud" title="Revisar">
+                            <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>`;
                 },
                 cellClick: function (e, cell) {
                     const row = cell.getRow().getData();
-                    if (e.target.closest('.action-sol-aprobar')) {
-                        confirmarSolicitud(row, 'aprobar');
-                    }
-                    if (e.target.closest('.action-sol-rechazar')) {
-                        confirmarSolicitud(row, 'rechazar');
+                    if (e.target.closest('.action-sol-revisar')) {
+                        revisarSolicitud(row);
                     }
                 }
             }
@@ -168,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function cargarBibliotecarios() {
         try {
             const data = await peticion('listar');
-            tablaBibliotecarios.setData(Array.isArray(data) ? data : []);
+            await tablaBibliotecarios.setData(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error(err);
             alerta('error', 'Error', 'No se pudieron cargar los bibliotecarios.');
@@ -179,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const data = await peticion('listar_pendientes');
             const lista = Array.isArray(data) ? data : [];
-            tablaPendientes.setData(lista);
+            await tablaPendientes.setData(lista);
             actualizarBadge('badge-pendientes', lista.length);
         } catch (err) {
             console.error(err);
@@ -191,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const data = await peticion('listar_solicitudes');
             const lista = Array.isArray(data) ? data : [];
-            tablaSolicitudes.setData(lista);
+            await tablaSolicitudes.setData(lista);
             actualizarBadge('badge-solicitudes', lista.length);
         } catch (err) {
             console.error(err);
@@ -311,55 +362,77 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 6. Confirmar solicitudes de cambio
-    function confirmarSolicitud(row, accion) {
-        const esAprobar = accion === 'aprobar';
-        const titulo = esAprobar ? '¿Aprobar solicitud?' : '¿Rechazar solicitud?';
-        const texto = esAprobar
-            ? 'Se aplicará el cambio de "' + row.tipo + '" para ' + (row.nombre_apellido || row.nombre_usuario) + '.'
-            : 'Se rechazará la solicitud de "' + row.tipo + '" sin aplicar cambios.';
+    // 6. Revisar solicitudes de cambio
+    async function revisarSolicitud(row) {
+        const archivo = row.archivo_nuevo ? '/Appjoteca/' + String(row.archivo_nuevo).replace(/^\/+/, '') : '';
+        let vistaArchivo = '<p class="request-file-empty">No se adjuntó un documento.</p>';
+        if (archivo && row.archivo_mime === 'application/pdf') {
+            vistaArchivo = `<iframe class="request-document-preview" src="${escapeHtml(archivo)}" title="Documento adjunto en PDF"></iframe>`;
+        } else if (archivo && String(row.archivo_mime || '').startsWith('image/')) {
+            vistaArchivo = `<img class="request-document-image" src="${escapeHtml(archivo)}" alt="Documento adjunto">`;
+        }
 
-        Swal.fire({
-            title: titulo,
-            text: texto,
-            icon: esAprobar ? 'question' : 'warning',
+        const result = await Swal.fire({
+            title: 'Revisar solicitud',
+            html: `<div class="request-review">
+                <p><strong>${escapeHtml(row.nombre_apellido || row.nombre_usuario)}</strong> · ${escapeHtml(row.tipo)}</p>
+                <dl>
+                    <div><dt>Valor actual</dt><dd>${escapeHtml(row.valor_actual || '—')}</dd></div>
+                    <div><dt>Valor solicitado</dt><dd>${escapeHtml(row.valor_nuevo || '—')}</dd></div>
+                    <div><dt>Fecha</dt><dd>${escapeHtml(row.fecha_solicitud || '—')}</dd></div>
+                </dl>
+                ${vistaArchivo}
+            </div>`,
+            showDenyButton: true,
             showCancelButton: true,
-            confirmButtonText: esAprobar ? 'Sí, aprobar' : 'Sí, rechazar',
-            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Aprobar cambio',
+            denyButtonText: 'Rechazar',
+            cancelButtonText: 'Cerrar',
             reverseButtons: true,
             background: '#121212',
             color: '#e2e2e2',
-            iconColor: esAprobar ? undefined : '#ffb4ab',
-            confirmButtonColor: esAprobar ? '#4caf50' : '#ffb4ab',
-            cancelButtonColor: 'rgba(255,255,255,0.1)',
-            input: esAprobar ? undefined : 'text',
-            inputPlaceholder: esAprobar ? undefined : 'Comentario opcional...',
-            inputLabel: esAprobar ? undefined : 'Motivo del rechazo (opcional)'
-        }).then(async function (result) {
-            if (!result.isConfirmed) return;
-
-            try {
-                const extra = {
-                    id_solicitud: row.id_solicitud,
-                    decision: accion
-                };
-                if (!esAprobar && result.value) {
-                    extra.comentario = result.value;
-                }
-
-                const data = await peticion('resolver_solicitud', extra);
-
-                if (data.status === 'success') {
-                    alerta('success', esAprobar ? 'Aprobada' : 'Rechazada', data.message);
-                    cargarSolicitudes();
-                } else {
-                    alerta('error', 'Error', data.message || 'No se pudo procesar');
-                }
-            } catch (err) {
-                console.error(err);
-                alerta('error', 'Error de red', 'No se pudo procesar la solicitud.');
-            }
+            confirmButtonColor: '#42a17d',
+            denyButtonColor: '#b95757',
+            cancelButtonColor: 'rgba(255,255,255,0.1)'
         });
+
+        if (!result.isConfirmed && !result.isDenied) return;
+        let decision = result.isConfirmed ? 'aprobar' : 'rechazar';
+        let comentario = '';
+        if (decision === 'rechazar') {
+            const reason = await Swal.fire({
+                title: 'Rechazar solicitud',
+                input: 'text',
+                inputLabel: 'Motivo (opcional)',
+                inputPlaceholder: 'Escribe un comentario para el solicitante',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar rechazo',
+                cancelButtonText: 'Volver',
+                background: '#121212',
+                color: '#e2e2e2',
+                confirmButtonColor: '#b95757',
+                cancelButtonColor: 'rgba(255,255,255,0.1)'
+            });
+            if (!reason.isConfirmed) return;
+            comentario = reason.value || '';
+        }
+
+        try {
+            const data = await peticion('resolver_solicitud', {
+                id_solicitud: row.id_solicitud,
+                decision: decision,
+                comentario: comentario
+            });
+            if (data.status === 'success') {
+                alerta('success', decision === 'aprobar' ? 'Aprobada' : 'Rechazada', data.message);
+                cargarSolicitudes();
+            } else {
+                alerta('error', 'Error', data.message || 'No se pudo procesar');
+            }
+        } catch (err) {
+            console.error(err);
+            alerta('error', 'Error de red', 'No se pudo procesar la solicitud.');
+        }
     }
 
     // 7. Tabs
@@ -385,12 +458,45 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const tabInicial = new URLSearchParams(window.location.search).get('tab');
+    const parametrosIniciales = new URLSearchParams(window.location.search);
+    const tabInicial = parametrosIniciales.get('tab')
+        || (parametrosIniciales.has('focus_solicitud') ? 'solicitudes' : null)
+        || (parametrosIniciales.has('focus_usuario') ? 'pendientes' : null)
+        || (parametrosIniciales.has('focus_bibliotecario') ? 'bibliotecarios' : null);
     if (tabInicial) {
         const tabPendiente = Array.from(tabs).find(function (tab) {
             return tab.dataset.tab === tabInicial;
         });
         if (tabPendiente) tabPendiente.click();
+    }
+
+    function enfocarFila(table, id) {
+        const row = table.getRow(id);
+        if (!row || !row.getElement()) return null;
+        const element = row.getElement();
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('notification-focus');
+        window.setTimeout(function () {
+            element.classList.remove('notification-focus');
+        }, 4500);
+        return row.getData();
+    }
+
+    async function enfocarDestinoNotificacion() {
+        const params = new URLSearchParams(window.location.search);
+        const idBibliotecario = Number(params.get('focus_bibliotecario'));
+        const idPendiente = Number(params.get('focus_usuario'));
+        const idSolicitud = Number(params.get('focus_solicitud'));
+        if (Number.isInteger(idBibliotecario) && idBibliotecario > 0) {
+            enfocarFila(tablaBibliotecarios, idBibliotecario);
+        }
+        if (Number.isInteger(idPendiente) && idPendiente > 0) {
+            enfocarFila(tablaPendientes, idPendiente);
+        }
+        if (Number.isInteger(idSolicitud) && idSolicitud > 0) {
+            const row = enfocarFila(tablaSolicitudes, idSolicitud);
+            if (row) await revisarSolicitud(row);
+        }
     }
 
     // 8. Modal crear usuario
@@ -563,5 +669,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── Inicio ──
-    refrescarTodo();
+    refrescarTodo().then(enfocarDestinoNotificacion);
 });

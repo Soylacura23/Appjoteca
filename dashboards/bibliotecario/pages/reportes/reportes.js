@@ -19,7 +19,7 @@
     let periodoActual = '30';
 
     // Portada por defecto si no hay imagen
-    const PORTADA_DEFAULT = '../../../../shared/images/logo-appjoteca.png';
+    const PORTADA_DEFAULT = '../../../../shared/images/logo-appjoteca.svg';
 
     // Etiquetas legibles por período
     const etiquetasPeriodo = {

@@ -2,7 +2,7 @@
 <header class="main-header" id="mainHeader">
     <div class="header-container">
         <a href="index.php" class="logo-link">
-            <img src="shared/images/logo-appjoteca.png" alt="Appjoteca Logo" class="logo-img">
+            <img src="shared/images/logo-appjoteca.svg" alt="Appjoteca Logo" class="logo-img">
             <span class="logo-text">APPJOTECA</span>
         </a>
         <nav class="main-nav">

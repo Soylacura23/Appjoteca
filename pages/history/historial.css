@@ -623,17 +623,56 @@
       transform: translateX(-100%);
       width: 280px;
       top: 0;
-      z-index: var(--z-mobile-menu);
+      z-index: 1400;
       border-right: 1px solid rgba(242, 202, 80, 0.1);
     }
   
     .historial-sidebar.mobile-open {
       transform: translateX(0);
-      z-index: var(--z-mobile-menu);
+      z-index: 1400;
+      pointer-events: auto;
     }
 
     #overlay {
-      z-index: var(--z-mobile-overlay);
+      z-index: var(--z-mobile-overlay) !important;
+    }
+
+    .page-historial .topbar-inner {
+      gap: 4px;
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+
+    .page-historial .logo-link {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .page-historial .logo-link img {
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .page-historial .topbar-actions {
+      flex: 0 0 auto;
+      gap: 0;
+      min-width: 0;
+    }
+
+    .page-historial .search-toggle-btn,
+    .page-historial .notification-tray,
+    .page-historial .menu-toggle-btn {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .page-historial #profile-button-topbar {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
     }
   
     .historial-sidebar.expanded {
