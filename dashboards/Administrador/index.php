@@ -11,6 +11,8 @@ requiereRol([4]);
     <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
     <title>Panel de Administrador - AppJoteca</title>
 
+    <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,300;1,400&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
@@ -47,7 +49,7 @@ requiereRol([4]);
             <p class="config-page-subtitle">Administra perfiles, estados de cuenta, solicitudes de cambio y nuevas altas.</p>
         </header>
 
-        <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
+        
 
         <div class="admin-actions-bar">
             <button id="btnAbrirModal" class="btn-gold" type="button">
@@ -126,6 +128,8 @@ requiereRol([4]);
                 <button class="btn-outline" id="directory-next" type="button">Siguiente</button>
             </div>
         </section>
+
+        <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
 
     </div>
 </main>

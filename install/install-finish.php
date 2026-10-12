@@ -16,6 +16,9 @@ session_destroy();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instalación completa - Appjoteca</title>
+    
+    <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;

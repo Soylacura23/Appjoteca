@@ -17,18 +17,7 @@ if (empty($_SESSION['csrf_token'])) {
   <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
   <title>Recuperar Acceso en AppJoteca</title>
 
-  <style>
-    html.auth-styles-loading { background: #0a0a0a; }
-    html.auth-styles-loading body { visibility: hidden; }
-  </style>
-  <script>
-    (() => {
-      document.documentElement.classList.add('auth-styles-loading');
-      const revealAuthPage = () => document.documentElement.classList.remove('auth-styles-loading');
-      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(revealAuthPage), { once: true });
-      window.setTimeout(revealAuthPage, 1500);
-    })();
-  </script>
+  <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

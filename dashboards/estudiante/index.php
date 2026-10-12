@@ -13,6 +13,8 @@ requiereRol([1]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Estudiante - AppJoteca</title>
 
+    <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,300;1,400&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 

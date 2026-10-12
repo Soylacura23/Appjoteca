@@ -22,6 +22,9 @@ if ($step === 'composer') {
     <head>
         <meta charset="UTF-8">
         <title>Instalación - Composer</title>
+
+        <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
         <style>
             body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
             pre { background: #f4f4f4; padding: 12px; border-radius: 4px; }
@@ -75,6 +78,9 @@ if ($step === 'env') {
     <head>
         <meta charset="UTF-8">
         <title>Instalación - Variables de entorno</title>
+
+        <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
         <style>
             body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
             ul { background: #fff3cd; padding: 16px 16px 16px 36px; border-radius: 4px; }
@@ -117,6 +123,9 @@ if ($step === 'connection') {
     <head>
         <meta charset="UTF-8">
         <title>Instalación - Conexión</title>
+
+        <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
         <style>
             body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
             .error { color: #c0392b; background: #fdecea; padding: 12px; border-radius: 4px; }
@@ -194,7 +203,11 @@ if ($step === 'database') {
     <html lang="es">
     <head>
         <meta charset="UTF-8">
+        
         <title>Instalación - Base de datos</title>
+
+        <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+        
         <style>
             body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
             .error { color: #c0392b; background: #fdecea; padding: 12px; border-radius: 4px; }

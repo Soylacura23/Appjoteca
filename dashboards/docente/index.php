@@ -23,6 +23,8 @@ $teacherNotesQuery->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Docente | Dashboard - AppJoteca</title>
 
+    <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
     <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">

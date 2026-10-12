@@ -18,19 +18,7 @@ require_once __DIR__ . '/../../backend/config/auth-check.php';
 
   <title>Iniciar Sesión en AppJoteca</title>
 
-  <style>
-    html.auth-styles-loading { background: #0a0a0a; }
-    html.auth-styles-loading body { visibility: hidden; }
-  </style>
-  <script>
-    (() => {
-      document.documentElement.classList.add('auth-styles-loading');
-      const revealAuthPage = () => document.documentElement.classList.remove('auth-styles-loading');
-      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(revealAuthPage), { once: true });
-      window.setTimeout(revealAuthPage, 1500);
-    })();
-  </script>
-
+  <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">

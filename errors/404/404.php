@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Recurso Perdido | AppJoteca</title>
 
+    <?php include_once '/Appjoteca/shared/layouts/anti-fouc.php'; ?>
+
     <base href="/Appjoteca/errors/404/">
     
     <link rel="stylesheet" href="../../shared/css/theme.css">
