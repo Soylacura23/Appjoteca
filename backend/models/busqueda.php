@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../helpers/redirect.php';
+
 class Busqueda
 {
     private $db;
@@ -44,9 +46,7 @@ class Busqueda
                 'id'        => (int) $fila['id_libro'],
                 'titulo'    => $fila['titulo'] ?? 'Sin título',
                 'subtitulo' => trim(($fila['autores'] ?: 'Sin autor') . ' · ' . ($fila['materia'] ?: 'General')),
-                'url'       => (int) $rol === 3
-                    ? '/Appjoteca/dashboards/bibliotecario/pages/inventario/inventario.php?open_book=' . (int) $fila['id_libro']
-                    : '/Appjoteca/pages/biblioteca-catalogo/vista-libro/book-view.php?id=' . (int) $fila['id_libro'],
+                'url'       => redirect_to('book', (int) $rol, (int) $fila['id_libro']),
             ];
         }
         $q->close();
@@ -54,16 +54,19 @@ class Busqueda
     }
 
     // Usuarios por nombre, usuario o correo
-    public function usuarios($texto)
+    public function usuarios($texto, $rol = 3)
     {
         $like = '%' . $texto . '%';
+        $filtroBibliotecario = $rol === 3 ? 'AND u.id_rol IN (1, 2, 4)' : '';
         $sql = "SELECT u.id_usuario, u.nombre_apellido, u.nombre_usuario,
                        u.correo_institucional, r.nombre AS rol
                 FROM usuarios u
                 LEFT JOIN roles r ON r.id_rol = u.id_rol
-                WHERE u.nombre_apellido LIKE ?
+                WHERE u.estado IN ('1', 'inactivo', '0')
+                  {$filtroBibliotecario}
+                  AND (u.nombre_apellido LIKE ?
                    OR u.nombre_usuario LIKE ?
-                   OR u.correo_institucional LIKE ?
+                   OR u.correo_institucional LIKE ?)
                 ORDER BY u.nombre_apellido ASC
                 LIMIT ?";
 
@@ -80,7 +83,65 @@ class Busqueda
                 'id'        => (int) $fila['id_usuario'],
                 'titulo'    => $fila['nombre_apellido'] ?? $fila['nombre_usuario'],
                 'subtitulo' => trim(($fila['rol'] ?? 'Usuario') . ' · @' . ($fila['nombre_usuario'] ?? '')),
-                'url'       => '/Appjoteca/dashboards/bibliotecario/pages/usuarios/usuarios.php?id=' . (int) $fila['id_usuario'],
+                'url'       => redirect_to('profile', (int) $rol, (int) $fila['id_usuario']),
+            ];
+        }
+        $q->close();
+        return $lista;
+    }
+
+    public function pendientes($texto)
+    {
+        $like = '%' . $texto . '%';
+        $sql = "SELECT u.id_usuario, u.nombre_apellido, u.nombre_usuario, r.nombre AS rol
+                FROM usuarios u
+                LEFT JOIN roles r ON r.id_rol = u.id_rol
+                WHERE u.estado = 'pendiente'
+                  AND (u.nombre_apellido LIKE ? OR u.nombre_usuario LIKE ? OR u.correo_institucional LIKE ?)
+                ORDER BY u.fecha_registro DESC
+                LIMIT ?";
+        $q = $this->db->prepare($sql);
+        $lim = $this->limite;
+        $q->bind_param('sssi', $like, $like, $like, $lim);
+        $q->execute();
+        $lista = [];
+        $res = $q->get_result();
+        while ($fila = $res->fetch_assoc()) {
+            $lista[] = [
+                'tipo' => 'pendiente',
+                'id' => (int) $fila['id_usuario'],
+                'titulo' => $fila['nombre_apellido'] ?: $fila['nombre_usuario'],
+                'subtitulo' => trim(($fila['rol'] ?? 'Usuario') . ' · cuenta pendiente'),
+                'url' => redirect_to('pending', 4, (int) $fila['id_usuario']),
+            ];
+        }
+        $q->close();
+        return $lista;
+    }
+
+    public function solicitudes($texto)
+    {
+        $like = '%' . $texto . '%';
+        $sql = "SELECT s.id_solicitud, s.tipo, u.nombre_apellido, u.nombre_usuario, s.valor_nuevo
+                FROM solicitudes_cambio s
+                JOIN usuarios u ON u.id_usuario = s.id_usuario
+                WHERE s.estado = 'pendiente'
+                  AND (u.nombre_apellido LIKE ? OR u.nombre_usuario LIKE ? OR s.tipo LIKE ? OR s.valor_nuevo LIKE ?)
+                ORDER BY s.fecha_solicitud DESC
+                LIMIT ?";
+        $q = $this->db->prepare($sql);
+        $lim = $this->limite;
+        $q->bind_param('ssssi', $like, $like, $like, $like, $lim);
+        $q->execute();
+        $lista = [];
+        $res = $q->get_result();
+        while ($fila = $res->fetch_assoc()) {
+            $lista[] = [
+                'tipo' => 'solicitud',
+                'id' => (int) $fila['id_solicitud'],
+                'titulo' => ucfirst($fila['tipo']) . ' · ' . ($fila['nombre_apellido'] ?: $fila['nombre_usuario']),
+                'subtitulo' => trim((string) ($fila['valor_nuevo'] ?? 'Solicitud pendiente')),
+                'url' => redirect_to('request', 4, (int) $fila['id_solicitud']),
             ];
         }
         $q->close();
@@ -178,13 +239,16 @@ class Busqueda
 
         $lista = [];
         while ($fila = $res->fetch_assoc()) {
-            $preview = mb_substr(trim($fila['comentario'] ?? ''), 0, 60);
+            $comentario = trim($fila['comentario'] ?? '');
+            $preview = function_exists('mb_substr')
+                ? mb_substr($comentario, 0, 60, 'UTF-8')
+                : substr($comentario, 0, 60);
             $lista[] = [
                 'tipo'      => 'comentario',
                 'id'        => (int) $fila['id_comentario'],
                 'titulo'    => $preview !== '' ? $preview : 'Comentario #' . $fila['id_comentario'],
                 'subtitulo' => trim(($fila['nombre'] ?? 'Anónimo') . ' · ' . ($fila['tipo_comentario'] ?? '')),
-                'url'       => '/Appjoteca/dashboards/Administrador/comentarios/comentarios.php',
+                'url'       => redirect_to('comment', 4),
             ];
         }
         $q->close();

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var btnReservar    = document.getElementById('btn-reservar');
     var btnCancelar    = document.getElementById('btn-cancelar-reserva');
     var btnAddLibrary  = document.getElementById('btn-add-library');
+    var btnWishlist = document.getElementById('btn-wishlist');
     var synopsisText = document.querySelector('.synopsis-text');
     var synopsisToggle = document.querySelector('.synopsis-toggle');
 
@@ -123,6 +124,37 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!id) return;
             console.log('[book-view] Agregar a biblioteca, id:', id);
             // TODO: conectar con el endpoint cuando exista
+        });
+    }
+
+    if (btnWishlist) {
+        btnWishlist.addEventListener('click', async function () {
+            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            var body = new FormData();
+            body.append('action', 'wishlist_toggle');
+            body.append('id_libro', btnWishlist.dataset.id || '');
+            body.append('csrf_token', csrfMeta ? csrfMeta.content : '');
+            btnWishlist.disabled = true;
+            try {
+                var response = await fetch('/Appjoteca/backend/controllers/reading_features.php', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: body
+                });
+                var result = await response.json();
+                if (!response.ok || !result.ok) throw new Error(result.error || 'No se pudo actualizar la lista.');
+                btnWishlist.classList.toggle('is-saved', result.saved);
+                btnWishlist.setAttribute('aria-pressed', String(result.saved));
+                btnWishlist.querySelector('.material-symbols-outlined').textContent =
+                    result.saved ? 'favorite' : 'favorite_border';
+                btnWishlist.lastChild.textContent = result.saved
+                    ? ' Quitar de mi lista'
+                    : ' Agregar a mi lista de deseos';
+            } catch (error) {
+                mostrarAlerta('error', 'Lista de deseos', error.message);
+            } finally {
+                btnWishlist.disabled = false;
+            }
         });
     }
 });

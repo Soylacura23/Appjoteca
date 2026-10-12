@@ -57,6 +57,10 @@
     padding-right: 52px;
 }
 
+.topbar-search-mobile.has-search-submit .topbar-search-submit {
+    right: 21px;
+}
+
 .topbar-search-item {
     display: flex;
     align-items: flex-start;

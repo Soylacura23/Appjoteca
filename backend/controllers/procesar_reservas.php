@@ -8,6 +8,7 @@ require_once __DIR__ . '/../models/reserva.php';
 require_once __DIR__ . '/../models/prestamo.php';
 require_once __DIR__ . '/../models/notificacion.php';
 require_once __DIR__ . '/../models/historial.php';
+require_once __DIR__ . '/../models/reading_achievements.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -75,12 +76,30 @@ if ($accion === 'aceptar') {
             "Reserva #$id_reserva · «{$tituloLibro}» · {$ejemplaresTxt} · Préstamo(s) #{$idsTxt}"
         );
 
+        $readingUpdated = true;
+        try {
+            $badges = (new ReadingAchievements($connection))->recordLoan($id_usuario);
+        } catch (Throwable $error) {
+            error_log('No se pudo asignar insignia tras el préstamo: ' . $error->getMessage());
+            $badges = [];
+            $readingUpdated = false;
+        }
+        if ($badges) {
+            $nombresInsignias = implode(', ', array_column($badges, 'nombre'));
+            $modeloNotif->crear(
+                "¡Nueva insignia desbloqueada: {$nombresInsignias}!",
+                '/Appjoteca/pages/history/historial.php',
+                $id_usuario
+            );
+        }
+
         echo json_encode([
             'ok'           => true,
             'id_prestamo'  => $ids_prestamo[0],
             'id_prestamos' => $ids_prestamo,
             'cantidad'     => $n,
-            'solicitados'  => $cantidadSolicitada
+            'solicitados'  => $cantidadSolicitada,
+            'progreso_lectura' => $readingUpdated
         ]);
     } else {
         echo json_encode(['ok' => false, 'error' => 'No se pudo aceptar la reserva. Verifica disponibilidad.']);
@@ -181,7 +200,39 @@ if ($accion === 'devolver') {
             "{$cantidadTxt} · Préstamo(s) #{$idsTxt} · {$detalle['libro']}"
         );
 
-        echo json_encode(['ok' => true, 'cantidad' => count($idsDevueltos)]);
+        $progreso = ['goals_completed' => [], 'badges_unlocked' => []];
+        try {
+            $progreso = (new ReadingAchievements($connection))->recordReturns($id_usuario, count($idsDevueltos));
+        } catch (Throwable $error) {
+            error_log('No se pudo actualizar logros tras la devolución: ' . $error->getMessage());
+            $progreso['error'] = 'No se pudo actualizar el progreso de lectura.';
+        }
+        $mensajesLectura = [];
+        if (!empty($progreso['goals_completed'])) {
+            $mensajesLectura[] = '¡Meta cumplida: ' . implode(', ', $progreso['goals_completed']) . '!';
+        }
+        if (!empty($progreso['badges_unlocked'])) {
+            $mensajesLectura[] = 'Insignias nuevas: ' . implode(', ', array_column($progreso['badges_unlocked'], 'nombre')) . '.';
+        }
+        if ($mensajesLectura) {
+            $mensajeLectura = implode(' ', $mensajesLectura);
+            $mensajeLectura = function_exists('mb_substr')
+                ? mb_substr($mensajeLectura, 0, 250, 'UTF-8')
+                : substr($mensajeLectura, 0, 250);
+            $modeloNotif->crear(
+                $mensajeLectura,
+                '/Appjoteca/pages/history/historial.php',
+                $id_usuario
+            );
+        }
+
+        echo json_encode([
+            'ok' => true,
+            'cantidad' => count($idsDevueltos),
+            'progreso_lectura' => empty($progreso['error']),
+            'metas_completadas' => $progreso['goals_completed'] ?? [],
+            'insignias_nuevas' => array_column($progreso['badges_unlocked'] ?? [], 'nombre'),
+        ]);
     } else {
         echo json_encode(['ok' => false, 'error' => 'No se pudo registrar la devolución.']);
     }

@@ -3,6 +3,18 @@ require_once __DIR__ . '/../../backend/config/auth.php';
 require_once __DIR__ . '/../../backend/config/user_context.php';
 
 requiereRol([2]);
+$teacherNotesQuery = $connection->prepare(
+    'SELECT titulo, fecha_recordatorio, es_importante
+     FROM notas_docente WHERE id_usuario = ?
+     ORDER BY es_importante DESC, fecha_recordatorio IS NULL, fecha_recordatorio ASC, fecha_creacion DESC
+     LIMIT 5'
+);
+$teacherNotesQuery->bind_param('i', $mi_id);
+$teacherNotesQuery->execute();
+$teacherNotesResult = $teacherNotesQuery->get_result();
+$teacherNotes = [];
+while ($note = $teacherNotesResult->fetch_assoc()) $teacherNotes[] = $note;
+$teacherNotesQuery->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,6 +34,7 @@ requiereRol([2]);
     <link rel="stylesheet" href="../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../shared/css/components/reading-summary.css">
     <link rel="stylesheet" href="docente.css">
 
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
@@ -58,8 +71,17 @@ requiereRol([2]);
                 </div>
             </section>
 
+            <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
+
             <!-- ACCIONES RÁPIDAS Y NAVEGACIÓN DE SESIÓN -->
             <section class="quick-actions">
+                <a href="tablero.php" class="action-card">
+                    <span class="material-symbols-outlined action-icon">edit_note</span>
+                    <div class="action-text">
+                        <h3>Mi Tablero</h3>
+                        <p>Notas y recordatorios privados</p>
+                    </div>
+                </a>
                 <a href="../../pages/catalogo/index.php" class="action-card">
                     <span class="material-symbols-outlined action-icon">search</span>
                     <div class="action-text">
@@ -179,6 +201,28 @@ requiereRol([2]);
                 <!-- COLUMNA DERECHA (SIDEBAR) -->
                 <aside class="dashboard-sidebar">
 
+                    <div class="sidebar-card teacher-reminders">
+                        <div class="block-header">
+                            <h3 class="sidebar-title">Mis recordatorios</h3>
+                            <a href="tablero.php">Ver todos</a>
+                        </div>
+                        <?php if ($teacherNotes): ?>
+                            <ul class="panel-list">
+                                <?php foreach ($teacherNotes as $note): ?>
+                                    <li>
+                                        <span class="material-symbols-outlined"><?= (int) $note['es_importante'] ? 'push_pin' : 'event_note' ?></span>
+                                        <div>
+                                            <strong><?= htmlspecialchars($note['titulo'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                            <small><?= $note['fecha_recordatorio'] ? htmlspecialchars(date('d/m/Y', strtotime($note['fecha_recordatorio'])), ENT_QUOTES, 'UTF-8') : 'Sin fecha' ?></small>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="teacher-empty">Aún no tienes notas. Crea un recordatorio para tenerlo a mano.</p>
+                        <?php endif; ?>
+                    </div>
+
                     <!-- RESUMEN PERFIL -->
                     <div class="sidebar-card">
                         <h3 class="sidebar-title">Perfil Docente</h3>
@@ -242,6 +286,7 @@ requiereRol([2]);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../shared/js/components/navbar.js"></script>
     <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+    <script src="/Appjoteca/shared/js/components/reading-summary.js" defer></script>
     <script src="../../shared/js/global.js"></script>
     <script src="docente.js"></script>
     <script src="/Appjoteca/shared/js/register-sw.js"></script>

@@ -20,29 +20,43 @@ if ($longitud > 80) {
         : substr($q, 0, 80);
 }
 
-$rol = (int) ($_SESSION['rol'] ?? 0);
+$rolSesion = (int) ($_SESSION['rol'] ?? 0);
+$idSesion = (int) ($_SESSION['usuario_id'] ?? 0);
+$rol = 0;
+if ($idSesion > 0) {
+    $consultaUsuario = $connection->prepare('SELECT id_rol, estado FROM usuarios WHERE id_usuario = ? LIMIT 1');
+    $consultaUsuario->bind_param('i', $idSesion);
+    $consultaUsuario->execute();
+    $usuarioActual = $consultaUsuario->get_result()->fetch_assoc();
+    $consultaUsuario->close();
+    if (!$usuarioActual || $usuarioActual['estado'] !== '1' || (int) $usuarioActual['id_rol'] !== $rolSesion) {
+        http_response_code(401);
+        echo json_encode(['ok' => false, 'error' => 'La sesión ya no está activa.']);
+        exit();
+    }
+    $rol = $rolSesion;
+}
 $busqueda = new Busqueda($connection, $limit);
 $resultados = [];
 
-// Todos pueden buscar libros
-$resultados = array_merge($resultados, $busqueda->libros($q, $rol));
+if (in_array($rol, [1, 2, 3, 4], true)) {
+    $resultados = array_merge($resultados, $busqueda->libros($q, $rol));
+}
 
-// Bibliotecario
 if ($rol === 3) {
     $resultados = array_merge(
         $resultados,
-        $busqueda->usuarios($q),
+        $busqueda->usuarios($q, $rol),
         $busqueda->reservas($q),
         $busqueda->prestamos($q)
     );
-}
-
-// Administrador
-if ($rol === 4) {
+} elseif ($rol === 4) {
     $resultados = array_merge(
         $resultados,
+        $busqueda->usuarios($q, $rol),
+        $busqueda->pendientes($q),
+        $busqueda->solicitudes($q),
         $busqueda->comentarios($q),
-        $busqueda->usuarios($q)
     );
 }
 

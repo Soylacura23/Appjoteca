@@ -181,6 +181,22 @@ El repositorio incluye un archivo llamado `appjoteca.sql` que contiene toda la e
 
    > 💡 **Nota:** Si usas XAMPP por defecto, el usuario suele ser `root` y la contraseña se deja en blanco.
 
+### Migración de funciones de lectura y recordatorios
+
+Después de importar el esquema y configurar la conexión, aplica la migración:
+
+```bash
+mysql -u tu_usuario -p appjoteca < sql/migrations/001_reading_features.sql
+```
+
+Para enviar por correo los recordatorios docentes del día y del día siguiente, configura una tarea diaria con el PHP de tu instalación. Ejemplo en Linux:
+
+```cron
+0 8 * * * /usr/bin/php /ruta/a/Appjoteca/backend/cron/send_teacher_reminders.php
+```
+
+La tarea necesita las variables SMTP ya configuradas en `.env` o en el entorno. También puede ejecutarse manualmente desde consola para comprobar su resultado.
+
 ### Seguridad de despliegue
 
 - La aplicación redirige a HTTPS fuera de `localhost` y configura cookies `Secure`, cabeceras de seguridad y HSTS cuando la petición ya usa TLS. En producción, termina TLS en Apache o en un proxy de confianza y configura la aplicación para que PHP reciba la conexión como HTTPS.

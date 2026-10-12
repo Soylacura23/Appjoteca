@@ -41,6 +41,62 @@
     line-height: 1.5;
 }
 
+.biography-editor textarea {
+    display: block;
+    width: 100%;
+    min-height: 112px;
+    padding: 14px 16px;
+    resize: vertical;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md, 12px);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--on-surface, #e2e2e2);
+    font: inherit;
+    line-height: 1.55;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.biography-editor {
+    grid-column: 1 / -1;
+}
+
+.biography-editor textarea:focus {
+    outline: none;
+    border-color: var(--primary, #f2ca50);
+    box-shadow: 0 0 0 3px rgba(242, 202, 80, 0.12);
+}
+
+.biography-editor-footer,
+.biography-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.biography-counter {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.biography-actions {
+    justify-content: flex-end;
+}
+
+.biography-actions[hidden] {
+    display: none;
+}
+
+.biography-actions .btn-gold {
+    width: auto;
+}
+
+.biography-actions .btn-outline {
+    width: auto;
+}
+
 /* ── Grid principal ── */
 .config-layout {
     display: flex;

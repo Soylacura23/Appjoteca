@@ -459,26 +459,43 @@ document.addEventListener('DOMContentLoaded', function () {
     // 9. Solicitar eliminación de cuenta
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', function () {
+            const esAdmin = deleteAccountBtn.dataset.admin === 'true';
             Swal.fire({
-                title: '¿Solicitar eliminación?',
-                text: 'Se enviará una solicitud de baja definitiva al administrador. ¿Está seguro?',
+                title: esAdmin ? 'Eliminar cuenta de administrador' : '¿Solicitar eliminación?',
+                text: esAdmin ? undefined : 'Se enviará una solicitud de baja definitiva al administrador. ¿Está seguro?',
+                html: esAdmin ? '<p>Para continuar, escribe <strong>ELIMINAR</strong> e ingresa tu contraseña actual.</p><input id="confirmDeleteText" class="swal2-input" placeholder="ELIMINAR" autocomplete="off"><input id="confirmDeletePassword" class="swal2-input" type="password" placeholder="Contraseña actual" autocomplete="current-password">' : undefined,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, solicitar',
+                confirmButtonText: esAdmin ? 'Eliminar mi cuenta' : 'Sí, solicitar',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
                 background: '#121212',
                 color: '#e2e2e2',
                 iconColor: '#ffb4ab',
                 confirmButtonColor: '#ffb4ab',
-                cancelButtonColor: 'rgba(255,255,255,0.1)'
+                cancelButtonColor: 'rgba(255,255,255,0.1)',
+                preConfirm: function () {
+                    if (!esAdmin) return {};
+                    const texto = document.getElementById('confirmDeleteText').value.trim();
+                    const password = document.getElementById('confirmDeletePassword').value;
+                    if (texto !== 'ELIMINAR' || !password) {
+                        Swal.showValidationMessage('Escribe ELIMINAR e ingresa tu contraseña.');
+                        return false;
+                    }
+                    return { texto: texto, password: password };
+                }
             }).then(function (result) {
                 if (!result.isConfirmed) return;
 
                 const formData = new FormData();
-                formData.append('accion', 'solicitar_cambio');
-                formData.append('tipo', 'eliminacion');
-                formData.append('valor_nuevo', '');
+                formData.append('accion', esAdmin ? 'eliminar_cuenta' : 'solicitar_cambio');
+                if (!esAdmin) {
+                    formData.append('tipo', 'eliminacion');
+                    formData.append('valor_nuevo', '');
+                } else {
+                    formData.append('confirmacion', result.value.texto);
+                    formData.append('contrasena_actual', result.value.password);
+                }
                 formData.append('csrf_token', getToken());
 
                 fetch(ENDPOINT, {
@@ -488,6 +505,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data.success) {
+                        if (esAdmin) {
+                            window.location.assign('/Appjoteca/auth/login/login.php');
+                            return;
+                        }
                         alerta('success', 'Solicitud enviada', data.message);
                     } else {
                         alerta('error', 'Error', data.message);

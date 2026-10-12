@@ -1,6 +1,9 @@
 <?php
 // Asegurar que la sesión esté iniciada para leer el rol
 include_once __DIR__ . '/../../backend/helpers/routes.php';
+$searchPlaceholder = $userRole === '4'
+    ? 'Buscar libros, usuarios o solicitudes...'
+    : ($userRole === '3' ? 'Buscar libros, usuarios o reservas...' : 'Buscar título o autor...');
 
 ?>
 
@@ -12,7 +15,7 @@ include_once __DIR__ . '/../../backend/helpers/routes.php';
         </a>
         
         <div class="topbar-search">
-            <input type="text" class="topbar-search-input" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+            <input type="text" class="topbar-search-input" placeholder="<?php echo htmlspecialchars($searchPlaceholder, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Buscar en AppJoteca">
             <span class="material-symbols-outlined topbar-search-icon">search</span>
         </div>
         
@@ -42,6 +45,6 @@ include_once __DIR__ . '/../../backend/helpers/routes.php';
         </div>
     </div>
     <div class="topbar-search-mobile" aria-hidden="true">
-        <input type="text" placeholder="Buscar título o autor..." aria-label="Buscar en el catálogo">
+        <input type="text" placeholder="<?php echo htmlspecialchars($searchPlaceholder, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Buscar en AppJoteca">
     </div>
 </header>

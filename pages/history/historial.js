@@ -39,10 +39,14 @@
       item.addEventListener('click', () => {
         const targetId = item.dataset.section;
         if (!targetId) return;
-  
+
         // Activar item
-        sidebarItems.forEach(i => i.classList.remove('active'));
+        sidebarItems.forEach(i => {
+          i.classList.remove('active');
+          i.setAttribute('aria-selected', 'false');
+        });
         item.classList.add('active');
+        item.setAttribute('aria-selected', 'true');
   
         // Mostrar sección
         sections.forEach(sec => {
@@ -53,6 +57,11 @@
         if (window.innerWidth < 768) closeMobileSidebar();
       });
     });
+
+    const requestedSection = new URLSearchParams(window.location.search).get('section');
+    if (requestedSection) {
+      document.querySelector(`.sidebar-item[data-section="${CSS.escape(requestedSection)}"]`)?.click();
+    }
   
     // ── Animación escalonada de tarjetas ──
     const cards = document.querySelectorAll('.timeline-card');

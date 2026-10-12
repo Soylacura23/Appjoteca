@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../backend/Database/conexion.php';
 require_once __DIR__ . '/../../backend/models/historial.php';
 require_once __DIR__ . '/../../backend/models/prestamo.php';
 
-requiereRol([1, 2]);
+requiereRol([1, 2, 4]);
 
 $id_usuario = (int) $_SESSION['usuario_id'];
 $historialModel = new Historial($connection);
@@ -16,6 +16,22 @@ $listaPrestamos    = $historialModel->obtenerPrestamosUsuario($id_usuario);
 $listaReservas     = $historialModel->obtenerReservasUsuario($id_usuario);
 $listaDevoluciones = $historialModel->obtenerDevolucionesUsuario($id_usuario);
 $listaIncidencias  = $historialModel->obtenerPorUsuario($id_usuario, 'incidencia');
+$wishlistQuery = $connection->prepare(
+    "SELECT l.id_libro, l.titulo, l.portada,
+            COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '), 'Autor desconocido') AS autores
+     FROM lista_deseos w
+     JOIN libros l ON l.id_libro = w.id_libro
+     LEFT JOIN libro_autor la ON la.id_libro = l.id_libro
+     LEFT JOIN autores a ON a.id_autor = la.id_autor
+     WHERE w.id_usuario = ? AND l.fecha_eliminacion_libro IS NULL
+     GROUP BY l.id_libro ORDER BY w.fecha_agregado DESC LIMIT 100"
+);
+$wishlistQuery->bind_param('i', $id_usuario);
+$wishlistQuery->execute();
+$wishlistResult = $wishlistQuery->get_result();
+$wishlistBooks = [];
+while ($book = $wishlistResult->fetch_assoc()) $wishlistBooks[] = $book;
+$wishlistQuery->close();
 
 function formatearFechaHistorial($fecha) {
     if (!$fecha) return '';
@@ -84,6 +100,10 @@ function formatearFechaHistorial($fecha) {
                 <div class="sidebar-item" data-section="reservas" role="tab" aria-selected="false" tabindex="0">
                     <span class="material-symbols-outlined">bookmark_added</span>
                     <span class="sidebar-label">Reservas</span>
+                </div>
+                <div class="sidebar-item" data-section="lista-deseos" id="tab-lista-deseos" role="tab" aria-selected="false" tabindex="0">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <span class="sidebar-label">Quiero leer</span>
                 </div>
                 <div class="sidebar-item" data-section="devoluciones" role="tab" aria-selected="false" tabindex="0">
                     <span class="material-symbols-outlined">assignment_return</span>
@@ -184,6 +204,32 @@ function formatearFechaHistorial($fecha) {
                             <p class="empty-msg" style="color: #888; padding: 15px 0;">No tienes reservas registradas.</p>
                         <?php endif; ?>
                     </div>
+                </section>
+
+                <section class="historial-section" id="lista-deseos" role="tabpanel" aria-labelledby="tab-lista-deseos">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">favorite</span>
+                        <div>
+                            <h2 class="section-title">Quiero leer</h2>
+                            <p class="section-subtitle">Libros que guardaste para después</p>
+                        </div>
+                    </div>
+                    <?php if ($wishlistBooks): ?>
+                        <div class="wishlist-history-grid">
+                            <?php foreach ($wishlistBooks as $book): ?>
+                                <a class="wishlist-history-card" href="../biblioteca-catalogo/vista-libro/book-view.php?id=<?= (int) $book['id_libro'] ?>">
+                                    <img src="/Appjoteca/<?= htmlspecialchars(ltrim($book['portada'] ?: 'assets/images/books/default-cover.jpg', '/'), ENT_QUOTES, 'UTF-8') ?>"
+                                         alt="" loading="lazy">
+                                    <span>
+                                        <strong><?= htmlspecialchars($book['titulo'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                        <small><?= htmlspecialchars($book['autores'], ENT_QUOTES, 'UTF-8') ?></small>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="empty-msg">Aún no tienes libros en tu lista de deseos.</p>
+                    <?php endif; ?>
                 </section>
 
                 <!-- DEVOLUCIONES -->

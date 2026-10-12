@@ -46,6 +46,8 @@
         const iconos = {
             libro: 'menu_book',
             usuario: 'person',
+            pendiente: 'person_add',
+            solicitud: 'assignment',
             reserva: 'bookmark',
             prestamo: 'local_library',
             comentario: 'chat'

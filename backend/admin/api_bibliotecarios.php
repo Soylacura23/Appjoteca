@@ -26,6 +26,220 @@ $rolesPermitidos = [
 
 try {
 
+// DIRECTORIO PAGINADO
+if ($action === 'listar_usuarios') {
+    $pagina = max(1, (int) ($_POST['pagina'] ?? 1));
+    $limite = max(10, min(50, (int) ($_POST['limite'] ?? 25)));
+    $rolFiltro = (int) ($_POST['rol'] ?? 0);
+    $estadoFiltro = is_string($_POST['estado'] ?? null) ? $_POST['estado'] : '';
+    $texto = is_string($_POST['busqueda'] ?? null) ? trim($_POST['busqueda']) : '';
+    $texto = function_exists('mb_substr')
+        ? mb_substr($texto, 0, 80, 'UTF-8')
+        : substr($texto, 0, 80);
+    $like = '%' . $texto . '%';
+    $condiciones = ["u.estado IN ('1', 'inactivo', '0')"];
+    $tipos = '';
+    $parametros = [];
+
+    if (in_array($rolFiltro, [1, 2, 3, 4], true)) {
+        $condiciones[] = 'u.id_rol = ?';
+        $tipos .= 'i';
+        $parametros[] = $rolFiltro;
+    }
+    if (in_array($estadoFiltro, ['activo', 'inactivo'], true)) {
+        $condiciones[] = $estadoFiltro === 'activo'
+            ? "u.estado = '1'"
+            : "u.estado IN ('inactivo', '0')";
+    }
+    if ($texto !== '') {
+        $condiciones[] = '(u.nombre_apellido LIKE ? OR u.nombre_usuario LIKE ? OR u.correo_institucional LIKE ?)';
+        $tipos .= 'sss';
+        array_push($parametros, $like, $like, $like);
+    }
+    $where = implode(' AND ', $condiciones);
+
+    $count = $connection->prepare("SELECT COUNT(*) AS total FROM usuarios u WHERE {$where}");
+    if ($tipos !== '') $count->bind_param($tipos, ...$parametros);
+    $count->execute();
+    $total = (int) ($count->get_result()->fetch_assoc()['total'] ?? 0);
+    $count->close();
+
+    $paginas = max(1, (int) ceil($total / $limite));
+    $pagina = min($pagina, $paginas);
+    $offset = ($pagina - 1) * $limite;
+    $sql = "SELECT u.id_usuario, u.id_rol, r.nombre AS rol, u.nombre_apellido,
+                   u.nombre_usuario, u.correo_institucional, u.documento,
+                   u.foto_perfil, u.biografia, u.estado, u.fecha_registro,
+                   (SELECT s.id_solicitud FROM solicitudes_cambio s
+                    WHERE s.id_usuario = u.id_usuario AND s.estado = 'pendiente'
+                    ORDER BY s.fecha_solicitud DESC LIMIT 1) AS id_solicitud_pendiente
+            FROM usuarios u
+            LEFT JOIN roles r ON r.id_rol = u.id_rol
+            WHERE {$where}
+            ORDER BY u.nombre_apellido ASC, u.id_usuario ASC
+            LIMIT ? OFFSET ?";
+    $query = $connection->prepare($sql);
+    $tiposPagina = $tipos . 'ii';
+    $parametrosPagina = $parametros;
+    $parametrosPagina[] = $limite;
+    $parametrosPagina[] = $offset;
+    $query->bind_param($tiposPagina, ...$parametrosPagina);
+    $query->execute();
+    $rows = $query->get_result();
+    $usuarios = [];
+    while ($row = $rows->fetch_assoc()) {
+        $row['foto_perfil'] = !empty($row['foto_perfil'])
+            ? '/Appjoteca/' . ltrim($row['foto_perfil'], '/')
+            : '/Appjoteca/assets/images/default-avatar.png';
+        $row['estado'] = $row['estado'] === '1' ? 'activo' : 'inactivo';
+        $row['id_solicitud_pendiente'] = $row['id_solicitud_pendiente']
+            ? (int) $row['id_solicitud_pendiente']
+            : null;
+        $usuarios[] = $row;
+    }
+    $query->close();
+    echo json_encode([
+        'status' => 'success',
+        'usuarios' => $usuarios,
+        'total' => $total,
+        'pagina' => $pagina,
+        'paginas' => $paginas,
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// PERFIL DE USUARIO
+if ($action === 'obtener_perfil') {
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'ID inválido']);
+        exit;
+    }
+    $query = $connection->prepare(
+        "SELECT u.id_usuario, u.id_rol, r.nombre AS rol, u.nombre_apellido,
+                u.nombre_usuario, u.correo_institucional, u.documento,
+                u.foto_perfil, u.foto_documento, u.biografia, u.estado, u.fecha_registro,
+                (SELECT r.id_reserva FROM reservas r
+                 WHERE r.fk_id_usuario_reserva = u.id_usuario AND r.estado = 'activa'
+                 ORDER BY r.fecha_reserva ASC, r.id_reserva ASC LIMIT 1) AS id_reserva_pendiente,
+                (SELECT MIN(p.id_prestamo) FROM prestamos p
+                 JOIN reservas r ON r.id_reserva = p.id_reserva
+                 WHERE r.fk_id_usuario_reserva = u.id_usuario AND p.estado IN ('activo', 'vencido')
+                 GROUP BY r.id_reserva ORDER BY MIN(p.fecha_devolucion_prevista) ASC LIMIT 1) AS id_prestamo_activo,
+                (SELECT s.id_solicitud FROM solicitudes_cambio s
+                 WHERE s.id_usuario = u.id_usuario AND s.estado = 'pendiente'
+                 ORDER BY s.fecha_solicitud DESC LIMIT 1) AS id_solicitud_pendiente
+         FROM usuarios u
+         LEFT JOIN roles r ON r.id_rol = u.id_rol
+         WHERE u.id_usuario = ? AND u.estado IN ('1', 'inactivo', '0', 'pendiente')
+         LIMIT 1"
+    );
+    $query->bind_param('i', $id);
+    $query->execute();
+    $perfil = $query->get_result()->fetch_assoc();
+    $query->close();
+    if (!$perfil) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontró el perfil solicitado']);
+        exit;
+    }
+    $perfil['foto_perfil'] = !empty($perfil['foto_perfil'])
+        ? '/Appjoteca/' . ltrim($perfil['foto_perfil'], '/')
+        : '/Appjoteca/assets/images/default-avatar.png';
+    $perfil['foto_documento'] = !empty($perfil['foto_documento'])
+        ? '/Appjoteca/' . ltrim($perfil['foto_documento'], '/')
+        : null;
+    $perfil['estado'] = $perfil['estado'] === '1'
+        ? 'activo'
+        : ($perfil['estado'] === '0' ? 'inactivo' : $perfil['estado']);
+    $perfil['id_solicitud_pendiente'] = $perfil['id_solicitud_pendiente']
+        ? (int) $perfil['id_solicitud_pendiente']
+        : null;
+    $perfil['id_reserva_pendiente'] = $perfil['id_reserva_pendiente']
+        ? (int) $perfil['id_reserva_pendiente']
+        : null;
+    $perfil['id_prestamo_activo'] = $perfil['id_prestamo_activo']
+        ? (int) $perfil['id_prestamo_activo']
+        : null;
+    echo json_encode(['status' => 'success', 'perfil' => $perfil], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// CAMBIAR ESTADO
+if ($action === 'cambiar_estado_usuario') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $nuevoEstado = is_string($_POST['estado'] ?? null) ? $_POST['estado'] : '';
+    if ($id <= 0 || $id === $mi_id || !in_array($nuevoEstado, ['1', 'inactivo'], true)) {
+        echo json_encode(['status' => 'error', 'message' => 'Acción o usuario no válido']);
+        exit;
+    }
+
+    $query = $connection->prepare("SELECT id_rol, estado FROM usuarios WHERE id_usuario = ? AND estado IN ('1', 'inactivo', '0') LIMIT 1");
+    $query->bind_param('i', $id);
+    $query->execute();
+    $objetivo = $query->get_result()->fetch_assoc();
+    $query->close();
+    if (!$objetivo) {
+        echo json_encode(['status' => 'error', 'message' => 'No se puede cambiar una cuenta pendiente o eliminada']);
+        exit;
+    }
+
+    if ($nuevoEstado === 'inactivo' && (int) $objetivo['id_rol'] === 4 && $objetivo['estado'] === '1') {
+        $activos = $connection->query("SELECT COUNT(*) AS total FROM usuarios WHERE id_rol = 4 AND estado = '1'");
+        if ((int) ($activos->fetch_assoc()['total'] ?? 0) <= 1) {
+            echo json_encode(['status' => 'error', 'message' => 'No se puede desactivar al último administrador activo']);
+            exit;
+        }
+    }
+
+    $query = $connection->prepare("UPDATE usuarios SET estado = ?, remember_token = IF(? = 'inactivo', NULL, remember_token) WHERE id_usuario = ? AND estado IN ('1', 'inactivo', '0')");
+    $query->bind_param('ssi', $nuevoEstado, $nuevoEstado, $id);
+    $query->execute();
+    $ok = $query->affected_rows === 1 || $objetivo['estado'] === $nuevoEstado;
+    $query->close();
+    echo json_encode([
+        'status' => $ok ? 'success' : 'error',
+        'message' => $ok ? 'Estado de la cuenta actualizado' : 'No se pudo actualizar el estado',
+    ]);
+    exit;
+}
+
+// ELIMINACIÓN MODERADA
+if ($action === 'eliminar_usuario') {
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id <= 0 || $id === $mi_id) {
+        echo json_encode(['status' => 'error', 'message' => 'No puedes eliminar tu propia cuenta desde este panel']);
+        exit;
+    }
+
+    $query = $connection->prepare("SELECT id_rol, estado FROM usuarios WHERE id_usuario = ? AND estado IN ('1', 'inactivo', '0') LIMIT 1");
+    $query->bind_param('i', $id);
+    $query->execute();
+    $objetivo = $query->get_result()->fetch_assoc();
+    $query->close();
+    if (!$objetivo) {
+        echo json_encode(['status' => 'error', 'message' => 'Solo se pueden eliminar cuentas activas o inactivas']);
+        exit;
+    }
+    if ((int) $objetivo['id_rol'] === 4 && $objetivo['estado'] === '1') {
+        $activos = $connection->query("SELECT COUNT(*) AS total FROM usuarios WHERE id_rol = 4 AND estado = '1'");
+        if ((int) ($activos->fetch_assoc()['total'] ?? 0) <= 1) {
+            echo json_encode(['status' => 'error', 'message' => 'No se puede eliminar al último administrador activo']);
+            exit;
+        }
+    }
+
+    $query = $connection->prepare("UPDATE usuarios SET estado = 'eliminado', remember_token = NULL WHERE id_usuario = ? AND estado IN ('1', 'inactivo', '0')");
+    $query->bind_param('i', $id);
+    $query->execute();
+    $ok = $query->affected_rows === 1;
+    $query->close();
+    echo json_encode([
+        'status' => $ok ? 'success' : 'error',
+        'message' => $ok ? 'La cuenta se marcó como eliminada' : 'No se pudo eliminar la cuenta',
+    ]);
+    exit;
+}
+
 // LISTAR BIBLIOTECARIOS
 if ($action === 'listar') {
     $sql = "SELECT id_usuario, documento, nombre_apellido, correo_institucional, fecha_registro
@@ -122,13 +336,10 @@ if ($action === 'rechazar') {
     $query->execute();
 
     if ($query->affected_rows > 0) {
-        if (!empty($fotoRelativa)) {
-            $ruta = __DIR__ . '/../../' . $fotoRelativa;
-            if (is_file($ruta)) {
-                @unlink($ruta);
-            }
+        if (!empty($fotoRelativa) && !DocumentUpload::deleteManaged($fotoRelativa)) {
+            error_log('No se pudo eliminar el documento de la cuenta rechazada #' . $id);
         }
-        echo json_encode(['status' => 'success', 'message' => 'Solicitud rechazada y eliminada']);
+        echo json_encode(['status' => 'success', 'message' => 'La cuenta pendiente fue rechazada y eliminada']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'No se pudo rechazar (usuario no encontrado)']);
     }
@@ -285,13 +496,14 @@ if ($action === 'eliminar') {
         exit;
     }
 
-    $sql = "DELETE FROM usuarios WHERE id_usuario = ? AND id_rol = 3";
+    $sql = "UPDATE usuarios SET estado = 'eliminado', remember_token = NULL
+            WHERE id_usuario = ? AND id_rol = 3 AND estado = '1'";
     $query = $connection->prepare($sql);
     $query->bind_param('i', $id);
     $query->execute();
 
     if ($query->affected_rows > 0) {
-        echo json_encode(['status' => 'success', 'message' => 'Bibliotecario eliminado']);
+        echo json_encode(['status' => 'success', 'message' => 'Bibliotecario marcado como eliminado']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar (no encontrado)']);
     }
@@ -326,6 +538,9 @@ if ($action === 'resolver_solicitud') {
     $id_solicitud = (int)($_POST['id_solicitud'] ?? 0);
     $decision     = is_string($_POST['decision'] ?? null) ? $_POST['decision'] : '';
     $comentario   = is_string($_POST['comentario'] ?? null) ? trim($_POST['comentario']) : '';
+    $comentario   = function_exists('mb_substr')
+        ? mb_substr($comentario, 0, 160, 'UTF-8')
+        : substr($comentario, 0, 160);
 
     if ($id_solicitud <= 0 || !in_array($decision, ['aprobar', 'rechazar'], true)) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
@@ -335,7 +550,8 @@ if ($action === 'resolver_solicitud') {
     $connection->begin_transaction();
 
     // Traer la solicitud
-    $sql = "SELECT s.id_usuario, s.tipo, s.valor_nuevo, s.archivo_nuevo, s.archivo_mime
+    $sql = "SELECT s.id_usuario, s.tipo, s.valor_nuevo, s.archivo_nuevo, s.archivo_mime,
+                   u.id_rol, u.estado AS estado_usuario, u.nombre_usuario, u.nombre_apellido
             FROM solicitudes_cambio s
             INNER JOIN usuarios u ON u.id_usuario = s.id_usuario
             WHERE s.id_solicitud = ? AND s.estado = 'pendiente'
@@ -450,8 +666,16 @@ if ($action === 'resolver_solicitud') {
             $query->close();
 
         } elseif ($tipo === 'eliminacion') {
+            if ((int) $sol['id_rol'] === 4 && $sol['estado_usuario'] === '1') {
+                $activos = $connection->query("SELECT COUNT(*) AS total FROM usuarios WHERE id_rol = 4 AND estado = '1'");
+                if ((int) ($activos->fetch_assoc()['total'] ?? 0) <= 1) {
+                    $connection->rollback();
+                    echo json_encode(['status' => 'error', 'message' => 'No se puede eliminar al último administrador activo.']);
+                    exit;
+                }
+            }
             // Marcar cuenta como eliminada (soft delete)
-            $sql = "UPDATE usuarios SET estado = 'eliminado' WHERE id_usuario = ?";
+            $sql = "UPDATE usuarios SET estado = 'eliminado', remember_token = NULL WHERE id_usuario = ?";
             $query = $connection->prepare($sql);
             $query->bind_param('i', $uid);
             $query->execute();
@@ -479,6 +703,19 @@ if ($action === 'resolver_solicitud') {
     }
 
     $connection->commit();
+
+    if ((int) $sol['id_usuario'] > 0) {
+        require_once __DIR__ . '/../models/notificacion.php';
+        $nombreSolicitante = $sol['nombre_apellido'] ?: $sol['nombre_usuario'];
+        $resultadoSolicitud = $decision === 'aprobar' ? 'aprobada' : 'rechazada';
+        $mensaje = "Tu solicitud de {$sol['tipo']} fue {$resultadoSolicitud}.";
+        if ($comentario !== '') {
+            $mensaje .= ' Comentario del administrador: ' . $comentario;
+        }
+        $notificacion = new Notificacion($connection);
+        $creada = $notificacion->crear($mensaje, '/Appjoteca/pages/settings/configuracion.php', (int) $sol['id_usuario']);
+        if ($creada === false) error_log('No se pudo notificar resultado de solicitud #' . $id_solicitud);
+    }
 
     if ($archivoParaBorrar !== null && $archivoParaBorrar !== ''
         && !DocumentUpload::deleteManaged($archivoParaBorrar)) {

@@ -21,6 +21,7 @@ requiereRol([4]);
     <link rel="stylesheet" href="../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../shared/css/components/reading-summary.css">
     <link rel="stylesheet" href="administrador.css">
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -43,8 +44,10 @@ requiereRol([4]);
 
         <header class="config-page-header">
             <h1 class="config-page-title">Gestión de <span>Usuarios</span></h1>
-            <p class="config-page-subtitle">Administra bibliotecarios, aprueba cuentas pendientes, resuelve solicitudes de cambio y crea nuevas cuentas.</p>
+            <p class="config-page-subtitle">Administra perfiles, estados de cuenta, solicitudes de cambio y nuevas altas.</p>
         </header>
+
+        <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
 
         <div class="admin-actions-bar">
             <button id="btnAbrirModal" class="btn-gold" type="button">
@@ -70,6 +73,10 @@ requiereRol([4]);
                     Solicitudes de cambio
                     <span class="tab-badge" id="badge-solicitudes" hidden>0</span>
                 </button>
+                <button class="admin-tab" data-tab="usuarios" role="tab" type="button">
+                    <span class="material-symbols-outlined">manage_accounts</span>
+                    Directorio de usuarios
+                </button>
             </nav>
         </div>
 
@@ -91,6 +98,32 @@ requiereRol([4]);
         <section class="admin-panel" data-panel="solicitudes">
             <div class="table-scroll">
                 <div id="tabla-solicitudes"></div>
+            </div>
+        </section>
+
+        <section class="admin-panel" data-panel="usuarios">
+            <div class="directory-toolbar">
+                <input id="directory-search" type="search" placeholder="Buscar nombre, usuario o correo" aria-label="Buscar usuarios">
+                <select id="directory-role" aria-label="Filtrar por rol">
+                    <option value="">Todos los roles</option>
+                    <option value="1">Estudiante</option>
+                    <option value="2">Docente</option>
+                    <option value="3">Bibliotecario</option>
+                    <option value="4">Administrador</option>
+                </select>
+                <select id="directory-status" aria-label="Filtrar por estado">
+                    <option value="">Activos e inactivos</option>
+                    <option value="activo">Activos</option>
+                    <option value="inactivo">Inactivos</option>
+                </select>
+            </div>
+            <div class="table-scroll">
+                <div id="tabla-usuarios"></div>
+            </div>
+            <div class="directory-pagination">
+                <button class="btn-outline" id="directory-prev" type="button">Anterior</button>
+                <span id="directory-page-label" aria-live="polite">Página 1</span>
+                <button class="btn-outline" id="directory-next" type="button">Siguiente</button>
             </div>
         </section>
 
@@ -202,12 +235,52 @@ requiereRol([4]);
     </div>
 </div>
 
+<div class="admin-profile-overlay" id="admin-profile-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-profile-name" hidden>
+    <div class="admin-profile-backdrop" id="admin-profile-backdrop"></div>
+    <article class="admin-profile-card">
+        <button class="admin-profile-close" id="admin-profile-close" type="button" aria-label="Cerrar perfil">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="admin-profile-heading">
+            <img id="admin-profile-avatar" src="/Appjoteca/assets/images/default-avatar.png" alt="">
+            <div>
+                <span id="admin-profile-role" class="admin-profile-role"></span>
+                <h2 id="admin-profile-name"></h2>
+                <p id="admin-profile-username"></p>
+            </div>
+        </div>
+        <p id="admin-profile-bio" class="admin-profile-bio"></p>
+        <dl class="admin-profile-details">
+            <div><dt>Correo</dt><dd id="admin-profile-email"></dd></div>
+            <div><dt>Documento</dt><dd id="admin-profile-document"></dd></div>
+            <div><dt>Estado</dt><dd id="admin-profile-status"></dd></div>
+            <div><dt>Registro</dt><dd id="admin-profile-date"></dd></div>
+            <div><dt>Reserva pendiente</dt><dd id="admin-profile-reservation"></dd></div>
+            <div><dt>Préstamo activo</dt><dd id="admin-profile-loan"></dd></div>
+        </dl>
+        <section class="admin-profile-document" id="admin-profile-document-preview" hidden>
+            <h3>Documento de identidad</h3>
+            <img id="admin-profile-document-image" alt="Documento de identidad" hidden>
+            <iframe id="admin-profile-document-pdf" title="Documento de identidad en PDF" hidden></iframe>
+            <a id="admin-profile-document-link" target="_blank" rel="noopener noreferrer" hidden>Abrir documento</a>
+        </section>
+        <a id="admin-profile-request" class="admin-profile-request" hidden></a>
+        <div class="admin-profile-actions">
+            <button id="admin-profile-state" class="btn-outline" type="button"></button>
+            <button id="admin-profile-delete" class="btn-danger" type="button">
+                <span class="material-symbols-outlined">delete_forever</span> Eliminar usuario
+            </button>
+        </div>
+    </article>
+</div>
+
 <?php include '../../shared/layouts/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
 <script src="../../shared/js/components/navbar.js"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+<script src="/Appjoteca/shared/js/components/reading-summary.js" defer></script>
 <script src="../../shared/js/global.js"></script>
 <script src="administrador.js"></script>
 

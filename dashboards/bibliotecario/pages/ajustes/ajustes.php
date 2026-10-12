@@ -6,13 +6,15 @@ requiereRol([3]);
 
 $documento = $mi_documento ?? '';
 $foto_documento = '';
-$consultaDocumento = $connection->prepare('SELECT foto_documento FROM usuarios WHERE id_usuario = ?');
+$consultaDocumento = $connection->prepare('SELECT foto_documento, biografia FROM usuarios WHERE id_usuario = ?');
 if (!$consultaDocumento) {
     throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
 }
 $consultaDocumento->bind_param('i', $mi_id);
 $consultaDocumento->execute();
-$fotoDocumento = $consultaDocumento->get_result()->fetch_assoc()['foto_documento'] ?? '';
+$datosCuenta = $consultaDocumento->get_result()->fetch_assoc() ?: [];
+$fotoDocumento = $datosCuenta['foto_documento'] ?? '';
+$mi_biografia = (string) ($datosCuenta['biografia'] ?? '');
 $consultaDocumento->close();
 if ($fotoDocumento !== '') {
     $foto_documento = '/Appjoteca/' . ltrim($fotoDocumento, '/');
@@ -260,6 +262,23 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
                                 <span class="input-hint hint-success">Puede cambiarlo cada 7 días. El anterior queda reservado 30 días.</span>
                             </div>
 
+                            <div class="form-group biography-editor">
+                                <label for="biographyInput">Biografía</label>
+                                <textarea id="biographyInput" data-endpoint="../../../../backend/settings/configuracion-back.php" maxlength="500" rows="4" placeholder="Cuéntanos un poco sobre ti..."><?= htmlspecialchars($mi_biografia, ENT_QUOTES, 'UTF-8'); ?></textarea>
+                                <div class="biography-editor-footer">
+                                    <span class="input-hint">Hasta 500 caracteres</span>
+                                    <span class="biography-counter" id="biographyCounter">0 / 500</span>
+                                </div>
+                                <div class="biography-actions" id="biographyActions" hidden>
+                                    <button class="btn-outline" id="cancelBiographyBtn" type="button">
+                                        <span class="material-symbols-outlined">close</span> Cancelar
+                                    </button>
+                                    <button class="btn-gold" id="saveBiographyBtn" type="button">
+                                        <span class="material-symbols-outlined">save</span> Guardar
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="form-group locked">
                                 <label for="documentInput">Número de Documento</label>
                                 <div class="input-wrapper">
@@ -456,6 +475,7 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
 <script src="../../../../shared/js/global.js"></script>
 <script src="ajustes.js"></script>
+<script src="/Appjoteca/shared/js/components/biography-editor.js"></script>
 
 <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>

@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../../backend/config/security.php';
+require_once __DIR__ . '/../../backend/helpers/current_user.php';
+$publicUserRole = appCurrentUserRole();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -12,12 +14,20 @@ require_once __DIR__ . '/../../backend/config/security.php';
     <link rel="stylesheet" href="../../shared/css/theme.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
     <link rel="stylesheet" href="legal.css">
+    <?php if ($publicUserRole): ?>
+        <link rel="stylesheet" href="../../shared/css/components/navbar.css">
+        <link rel="stylesheet" href="../../shared/css/components/notifications.css">
+        <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <?php endif; ?>
     <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 </head>
-<body class="legal-page">
+<body class="legal-page <?= $publicUserRole ? 'authenticated-public-page' : '' ?>">
+    <?php include __DIR__ . '/../../shared/layouts/public-user-header.php'; ?>
+    <?php if (!$publicUserRole): ?>
     <header class="legal-header">
         <a href="../../index.php">AppJoteca</a>
     </header>
+    <?php endif; ?>
     <main class="legal-main">
         <p class="legal-eyebrow">Información legal</p>
         <h1>Privacidad</h1>
@@ -27,6 +37,12 @@ require_once __DIR__ . '/../../backend/config/security.php';
         </div>
     </main>
     <?php include __DIR__ . '/../../shared/layouts/footer.php'; ?>
+    <?php if ($publicUserRole): ?>
+        <script src="../../shared/js/components/navbar.js"></script>
+        <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+        <script src="../../shared/js/global.js"></script>
+        <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+    <?php endif; ?>
     <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>
 </html>

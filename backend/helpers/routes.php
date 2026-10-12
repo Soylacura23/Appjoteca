@@ -19,6 +19,7 @@ $menusByRole = [
     '2' => [ // Docente
         ['text' => 'Catálogo',     'url' => 'pages/biblioteca-digital/index.php', 'nav' => 'catalogo'],
         ['text' => 'Mi historial', 'url' => 'pages/history/historial.php',        'nav' => 'historial'],
+        ['text' => 'Mi Tablero',   'url' => 'dashboards/docente/tablero.php',     'nav' => 'tablero'],
         ['text' => 'Panel',         'url' => 'dashboards/docente/index.php',        'nav' => 'panel']
     ],
     '3' => [ // Bibliotecario
@@ -27,8 +28,10 @@ $menusByRole = [
         ['text' => 'Panel Control',  'url' => 'pages/admin/dashboard.php',        'nav' => 'panel']
     ],
     '4' => [ // Administrador
-        ['text' => 'Gestión Comentarios', 'url' => 'dashboards/Administrador/comentarios/comentarios.php', 'nav' => 'comentarios'],
-        ['text' => 'Panel Control',  'url' => 'dashboards/Administrador/index.php',        'nav' => 'panel']
+        ['text' => 'Catálogo', 'url' => 'pages/biblioteca-digital/index.php', 'nav' => 'catalogo'],
+        ['text' => 'Mi historial', 'url' => 'pages/history/historial.php', 'nav' => 'historial'],
+        ['text' => 'Comentarios', 'url' => 'dashboards/Administrador/comentarios/comentarios.php', 'nav' => 'comentarios'],
+        ['text' => 'Panel Control', 'url' => 'dashboards/Administrador/index.php', 'nav' => 'panel']
     ]
 ];
 

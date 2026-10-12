@@ -173,6 +173,7 @@ requiereRol([3]);
                         <option value="Estudiante">Estudiantes</option>
                         <option value="Docente">Docentes</option>
                         <option value="Bibliotecario">Bibliotecarios</option>
+                        <option value="Administrador">Administradores</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -255,6 +256,7 @@ requiereRol([3]);
                     <div class="section-fields">
                         <div class="id-preview" id="id-preview">
                             <img class="id-preview-img" id="detail-doc-img" src="" alt="Documento de identidad" hidden>
+                            <iframe class="id-preview-pdf" id="detail-doc-pdf" title="Documento de identidad en PDF" hidden></iframe>
                             <div class="id-placeholder" id="id-placeholder">
                                 <span class="material-symbols-outlined">badge</span>
                                 <span>Sin documento cargado</span>
@@ -268,7 +270,7 @@ requiereRol([3]);
                         <span class="material-symbols-outlined">delete_forever</span>
                         Eliminar Cuenta
                     </button>
-                    <p>Esta acción es irreversible y eliminará toda la cuenta del usuario</p>
+                    <p>La cuenta se marcará como eliminada y perderá el acceso al sistema.</p>
                 </div>
             </div>
         </div>

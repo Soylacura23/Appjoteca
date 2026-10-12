@@ -22,6 +22,7 @@ requiereRol([1]);
     <link rel="stylesheet" href="../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../shared/css/components/reading-summary.css">
 
     <link rel="stylesheet" href="estudiante.css">
     
@@ -56,6 +57,8 @@ requiereRol([1]);
                     <p class="welcome-date" id="currentDate">Cargando fecha...</p>
                 </div>
             </section>
+
+            <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
 
             <!-- ACCIONES RÁPIDAS -->
             <section class="quick-actions">
@@ -247,6 +250,7 @@ requiereRol([1]);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../shared/js/components/navbar.js"></script>
     <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+    <script src="/Appjoteca/shared/js/components/reading-summary.js" defer></script>
     <script src="../../shared/js/global.js"></script>
     <script src="estudiante.js"></script>
     <script src="/Appjoteca/shared/js/register-sw.js"></script>

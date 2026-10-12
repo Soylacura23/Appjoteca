@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../backend/models/libro.php';
 require_once __DIR__ . '/../../../backend/models/reserva.php';
 require_once __DIR__ . '/../../../backend/helpers/libros.php';
 
-requiereRol([1, 2]);
+requiereRol([1, 2, 4]);
 
 $base_url = '/Appjoteca/';
 

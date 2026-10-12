@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 ini_set('log_errors', 1);
 
 require_once __DIR__ . '/../config/verify-csrf.php';
+require_once __DIR__ . '/../helpers/redirect.php';
 
 require("../Database/conexion.php");
 require_once __DIR__ . '/../helpers/RateLimiter.php';
@@ -111,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $usuario_db = $resultado->fetch_assoc();
 
-    if (isset($usuario_db['estado']) && strtolower($usuario_db['estado']) === 'pendiente') {
+    if (($usuario_db['estado'] ?? '') !== '1') {
         echo json_encode([
             'status' => 'error',
             'message' => 'El usuario o la contraseña no son correctos.'
@@ -154,32 +155,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]);
         }
 
-        $destinos = [
-            1 => '../../dashboards/estudiante/index.php',
-            2 => '../../dashboards/docente/index.php',
-            3 => '../../dashboards/bibliotecario/index.php',
-            4 => '../../dashboards/Administrador/index.php'
-        ];
-
         $rol = (int) $usuario_db['id_rol'];
-        $url_destino = $destinos[$rol] ?? '../../index.php';
-        $return_to = $_POST['return_to'] ?? '';
+        $url_destino = redirect_to('home', $rol) ?? '/Appjoteca/';
+        $return_to = is_string($_POST['return_to'] ?? null) ? $_POST['return_to'] : '';
         $return_id = filter_var($_POST['return_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
-        if ($return_to === 'catalog') {
-            $url_destino = $rol === 3
-                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php'
-                : '../../pages/biblioteca-digital/index.php';
-        } elseif ($return_to === 'history' && in_array($rol, [1, 2], true)) {
-            $url_destino = '../../pages/history/historial.php';
-        } elseif ($return_id !== false && $return_to === 'book' && in_array($rol, [1, 2, 3], true)) {
-            $url_destino = $rol === 3
-                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php?open_book=' . $return_id
-                : '../../pages/biblioteca-catalogo/vista-libro/book-view.php?id=' . $return_id;
-        } elseif ($return_id !== false && $return_to === 'author' && in_array($rol, [1, 2, 3], true)) {
-            $url_destino = $rol === 3
-                ? '../../dashboards/bibliotecario/pages/inventario/inventario.php?autor=' . $return_id
-                : '../../pages/biblioteca-catalogo/catalogo/catalogo.php?autor=' . $return_id;
+        if (in_array($return_to, ['catalog', 'history'], true)) {
+            $url_destino = redirect_to($return_to, $rol) ?? $url_destino;
+        } elseif ($return_id !== false && in_array($return_to, ['book', 'author'], true)) {
+            $url_destino = redirect_to($return_to, $rol, (int) $return_id) ?? $url_destino;
         }
 
         echo json_encode([

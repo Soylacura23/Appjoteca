@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../../backend/config/security.php';
+require_once __DIR__ . '/../../backend/helpers/current_user.php';
+$publicUserRole = appCurrentUserRole();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,13 +23,21 @@ require_once __DIR__ . '/../../backend/config/security.php';
     <link rel="stylesheet" href="../../shared/css/components/topbar-landing.css">
     
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <?php if ($publicUserRole): ?>
+        <link rel="stylesheet" href="../../shared/css/theme.css">
+        <link rel="stylesheet" href="../../shared/css/components/navbar.css">
+        <link rel="stylesheet" href="../../shared/css/components/notifications.css">
+        <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
+    <?php endif; ?>
     <?php require __DIR__ . '/../../shared/layouts/favicon.php'; ?>
 
     <!-- PDF.js desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
-<body>
+<body class="<?= $publicUserRole ? 'authenticated-public-page' : '' ?>">
 
+<?php include __DIR__ . '/../../shared/layouts/public-user-header.php'; ?>
+<?php if (!$publicUserRole): ?>
 <header class="main-header" id="mainHeader">
     <div class="header-container">
         <a href="../../index.php" class="logo-link">
@@ -51,6 +61,7 @@ require_once __DIR__ . '/../../backend/config/security.php';
         </button>
     </div>
 </header>
+<?php endif; ?>
 
     <!-- CABECERA DE LA PÁGINA -->
     <section class="page-header">
@@ -93,6 +104,12 @@ require_once __DIR__ . '/../../backend/config/security.php';
     <?php if (file_exists('../../shared/layouts/footer.php')) include '../../shared/layouts/footer.php'; ?>
 
     <script src="../../shared/js/menu.js" onerror="this.remove()"></script>
+    <?php if ($publicUserRole): ?>
+        <script src="../../shared/js/components/navbar.js"></script>
+        <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+        <script src="../../shared/js/global.js"></script>
+        <script src="/Appjoteca/shared/js/components/topbar-search.js" defer></script>
+    <?php endif; ?>
     <script src="manual.js"></script>
     <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>

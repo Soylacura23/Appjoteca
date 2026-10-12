@@ -448,10 +448,23 @@
             cargarStats();
             cargarDevoluciones(1);
             if (historyTable) historyTable.setData();
+            const readingMessages = [];
+            if (json.metas_completadas?.length) {
+                readingMessages.push(`¡Felicitaciones! Completaste: ${json.metas_completadas.join(', ')}.`);
+            }
+            if (json.insignias_nuevas?.length) {
+                readingMessages.push(`Insignias nuevas: ${json.insignias_nuevas.join(', ')}.`);
+            }
+            if (json.progreso_lectura === false) {
+                readingMessages.push('El progreso de lectura no se pudo actualizar. Inténtalo más tarde.');
+            }
             window.alerta(
                 'success',
                 'Devolución registrada',
-                `Se ${cantidad === 1 ? 'devolvió 1 ejemplar' : `devolvieron ${cantidad} ejemplares`} correctamente.`
+                [
+                    `Se ${cantidad === 1 ? 'devolvió 1 ejemplar' : `devolvieron ${cantidad} ejemplares`} correctamente.`,
+                    ...readingMessages
+                ].join('\n\n')
             );
         } catch (e) {
             window.alerta('error', 'No se pudo registrar la devolución', e.message || 'Intenta nuevamente.');

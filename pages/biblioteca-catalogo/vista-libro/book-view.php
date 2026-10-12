@@ -42,13 +42,23 @@ $portada   = urlPortada($libro['portada'] ?? '', $base_url);
 
 $modeloReserva = new Reserva($connection);
 $reservaPendiente = null;
+$wishlistSaved = false;
 if (!empty($_SESSION['usuario_id'])) {
     $reservaPendiente = $modeloReserva->obtenerPendienteDeUsuario((int) $_SESSION['usuario_id'], $id_libro);
+    if (in_array((int) ($_SESSION['rol'] ?? 0), [1, 2, 4], true)) {
+        $wishlistQuery = $connection->prepare(
+            'SELECT id FROM lista_deseos WHERE id_usuario = ? AND id_libro = ? LIMIT 1'
+        );
+        $wishlistQuery->bind_param('ii', $_SESSION['usuario_id'], $id_libro);
+        $wishlistQuery->execute();
+        $wishlistSaved = (bool) $wishlistQuery->get_result()->fetch_assoc();
+        $wishlistQuery->close();
+    }
 }
 
 $librosRelacionados = $modeloLibro->obtenerRelacionados($id_libro, 4);
 
-requiereRol([1, 2]); 
+requiereRol([1, 2, 4]);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -168,6 +178,15 @@ requiereRol([1, 2]);
 
                     <!-- Acciones -->
                     <div class="book-actions">
+                        <button
+                            class="btn-wishlist <?= $wishlistSaved ? 'is-saved' : '' ?>"
+                            id="btn-wishlist"
+                            type="button"
+                            data-id="<?= (int) $id_libro ?>"
+                            aria-pressed="<?= $wishlistSaved ? 'true' : 'false' ?>">
+                            <span class="material-symbols-outlined"><?= $wishlistSaved ? 'favorite' : 'favorite_border' ?></span>
+                            <?= $wishlistSaved ? 'Quitar de mi lista' : 'Agregar a mi lista de deseos' ?>
+                        </button>
                         <?php if ($reservaPendiente): ?>
                             <!-- El usuario YA tiene una reserva pendiente → botón Cancelar -->
                             <button

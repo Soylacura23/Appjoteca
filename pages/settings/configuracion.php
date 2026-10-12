@@ -11,7 +11,7 @@ $tiene_foto_personalizada = !empty($_SESSION['foto_perfil'])
 $foto_documento = '';
 
 $consultaFotoDocumento = $connection->prepare(
-    'SELECT foto_documento FROM usuarios WHERE id_usuario = ?'
+    'SELECT foto_documento, biografia FROM usuarios WHERE id_usuario = ?'
 );
 if (!$consultaFotoDocumento) {
     throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
@@ -21,6 +21,7 @@ $consultaFotoDocumento->bind_param('i', $mi_id);
 $consultaFotoDocumento->execute();
 $datosDocumento = $consultaFotoDocumento->get_result()->fetch_assoc();
 $consultaFotoDocumento->close();
+$mi_biografia = (string) ($datosDocumento['biografia'] ?? '');
 
 if (!empty($datosDocumento['foto_documento'])) {
     $foto_documento = BASE_URL . ltrim($datosDocumento['foto_documento'], '/');
@@ -46,6 +47,7 @@ $foto_documento_es_pdf = str_ends_with(
     <link rel="stylesheet" href="../../shared/css/components/notifications.css">
     <link rel="stylesheet" href="../../shared/css/components/navbar.css">
     <link rel="stylesheet" href="../../shared/css/components/footer.css">
+    <link rel="stylesheet" href="../../shared/css/components/reading-summary.css">
     <link rel="stylesheet" href="configuracion.css">
     <link rel="stylesheet" href="/Appjoteca/shared/css/components/topbar-search.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
@@ -186,6 +188,23 @@ $foto_documento_es_pdf = str_ends_with(
                                     </button>
                                 </div>
                                 <span class="input-hint hint-success">Puede cambiarlo cada 7 días. El anterior queda reservado 30 días.</span>
+                            </div>
+
+                            <div class="form-group biography-editor">
+                                <label for="biographyInput">Biografía</label>
+                                <textarea id="biographyInput" data-endpoint="../../backend/settings/configuracion-back.php" maxlength="500" rows="4" placeholder="Cuéntanos un poco sobre ti..."><?= htmlspecialchars($mi_biografia, ENT_QUOTES, 'UTF-8'); ?></textarea>
+                                <div class="biography-editor-footer">
+                                    <span class="input-hint">Hasta 500 caracteres</span>
+                                    <span class="biography-counter" id="biographyCounter">0 / 500</span>
+                                </div>
+                                <div class="biography-actions" id="biographyActions" hidden>
+                                    <button class="btn-outline" id="cancelBiographyBtn" type="button">
+                                        <span class="material-symbols-outlined">close</span> Cancelar
+                                    </button>
+                                    <button class="btn-gold" id="saveBiographyBtn" type="button">
+                                        <span class="material-symbols-outlined">save</span> Guardar
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="form-group locked">
@@ -348,12 +367,12 @@ $foto_documento_es_pdf = str_ends_with(
                             </div>
                             <div class="danger-text">
                                 <h4>Eliminación de Cuenta</h4>
-                                <p>Esta acción enviará una solicitud de baja definitiva al administrador del sistema. Perderá acceso a todos sus préstamos y reservas activas.</p>
+                                <p><?= $es_admin ? 'La cuenta se desactivará de forma definitiva. Deberá confirmar escribiendo ELIMINAR y con su contraseña actual.' : 'Esta acción enviará una solicitud de baja definitiva al administrador del sistema. Perderá acceso a todos sus préstamos y reservas activas.'; ?></p>
                             </div>
                         </div>
-                        <button class="btn-danger" id="deleteAccountBtn" type="button">
+                        <button class="btn-danger" id="deleteAccountBtn" data-admin="<?= $es_admin ? 'true' : 'false'; ?>" type="button">
                             <span class="material-symbols-outlined">delete_forever</span>
-                            Solicitar eliminación de cuenta
+                            <?= $es_admin ? 'Eliminar mi cuenta' : 'Solicitar eliminación de cuenta'; ?>
                         </button>
                     </div>
                 </section>
@@ -361,6 +380,9 @@ $foto_documento_es_pdf = str_ends_with(
             </div>
         </div>
     </div>
+    <section id="lectura" class="reading-profile-section">
+        <?php include __DIR__ . '/../../shared/layouts/reading-summary.php'; ?>
+    </section>
 </main>
 
 <!-- Overlay documento ID -->
@@ -390,9 +412,11 @@ $foto_documento_es_pdf = str_ends_with(
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/Appjoteca/shared/js/components/notifications.js"></script>
+<script src="/Appjoteca/shared/js/components/reading-summary.js" defer></script>
 <script src="../../shared/js/components/navbar.js"></script>
 <script src="../../shared/js/global.js"></script>
 <script src="configuracion.js"></script>
+<script src="/Appjoteca/shared/js/components/biography-editor.js"></script>
 
 <script src="/Appjoteca/shared/js/register-sw.js"></script>
 </body>

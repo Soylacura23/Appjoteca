@@ -62,6 +62,7 @@
             var clase = '';
             if (d.rol === 'Docente') clase = 'rol-docente';
             if (d.rol === 'Bibliotecario') clase = 'rol-bibliotecario';
+            if (d.rol === 'Administrador') clase = 'rol-administrador';
             return '<span class="rol-badge ' + clase + '">' + d.rol + '</span>';
           }
         },
@@ -210,19 +211,28 @@
       }
   
       var esMiCuenta = window.AppUser && String(window.AppUser.id) === String(d.id);
-      botonEliminarCuenta.hidden = esMiCuenta;
+      botonEliminarCuenta.hidden = esMiCuenta || ![1, 2].includes(Number(d.id_rol));
   
       // Foto del documento de identidad
       var imgDoc = document.getElementById('detail-doc-img');
+      var pdfDoc = document.getElementById('detail-doc-pdf');
       var placeholderDoc = document.getElementById('id-placeholder');
+      imgDoc.hidden = true;
+      pdfDoc.hidden = true;
+      placeholderDoc.hidden = !d.foto_documento;
       if (d.foto_documento) {
-        imgDoc.src = d.foto_documento;
-        imgDoc.hidden = false;
-        placeholderDoc.hidden = true;
+        if (/\.pdf(?:$|[?#])/i.test(d.foto_documento)) {
+          pdfDoc.src = d.foto_documento;
+          pdfDoc.hidden = false;
+          imgDoc.removeAttribute('src');
+        } else {
+          imgDoc.src = d.foto_documento;
+          imgDoc.hidden = false;
+          pdfDoc.removeAttribute('src');
+        }
       } else {
         imgDoc.src = '';
-        imgDoc.hidden = true;
-        placeholderDoc.hidden = false;
+        pdfDoc.removeAttribute('src');
       }
   
       overlayDetalle.hidden = false;

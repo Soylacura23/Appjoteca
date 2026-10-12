@@ -16,6 +16,7 @@ $diccionario_roles = [
     1 => 'Estudiante',
     2 => 'Docente',
     3 => 'Bibliotecario',
+    4 => 'Administrador',
 ];
 
 $resultado = mysqli_query(
@@ -36,7 +37,8 @@ $resultado = mysqli_query(
              ORDER BY MIN(p.fecha_devolucion_prevista) ASC
              LIMIT 1) AS id_prestamo_activo
      FROM usuarios
-     WHERE id_rol IN (1, 2)"
+     WHERE id_rol IN (1, 2, 4)
+       AND estado IN ('1', 'inactivo', '0')"
 );
 
 if ($resultado) {
@@ -46,6 +48,7 @@ if ($resultado) {
             : BASE_URL . 'assets/images/default-avatar.png';
         $usuarios[] = [
             'id'             => $fila['id_usuario'],
+            'id_rol'         => (int) $fila['id_rol'],
             'rol'            => $diccionario_roles[$fila['id_rol']] ?? 'Sin rol',
             'nombre'         => $fila['nombre_apellido'],
             'usuario'        => $fila['nombre_usuario'],
@@ -55,7 +58,8 @@ if ($resultado) {
             'id_reserva_pendiente' => $fila['id_reserva_pendiente'] ? (int) $fila['id_reserva_pendiente'] : null,
             'id_prestamo_activo' => $fila['id_prestamo_activo'] ? (int) $fila['id_prestamo_activo'] : null,
             'biografia'      => $fila['biografia'],
-            'estado'         => $fila['estado'] == 1 ? 'activo' : 'inactivo',
+            'foto_documento' => !empty($fila['foto_documento']) ? BASE_URL . $fila['foto_documento'] : null,
+            'estado'         => $fila['estado'] === '1' ? 'activo' : 'inactivo',
             'fecha_creacion' => $fila['fecha_registro']
         ];
     }
@@ -69,4 +73,3 @@ if ($resultado) {
 
     echo json_encode(['ok' => false, 'error' => 'Error en la base de datos: ' . $error_msg], JSON_UNESCAPED_UNICODE);
 }
-

@@ -359,6 +359,34 @@ body{
     padding-top: var(--sp-xs);
 }
 
+.btn-wishlist {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 48px;
+    padding: 0.75rem 1.1rem;
+    color: var(--on-surface);
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.btn-wishlist:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.btn-wishlist.is-saved {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
 .btn-reservar {
     display: inline-flex;
     align-items: center;

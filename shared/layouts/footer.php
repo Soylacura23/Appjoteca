@@ -1,12 +1,13 @@
 <?php
 require_once __DIR__ . '/../../backend/config/security.php';
+require_once __DIR__ . '/../../backend/helpers/current_user.php';
 
-$footer_role = isset($_SESSION['usuario_id']) ? (int) ($_SESSION['rol'] ?? 0) : 0;
+$footer_role = appCurrentUserRole();
 $footer_base = '/Appjoteca/';
 $footer_catalog = $footer_role === 3
     ? $footer_base . 'dashboards/bibliotecario/pages/inventario/inventario.php'
     : $footer_base . 'pages/biblioteca-digital/index.php';
-$footer_history_roles = [1, 2];
+$footer_history_roles = [1, 2, 4];
 $footer_logged_in = $footer_role > 0;
 $footer_login = $footer_base . 'auth/login/login.php';
 ?>

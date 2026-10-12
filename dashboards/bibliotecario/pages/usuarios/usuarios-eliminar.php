@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../../../backend/config/auth.php';
 require_once __DIR__ . '/../../../../backend/Database/conexion.php';
 
 require_once __DIR__ . '/../../../../backend/config/verify-csrf.php';
+requiereRol([3]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -21,21 +22,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     else {
+        $consulta = $connection->prepare(
+            "SELECT id_rol, estado FROM usuarios
+             WHERE id_usuario = ? AND estado IN ('1', 'inactivo', '0')
+             LIMIT 1"
+        );
+        $consulta->bind_param('i', $id_usuario);
+        $consulta->execute();
+        $objetivo = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
 
-        $sql = $connection->prepare('DELETE FROM usuarios WHERE id_usuario = ?');
+        if (!$objetivo || !in_array((int) $objetivo['id_rol'], [1, 2], true)) {
+            echo json_encode(['ok' => false, 'error' => 'Solo puedes eliminar cuentas de estudiantes o docentes activas/inactivas']);
+            exit();
+        }
+
+        $sql = $connection->prepare(
+            "UPDATE usuarios SET estado = 'eliminado', remember_token = NULL
+             WHERE id_usuario = ? AND id_rol IN (1, 2) AND estado IN ('1', 'inactivo', '0')"
+        );
         $sql->bind_param('i', $id_usuario);
         
-        if ($sql->execute()){
-
-            if ($sql->affected_rows > 0) {
-                echo json_encode(['ok' => true]);
-            } else {
-                echo json_encode(['ok' => false, 'error' => 'Usuario no encontrado']);
-            }
-        };
-
+        $eliminado = $sql->execute() && $sql->affected_rows === 1;
         $sql->close();
         $connection->close();
+        echo json_encode($eliminado
+            ? ['ok' => true]
+            : ['ok' => false, 'error' => 'No se pudo eliminar la cuenta']);
+        exit();
     }
 } else{
     

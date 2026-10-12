@@ -49,6 +49,180 @@
 .metric-card.warning .metric-icon { color: #e53935; }
 .metric-card.success .metric-icon { color: #4caf50; }
 
+.teacher-reminders .block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.teacher-reminders .block-header a {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.teacher-empty {
+    color: var(--on-surface-variant);
+    line-height: 1.6;
+}
+
+.teacher-board {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 3rem auto;
+    min-height: 60vh;
+}
+
+.teacher-board-heading,
+.teacher-note-card-heading,
+.teacher-note-options,
+.teacher-form-actions,
+.teacher-note-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.teacher-board-heading {
+    margin-bottom: 1.5rem;
+}
+
+.teacher-board-heading h1 {
+    margin: 0.4rem 0;
+    color: var(--on-surface);
+}
+
+.teacher-board-heading p,
+.teacher-note-card p {
+    color: var(--on-surface-variant);
+    line-height: 1.65;
+}
+
+.teacher-primary-button,
+.teacher-secondary-button,
+.teacher-note-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 42px;
+    padding: 0.65rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 160ms ease, background 160ms ease;
+}
+
+.teacher-primary-button {
+    color: #1a1a1a;
+    background: var(--primary);
+}
+
+.teacher-secondary-button,
+.teacher-note-actions button {
+    color: var(--on-surface);
+    background: var(--surface-container-high);
+    border-color: var(--outline-variant);
+}
+
+.teacher-primary-button:hover,
+.teacher-secondary-button:hover,
+.teacher-note-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.teacher-note-form {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: 18px;
+}
+
+.teacher-note-form[hidden] {
+    display: none;
+}
+
+.teacher-note-form label {
+    display: grid;
+    gap: 0.45rem;
+    color: var(--on-surface);
+    font-weight: 700;
+}
+
+.teacher-note-form input:not([type="checkbox"]),
+.teacher-note-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    color: var(--on-surface);
+    background: var(--surface);
+    border: 1px solid var(--outline-variant);
+    border-radius: 10px;
+    font: inherit;
+}
+
+.teacher-note-options {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.teacher-important-toggle {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem !important;
+    align-self: end;
+    padding-bottom: 0.65rem;
+}
+
+.teacher-note-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+    gap: 1rem;
+}
+
+.teacher-note-card {
+    padding: 1.2rem;
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.teacher-note-card.is-important {
+    border-color: var(--primary);
+}
+
+.teacher-note-card h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--on-surface);
+}
+
+.teacher-note-card > small {
+    color: var(--on-surface-variant);
+}
+
+.teacher-note-actions {
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+.teacher-form-message,
+.teacher-error {
+    color: #b3261e;
+}
+
+@media (max-width: 600px) {
+    .teacher-board-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
 /* Lista de Actividad Reciente */
 .activity-card {
     background: var(--surface-container);

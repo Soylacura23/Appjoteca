@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-requiereRol([1, 2]);
+requiereRol([1, 2, 4]);
 
 $id_usuario = (int) ($_SESSION['usuario_id'] ?? 0);
 if ($id_usuario <= 0) {

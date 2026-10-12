@@ -1,0 +1,143 @@
+.reading-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.reading-summary-card {
+    min-width: 0;
+    padding: 1.15rem;
+    color: var(--on-surface);
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: 16px;
+}
+
+.reading-summary-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.85rem;
+    color: var(--primary);
+}
+
+.reading-summary-heading h2 {
+    margin: 0;
+    color: var(--on-surface);
+    font-size: 1rem;
+}
+
+.reading-summary-card p {
+    color: var(--on-surface-variant);
+    font-size: 0.88rem;
+}
+
+.reading-goal-item {
+    margin: 0.8rem 0;
+}
+
+.reading-goal-item > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.reading-goal-item progress {
+    width: 100%;
+    height: 0.55rem;
+    margin: 0.5rem 0 0.2rem;
+    accent-color: var(--primary);
+}
+
+.reading-goal-item small {
+    color: var(--on-surface-variant);
+}
+
+.reading-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.reading-badges > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.55rem;
+    color: var(--on-surface);
+    background: var(--surface-container-high);
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+
+.reading-badges .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.reading-wishlist {
+    padding-left: 1.1rem;
+    color: var(--on-surface-variant);
+}
+
+.reading-wishlist a,
+.reading-summary-link {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.reading-goal-form {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+}
+
+.reading-goal-form label {
+    display: grid;
+    gap: 0.25rem;
+    color: var(--on-surface-variant);
+    font-size: 0.75rem;
+}
+
+.reading-goal-form > div {
+    display: grid;
+    grid-template-columns: 0.6fr 1fr;
+    gap: 0.5rem;
+}
+
+.reading-goal-form input {
+    min-width: 0;
+    width: 100%;
+    padding: 0.55rem;
+    color: var(--on-surface);
+    background: var(--surface);
+    border: 1px solid var(--outline-variant);
+    border-radius: 8px;
+    font: inherit;
+}
+
+.reading-goal-form button {
+    justify-self: start;
+    padding: 0.55rem 0.8rem;
+    color: #1a1a1a;
+    background: var(--primary);
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.reading-goal-form [data-goal-message] {
+    margin: 0;
+    color: #b3261e;
+    font-size: 0.78rem;
+}
+
+.reading-summary-link {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.82rem;
+}

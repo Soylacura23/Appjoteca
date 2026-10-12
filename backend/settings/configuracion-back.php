@@ -32,6 +32,27 @@ $archivoTemporalRelativo = null;
 
 try {
 
+    if ($accion === 'update_biography') {
+        $biografia = is_string($_POST['biografia'] ?? null) ? trim($_POST['biografia']) : '';
+        $longitud = function_exists('mb_strlen') ? mb_strlen($biografia, 'UTF-8') : strlen($biografia);
+        if ($longitud > 500) {
+            echo json_encode(['success' => false, 'message' => 'La biografía no puede superar 500 caracteres.']);
+            exit;
+        }
+
+        $query = $connection->prepare('UPDATE usuarios SET biografia = ? WHERE id_usuario = ? AND estado = ?');
+        $estadoActivo = '1';
+        $query->bind_param('sis', $biografia, $mi_id, $estadoActivo);
+        if (!$query->execute() || $query->affected_rows < 0) {
+            $query->close();
+            echo json_encode(['success' => false, 'message' => 'No se pudo guardar la biografía.']);
+            exit;
+        }
+        $query->close();
+        echo json_encode(['success' => true, 'message' => 'Tu biografía se actualizó correctamente.']);
+        exit;
+    }
+
     // Cambiar nombre de usuario ──
     if ($accion === 'update_username' || isset($_POST['update_username'])) {
         $nuevo = trim($_POST['username'] ?? '');
@@ -484,11 +505,48 @@ try {
 
     // ── 7. Eliminar cuenta (solo Admin, directo) ──
     if ($accion === 'eliminar_cuenta' && $mi_rol === 4) {
-        $sql = "UPDATE usuarios SET estado = 'eliminado' WHERE id_usuario = ?";
-        $query = $connection->prepare($sql);
-        $query->bind_param('i', $mi_id);
+        $confirmacion = is_string($_POST['confirmacion'] ?? null) ? trim($_POST['confirmacion']) : '';
+        $contrasena = is_string($_POST['contrasena_actual'] ?? null) ? $_POST['contrasena_actual'] : '';
+        if ($confirmacion !== 'ELIMINAR' || $contrasena === '') {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'message' => 'Escribe ELIMINAR y confirma con tu contraseña actual.']);
+            exit;
+        }
 
-        if ($query->execute()) {
+        $administradoresActivos = $connection->query(
+            "SELECT COUNT(*) AS total FROM usuarios WHERE id_rol = 4 AND estado = '1'"
+        );
+        if ((int) ($administradoresActivos->fetch_assoc()['total'] ?? 0) <= 1) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'No puedes eliminar la última cuenta de administrador activa.']);
+            exit;
+        }
+
+        $consulta = $connection->prepare('SELECT password FROM usuarios WHERE id_usuario = ? AND id_rol = 4 AND estado = ?');
+        $estadoActivo = '1';
+        $consulta->bind_param('is', $mi_id, $estadoActivo);
+        $consulta->execute();
+        $usuarioAdmin = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
+        if (!$usuarioAdmin || !password_verify($contrasena, $usuarioAdmin['password'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'La contraseña actual no es correcta.']);
+            exit;
+        }
+
+        $sql = "UPDATE usuarios SET estado = 'eliminado', remember_token = NULL WHERE id_usuario = ? AND id_rol = 4 AND estado = ?";
+        $query = $connection->prepare($sql);
+        $query->bind_param('is', $mi_id, $estadoActivo);
+
+        if ($query->execute() && $query->affected_rows === 1) {
+            setcookie('remember_me', '', [
+                'expires' => time() - 3600,
+                'path' => '/Appjoteca',
+                'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+            session_destroy();
             echo json_encode(['success' => true, 'message' => 'Cuenta marcada como eliminada']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al eliminar la cuenta']);

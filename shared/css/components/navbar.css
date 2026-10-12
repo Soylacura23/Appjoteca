@@ -711,3 +711,6 @@ aside a.active,
 .nav-link.active {
     color: #FFD700 !important; /* Dorado */
 }
+body.authenticated-public-page {
+    padding-top: var(--topbar-h, 68px);
+}
