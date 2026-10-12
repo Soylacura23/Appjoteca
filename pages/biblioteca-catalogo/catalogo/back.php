@@ -78,11 +78,10 @@ try {
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
+    error_log('catalogo/back: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     echo json_encode([
         'exito'   => false,
-        'mensaje' => 'Error en el servidor: ' . $e->getMessage(),
-        'archivo' => $e->getFile(),
-        'linea'   => $e->getLine()
+        'mensaje' => 'No se pudo cargar el catálogo. Inténtalo de nuevo.'
     ], JSON_UNESCAPED_UNICODE);
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 12-10-2026 a las 00:40:56
+-- Tiempo de generación: 12-10-2026 a las 22:43:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -234,7 +234,8 @@ INSERT INTO `historial` (`id_historial`, `id_usuario`, `tipo`, `accion`, `detall
 (25, 5, 'reserva', 'Solicitud de reserva', 'Reserva #11 · «One of us is lying» · Cantidad: 2', NULL, '2026-10-10 20:05:28'),
 (26, 5, 'reserva', 'Reserva cancelada', 'Reserva #11 cancelada por el usuario', NULL, '2026-10-10 20:05:43'),
 (27, 5, 'reserva', 'Solicitud de reserva', 'Reserva #12 · «One of us is lying» · Cantidad: 2', NULL, '2026-10-10 20:05:53'),
-(28, 5, 'reserva', 'Reserva aceptada', 'Reserva #12 · «One of us is lying» · 2 ejemplares · Préstamo(s) #16, #17', NULL, '2026-10-10 20:34:15');
+(28, 5, 'reserva', 'Reserva aceptada', 'Reserva #12 · «One of us is lying» · 2 ejemplares · Préstamo(s) #16, #17', NULL, '2026-10-10 20:34:15'),
+(29, 5, 'reserva', 'Solicitud de reserva', 'Reserva #13 · «El amor en los tiempos del cólera» · Cantidad: 1', NULL, '2026-10-11 19:04:41');
 
 -- --------------------------------------------------------
 
@@ -255,6 +256,47 @@ CREATE TABLE `idioma` (
 
 INSERT INTO `idioma` (`id_idioma`, `nombre_idioma`) VALUES
 (1, 'Español');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `insignias`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:40:51
+--
+
+CREATE TABLE `insignias` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(50) NOT NULL,
+  `nombre` varchar(80) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `icono` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `insignias`
+--
+
+INSERT INTO `insignias` (`id`, `codigo`, `nombre`, `descripcion`, `icono`) VALUES
+(1, 'primera_pagina', 'Primera Página', 'Realizaste tu primer préstamo.', 'auto_stories'),
+(2, 'lector_novato', 'Lector Novato', 'Devolviste 3 libros.', 'menu_book'),
+(3, 'lector_intermedio', 'Lector Intermedio', 'Devolviste 10 libros.', 'library_books'),
+(4, 'lector_avanzado', 'Lector Avanzado', 'Devolviste 25 libros.', 'local_library'),
+(5, 'lector_experto', 'Lector Experto', 'Devolviste 50 libros.', 'school'),
+(6, 'lector_constante', 'Lector Constante', 'Leíste durante 3 meses consecutivos.', 'calendar_month'),
+(7, 'explorador', 'Explorador', 'Leíste libros de 3 categorías.', 'explore'),
+(8, 'polimata', 'Polímata', 'Leíste libros de 5 categorías.', 'psychology'),
+(9, 'meta_cumplida', 'Meta Cumplida', 'Completaste una meta personal.', 'flag'),
+(10, 'cumplidor_de_metas', 'Cumplidor de Metas', 'Completaste 3 metas personales.', 'military_tech'),
+(11, 'devolutor_puntual', 'Devolutor Puntual', 'Devolviste 5 libros a tiempo.', 'schedule'),
+(12, 'super_puntual', 'Súper Puntual', 'Devolviste 15 libros a tiempo.', 'verified'),
+(13, 'veloz', 'Veloz', 'Devolviste 3 libros en un mismo mes.', 'bolt'),
+(14, 'maratonista', 'Maratonista', 'Devolviste 5 libros en un mismo mes.', 'directions_run'),
+(15, 'cientifico', 'Científico', 'Leíste 5 libros de Ciencias.', 'science'),
+(16, 'literato', 'Literato', 'Leíste 5 libros de Literatura.', 'menu_book'),
+(17, 'historiador', 'Historiador', 'Leíste 5 libros de Historia.', 'history_edu'),
+(18, 'filosofo', 'Filósofo', 'Leíste 5 libros de Filosofía.', 'lightbulb');
 
 -- --------------------------------------------------------
 
@@ -321,6 +363,29 @@ INSERT INTO `libro_autor` (`id_detalle`, `id_libro`, `id_autor`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `lista_deseos`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:51:50
+--
+
+CREATE TABLE `lista_deseos` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_libro` int(11) NOT NULL,
+  `fecha_agregado` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `lista_deseos`
+--
+
+INSERT INTO `lista_deseos` (`id`, `id_usuario`, `id_libro`, `fecha_agregado`) VALUES
+(1, 5, 6, '2026-10-12 14:51:50');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `materias`
 --
 -- Creación: 18-09-2026 a las 05:15:51
@@ -343,10 +408,64 @@ INSERT INTO `materias` (`id_materia`, `nombre`, `id_dewey`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `metas`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:51:22
+--
+
+CREATE TABLE `metas` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(120) NOT NULL,
+  `cantidad_objetivo` int(11) NOT NULL,
+  `cantidad_actual` int(11) NOT NULL DEFAULT 0,
+  `fecha_limite` date DEFAULT NULL,
+  `completada` tinyint(1) NOT NULL DEFAULT 0,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `metas`
+--
+
+INSERT INTO `metas` (`id`, `id_usuario`, `titulo`, `cantidad_objetivo`, `cantidad_actual`, `fecha_limite`, `completada`, `fecha_creacion`) VALUES
+(1, 5, 'Leer 20 libros este período', 20, 0, '2026-10-29', 0, '2026-10-12 14:51:22');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `notas_docente`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 20:36:00
+--
+
+CREATE TABLE `notas_docente` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(120) NOT NULL,
+  `contenido` text NOT NULL,
+  `fecha_recordatorio` date DEFAULT NULL,
+  `es_importante` tinyint(1) NOT NULL DEFAULT 0,
+  `recordatorio_enviado` tinyint(1) NOT NULL DEFAULT 0,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `notas_docente`
+--
+
+INSERT INTO `notas_docente` (`id`, `id_usuario`, `titulo`, `contenido`, `fecha_recordatorio`, `es_importante`, `recordatorio_enviado`, `fecha_creacion`) VALUES
+(1, 8, 'Aquí', 'prueba', '2026-10-20', 1, 0, '2026-10-12 15:36:00');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `notificaciones`
 --
 -- Creación: 07-10-2026 a las 21:18:44
--- Última actualización: 11-10-2026 a las 21:55:39
+-- Última actualización: 12-10-2026 a las 18:45:56
 --
 
 CREATE TABLE `notificaciones` (
@@ -388,7 +507,10 @@ INSERT INTO `notificaciones` (`id_notificacion`, `mensaje`, `url_accion`, `fecha
 (25, 'Nueva solicitud de reserva #11 · «One of us is lying» (2 ejemplares)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-10 20:05:28'),
 (26, 'Nueva solicitud de reserva #12 · «One of us is lying» (2 ejemplares)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-10 20:05:53'),
 (27, 'Tu reserva #12 del libro «One of us is lying» fue aceptada (2 ejemplares). Ya puedes reclamarlo.', '/Appjoteca/pages/history/historial.php', '2026-10-10 20:34:15'),
-(28, 'Nueva solicitud de cuenta: Matías Vargas (matias.vargas). Pendiente de aprobación.', '/Appjoteca/dashboards/Administrador/index.php', '2026-10-11 16:55:39');
+(28, 'Nueva solicitud de cuenta: Matías Vargas (matias.vargas). Pendiente de aprobación.', '/Appjoteca/dashboards/Administrador/index.php', '2026-10-11 16:55:39'),
+(29, 'Nueva solicitud de reserva #13 · «El amor en los tiempos del cólera» (1 ejemplar)', '/Appjoteca/dashboards/bibliotecario/pages/reservaciones/reservaciones.php', '2026-10-11 19:04:41'),
+(30, 'Nueva solicitud de cuenta: Carolina Pérez Mosquera (caro.p). Pendiente de aprobación.', '/Appjoteca/dashboards/Administrador/index.php?tab=pendientes&focus_usuario=17', '2026-10-12 12:12:04'),
+(31, 'Nueva solicitud de eliminacion #3 de simon admin.', '/Appjoteca/dashboards/Administrador/index.php?tab=solicitudes&focus_solicitud=3', '2026-10-12 13:45:56');
 
 -- --------------------------------------------------------
 
@@ -396,7 +518,7 @@ INSERT INTO `notificaciones` (`id_notificacion`, `mensaje`, `url_accion`, `fecha
 -- Estructura de tabla para la tabla `notificacion_usuario`
 --
 -- Creación: 07-10-2026 a las 21:18:21
--- Última actualización: 11-10-2026 a las 21:55:39
+-- Última actualización: 12-10-2026 a las 19:55:18
 --
 
 CREATE TABLE `notificacion_usuario` (
@@ -434,8 +556,11 @@ INSERT INTO `notificacion_usuario` (`id_detalle`, `id_notificacion`, `id_usuario
 (25, 24, 7, 1),
 (26, 25, 7, 1),
 (27, 26, 7, 1),
-(28, 27, 5, 0),
-(29, 28, 12, 0);
+(28, 27, 5, 1),
+(29, 28, 12, 1),
+(30, 29, 7, 0),
+(31, 30, 12, 0),
+(32, 31, 12, 1);
 
 -- --------------------------------------------------------
 
@@ -485,7 +610,7 @@ INSERT INTO `prestamos` (`id_prestamo`, `id_ejemplar`, `id_reserva`, `fecha_pres
 -- Estructura de tabla para la tabla `rate_limits`
 --
 -- Creación: 10-10-2026 a las 17:22:16
--- Última actualización: 11-10-2026 a las 22:24:49
+-- Última actualización: 12-10-2026 a las 20:40:31
 --
 
 CREATE TABLE `rate_limits` (
@@ -500,11 +625,11 @@ CREATE TABLE `rate_limits` (
 --
 
 INSERT INTO `rate_limits` (`id`, `identifier`, `attempts`, `reset_time`) VALUES
-(57, 'login:127.0.0.1', 6, 1791756424),
+(57, 'login:127.0.0.1', 3, 1791838183),
 (65, 'recover-send:127.0.0.1', 4, 1791759029),
 (66, 'recover-verify:127.0.0.1', 11, 1791758151),
 (69, 'recover-update:127.0.0.1', 1, 1791756399),
-(71, 'register:127.0.0.1', 3, 1791759285);
+(71, 'register:127.0.0.1', 1, 1791828724);
 
 -- --------------------------------------------------------
 
@@ -541,7 +666,8 @@ INSERT INTO `reservas` (`id_reserva`, `fk_id_usuario_reserva`, `fk_id_libro_rese
 (8, 5, 6, 2, '2026-10-10', '2026-10-12', '2026-10-23', 'aceptada', 'mbm'),
 (9, 5, 6, 1, '2026-10-10', '2026-10-12', '2026-10-16', 'cancelada', '98'),
 (11, 5, 6, 2, '2026-10-10', '2026-10-12', '2026-10-20', 'cancelada', 'ryr'),
-(12, 5, 6, 2, '2026-10-10', '2026-10-12', '2026-10-21', 'aceptada', '44');
+(12, 5, 6, 2, '2026-10-10', '2026-10-12', '2026-10-21', 'aceptada', '44'),
+(13, 5, 5, 1, '2026-10-11', '2026-10-13', '2026-10-19', 'activa', 'Leer');
 
 -- --------------------------------------------------------
 
@@ -571,8 +697,8 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `solicitudes_cambio`
 --
--- Creación: 27-09-2026 a las 18:42:44
--- Última actualización: 11-10-2026 a las 21:58:47
+-- Creación: 12-10-2026 a las 00:52:30
+-- Última actualización: 12-10-2026 a las 19:01:45
 --
 
 CREATE TABLE `solicitudes_cambio` (
@@ -594,8 +720,10 @@ CREATE TABLE `solicitudes_cambio` (
 -- Volcado de datos para la tabla `solicitudes_cambio`
 --
 
-INSERT INTO `solicitudes_cambio` (`id_solicitud`, `id_usuario`, `tipo`, `valor_actual`, `valor_nuevo`, `estado`, `fecha_solicitud`, `fecha_resolucion`, `id_admin_resuelve`, `comentario`) VALUES
-(1, 7, 'nombre', 'simonmontoya', 'Simon Montoya', 'rechazada', '2026-09-27 22:09:02', '2026-10-11 16:58:47', 12, '');
+INSERT INTO `solicitudes_cambio` (`id_solicitud`, `id_usuario`, `tipo`, `valor_actual`, `valor_nuevo`, `estado`, `fecha_solicitud`, `fecha_resolucion`, `id_admin_resuelve`, `comentario`, `archivo_nuevo`, `archivo_mime`) VALUES
+(1, 7, 'nombre', 'simonmontoya', 'Simon Montoya', 'rechazada', '2026-09-27 22:09:02', '2026-10-11 16:58:47', 12, '', NULL, NULL),
+(2, 5, 'documento', '244242424242', '1125445873', 'rechazada', '2026-10-11 18:17:53', '2026-10-12 14:01:45', 12, 'No', NULL, NULL),
+(3, 12, 'eliminacion', NULL, '', 'rechazada', '2026-10-12 13:45:56', '2026-10-12 13:49:31', 12, 'No se puede eliminar', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -623,7 +751,7 @@ INSERT INTO `tipos_materiales` (`id_tipo_material`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `usuarios`
 --
 -- Creación: 11-10-2026 a las 21:16:15
--- Última actualización: 11-10-2026 a las 21:57:49
+-- Última actualización: 12-10-2026 a las 19:02:45
 --
 
 CREATE TABLE `usuarios` (
@@ -651,14 +779,30 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_apellido`, `nombre_usuario`, `nombre_usuario_anterior`, `fecha_liberacion_nombre`, `correo_institucional`, `documento`, `foto_documento`, `password`, `foto_perfil`, `biografia`, `estado`, `fecha_registro`, `ultimo_cambio_nombre`, `remember_token`) VALUES
 (4, 1, 'Simón Montoya Soto', 'simon.ms', NULL, NULL, 'simon.montoya@iemanueljbetancur.edu.co', '1186463034', NULL, '$2y$12$OmELGf9IV/cUljAnPz/R.O3QK6ZbjJrROQfugRfzT/UZCtNmg6wiG', NULL, NULL, '1', '2026-08-30', NULL, NULL),
-(5, 1, 'simoncito', 'simon.mo', NULL, NULL, 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, NULL, '2026-08-30', '2026-09-06 21:44:13', NULL),
+(5, 1, 'simoncito', 'simon.mo', NULL, NULL, 'simon.el@iemanueljbetancur.edu.co', '244242424242', NULL, '$2y$10$wWtZKyazb/24Ro/EG71m2OD6SqGhJuYYT1UycYJbYmUddz05GVtai', 'uploads/profiles/photos/profile_5_1788745607.jpg', NULL, '1', '2026-08-30', '2026-09-06 21:44:13', NULL),
 (7, 3, 'simonmontoya', 'simon.bibliotecario', NULL, NULL, 'simon.biblioteca@iemanueljbetancur.edu.co', '11864630345', NULL, '$2y$10$bT14geo/yIKlEE114AAL0e19WAy0pessoyQc.iw.f9.nTvyeQnIni', 'uploads/profiles/photos/profile_7_1791673749.png', NULL, '1', '2026-09-04', NULL, NULL),
 (8, 2, 'simon profesor', 'simon.profesor', NULL, NULL, 'simon.profesor@iemanueljbetancur.edu.co', '1187472934', 'uploads/profiles/doc_82034dc7cf179fa01ae324707a3ff48e.pdf', '$2y$10$Fugnc824oVYRylQVb8Xjhu6Jqsqo9nFUeixxOW4sUWnz8y4uOr862', NULL, NULL, '1', '2026-09-11', NULL, NULL),
 (10, 1, 'afaasda', 'adad', NULL, NULL, 'simon@manueljbetancur.edu.co', '12947242424242', 'uploads/profiles/documents/doc_9a559adefe006b7034675051afe5ffd6.png', '$2y$10$7EwuK6BqkpoR8bhJceFuIuXU1iatFAhq9C2gZzc8nzliHG9riejZS', NULL, NULL, '1', '2026-09-14', NULL, NULL),
 (12, 4, 'simon admin', 'simon.admin', NULL, NULL, 'simon.admin@iemanueljbetancur.edu.co', '11864343434', NULL, '$2y$10$eQKNEGyQu90oV4uRhxF.1eIucesyzRYwy4dZJTOc7QSelSivQpIEe', NULL, NULL, '1', '2026-09-21', NULL, NULL),
 (13, NULL, 'Matías Ruiz López', 'matias.ruiz', NULL, NULL, 'matias.ruiz@iemanueljbetancur.edu.co', '24242424242', 'uploads/profiles/documents/doc_c75a7b7078c353cfbbde4f5076fa2a80.pdf', '$2y$10$7el8Eb.rhOdAkzKbXCA3sOEr2Hm3ZiC97YAi5HqHNa7UYSAXCp.qu', NULL, NULL, '1', '2026-10-07', NULL, NULL),
-(15, 1, 'sianuro', 'sianuroa.adwew', NULL, NULL, 'sianuro@iemanueljbetancur.edu.co', '1186463032', 'uploads/profiles/documents/doc_5dcf6fbf121e3cc518d4777dbf671ab1.pdf', '$2y$10$.NPl8r.xkj213GrC/tcxm.gRN6dnMND7Ztgyt5BRDoHUD/HvBwAN6', NULL, NULL, 'pendiente', '2026-10-07', NULL, NULL),
-(16, 1, 'Matías Vargas', 'matias.vargas', NULL, NULL, 'matias.vargas@iemanueljbetancur.edu.co', '1186463033', 'uploads/profiles/documents/doc_5487b01c65e3bc9bb9f50a1464febd59.jpg', '$2y$12$k.QErvJcaGcxvVobKdKDSu0mp7k69Q1GGtiRbIK7eWVCxO40mJwpK', NULL, NULL, '1', '2026-10-11', NULL, NULL);
+(15, 1, 'sianuro', 'sianuroa.adwew', NULL, NULL, 'sianuro@iemanueljbetancur.edu.co', '1186463032', NULL, '$2y$10$.NPl8r.xkj213GrC/tcxm.gRN6dnMND7Ztgyt5BRDoHUD/HvBwAN6', NULL, NULL, 'eliminado', '2026-10-07', NULL, NULL),
+(16, 1, 'Matías Vargas', 'matias.vargas', NULL, NULL, 'matias.vargas@iemanueljbetancur.edu.co', '1186463033', 'uploads/profiles/documents/doc_5487b01c65e3bc9bb9f50a1464febd59.jpg', '$2y$12$k.QErvJcaGcxvVobKdKDSu0mp7k69Q1GGtiRbIK7eWVCxO40mJwpK', NULL, NULL, '1', '2026-10-11', NULL, NULL),
+(17, 1, 'Carolina Pérez Mosquera', 'caro.p', NULL, NULL, 'carolina.perez@iemanueljbetancur.edu.co', '1192464914', 'uploads/profiles/documents/doc_c8f64b8d10976d5e1eeff69a1237d365.jpg', '$2y$12$2IS0XpVVfPyrlBXAHp.gHujsqES25dozhmYuyqBpaarlHb9Jls6.W', NULL, NULL, '1', '2026-10-12', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuario_insignias`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+--
+
+CREATE TABLE `usuario_insignias` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_insignia` int(11) NOT NULL,
+  `fecha_obtencion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Índices para tablas volcadas
@@ -723,6 +867,13 @@ ALTER TABLE `idioma`
   ADD PRIMARY KEY (`id_idioma`);
 
 --
+-- Indices de la tabla `insignias`
+--
+ALTER TABLE `insignias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_insignias_codigo` (`codigo`);
+
+--
 -- Indices de la tabla `libros`
 --
 ALTER TABLE `libros`
@@ -741,11 +892,34 @@ ALTER TABLE `libro_autor`
   ADD KEY `id_autor` (`id_autor`);
 
 --
+-- Indices de la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_lista_deseos_usuario_libro` (`id_usuario`,`id_libro`),
+  ADD KEY `idx_lista_deseos_libro` (`id_libro`);
+
+--
 -- Indices de la tabla `materias`
 --
 ALTER TABLE `materias`
   ADD PRIMARY KEY (`id_materia`),
   ADD KEY `id_dewey` (`id_dewey`);
+
+--
+-- Indices de la tabla `metas`
+--
+ALTER TABLE `metas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_metas_usuario` (`id_usuario`,`completada`);
+
+--
+-- Indices de la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_notas_recordatorios` (`fecha_recordatorio`,`recordatorio_enviado`),
+  ADD KEY `idx_notas_usuario` (`id_usuario`,`es_importante`,`fecha_creacion`);
 
 --
 -- Indices de la tabla `notificaciones`
@@ -817,6 +991,14 @@ ALTER TABLE `usuarios`
   ADD KEY `id_rol` (`id_rol`);
 
 --
+-- Indices de la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_usuario_insignia` (`id_usuario`,`id_insignia`),
+  ADD KEY `fk_usuario_insignias_insignia` (`id_insignia`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -866,13 +1048,19 @@ ALTER TABLE `ejemplares`
 -- AUTO_INCREMENT de la tabla `historial`
 --
 ALTER TABLE `historial`
-  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `idioma`
 --
 ALTER TABLE `idioma`
   MODIFY `id_idioma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `insignias`
+--
+ALTER TABLE `insignias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `libros`
@@ -887,22 +1075,40 @@ ALTER TABLE `libro_autor`
   MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT de la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `materias`
 --
 ALTER TABLE `materias`
   MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT de la tabla `metas`
+--
+ALTER TABLE `metas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `notificacion_usuario`
 --
 ALTER TABLE `notificacion_usuario`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `prestamos`
@@ -914,13 +1120,13 @@ ALTER TABLE `prestamos`
 -- AUTO_INCREMENT de la tabla `rate_limits`
 --
 ALTER TABLE `rate_limits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=174;
 
 --
 -- AUTO_INCREMENT de la tabla `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -932,7 +1138,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `solicitudes_cambio`
 --
 ALTER TABLE `solicitudes_cambio`
-  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_materiales`
@@ -944,7 +1150,13 @@ ALTER TABLE `tipos_materiales`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT de la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -986,10 +1198,29 @@ ALTER TABLE `libro_autor`
   ADD CONSTRAINT `id_libro` FOREIGN KEY (`id_libro`) REFERENCES `libros` (`id_libro`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
+-- Filtros para la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  ADD CONSTRAINT `fk_lista_deseos_libro` FOREIGN KEY (`id_libro`) REFERENCES `libros` (`id_libro`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_lista_deseos_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `materias`
 --
 ALTER TABLE `materias`
   ADD CONSTRAINT `id_dewey` FOREIGN KEY (`id_dewey`) REFERENCES `dewey` (`id_dewey`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `metas`
+--
+ALTER TABLE `metas`
+  ADD CONSTRAINT `fk_metas_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  ADD CONSTRAINT `fk_notas_docente_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `notificacion_usuario`
@@ -1024,6 +1255,13 @@ ALTER TABLE `solicitudes_cambio`
 --
 ALTER TABLE `usuarios`
   ADD CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  ADD CONSTRAINT `fk_usuario_insignias_insignia` FOREIGN KEY (`id_insignia`) REFERENCES `insignias` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_usuario_insignias_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

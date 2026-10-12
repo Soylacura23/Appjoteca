@@ -1,6 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 require_once __DIR__ . '/../../../../backend/config/auth.php';
 require_once __DIR__ . '/../../../../backend/config/user_context.php';
@@ -189,12 +189,10 @@ requiereRol([3]);
         </div>
     </div>
 
-    <!-- Contenido (se llena con JS) -->
     <div id="reportes-contenido" class="reportes-contenido" hidden>
 
         <!-- Métricas -->
         <section class="metrics-grid" id="metrics-grid">
-            <!-- Se generan por JS -->
         </section>
 
         <!-- Gráfico + Insights -->

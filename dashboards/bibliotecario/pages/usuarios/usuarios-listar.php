@@ -68,8 +68,7 @@ if ($resultado) {
 
     echo json_encode(['ok' => true, 'usuarios' => $usuarios], JSON_UNESCAPED_UNICODE);
 } else{
-    $error_msg = mysqli_error($connection);
+    error_log('usuarios-listar: ' . mysqli_error($connection));
     mysqli_close($connection);
-
-    echo json_encode(['ok' => false, 'error' => 'Error en la base de datos: ' . $error_msg], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['ok' => false, 'error' => 'No se pudieron cargar los usuarios.'], JSON_UNESCAPED_UNICODE);
 }

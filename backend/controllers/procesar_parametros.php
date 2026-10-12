@@ -184,23 +184,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(['status' => 'success']);
 
     } catch (mysqli_sql_exception $e) {
-
-        if ($e->getCode() === 1062) {
-
-            echo json_encode(['status' => 'error', 'mensaje' => 'Ya existe un registro con esos datos.']);
-
-        } elseif ($e->getCode() === 1451) {
-
-            echo json_encode(['status' => 'error', 'mensaje' => 'No se puede eliminar porque este registro está en uso por colecciones, materias o libros asociados.']);
-
-        } else {
-
-            echo json_encode(['status' => 'error', 'mensaje' => 'Error en la base de datos: ' . $e->getMessage()]);
-        }
-    } catch (Exception $e) {
-
-        echo json_encode(['status' => 'error', 'mensaje' => $e->getMessage()]);
+    if ($e->getCode() === 1062) {
+        echo json_encode(['status' => 'error', 'mensaje' => 'Ya existe un registro con esos datos.']);
+    } elseif ($e->getCode() === 1451) {
+        echo json_encode(['status' => 'error', 'mensaje' => 'No se puede eliminar porque este registro está en uso por colecciones, materias o libros asociados.']);
+    } else {
+        error_log('procesar_parametros DB: ' . $e->getMessage());
+        echo json_encode(['status' => 'error', 'mensaje' => 'Error en la base de datos. Inténtalo de nuevo.']);
     }
+} catch (Exception $e) {
+    $msg = $e->getMessage();
+    $esValidacion = str_contains($msg, 'obligatorio')
+        || str_contains($msg, 'válid')
+        || str_contains($msg, 'no reconocida')
+        || str_contains($msg, 'Identificador');
+    if ($esValidacion) {
+        echo json_encode(['status' => 'error', 'mensaje' => $msg]);
+    } else {
+        error_log('procesar_parametros: ' . $msg);
+        echo json_encode(['status' => 'error', 'mensaje' => 'No se pudo completar la operación.']);
+    }
+}
 
     $connection->close();
 

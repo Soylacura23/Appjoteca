@@ -9,7 +9,6 @@ if (!isset($connection) || $connection->connect_error) {
     exit;
 }
 
-// Consulta uniendo libros con la tabla de autores y libro_autor
 $sql = "SELECT l.id_libro, l.titulo, 
                COALESCE(a.nombre, 'Autor desconocido') AS autor
         FROM libros l
@@ -29,7 +28,7 @@ if ($result && $result->num_rows > 0) {
             'id'          => $row['id_libro'],
             'titulo'      => $row['titulo'],
             'autor'       => $row['autor'],
-            'portada_url' => '../../shared/images/default-book.png'
+            'portada_url' => '../../assets/images/books/default-cover.jpg'
         ];
     }
 }

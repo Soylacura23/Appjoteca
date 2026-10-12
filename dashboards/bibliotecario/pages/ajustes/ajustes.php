@@ -7,9 +7,13 @@ requiereRol([3]);
 $documento = $mi_documento ?? '';
 $foto_documento = '';
 $consultaDocumento = $connection->prepare('SELECT foto_documento, biografia FROM usuarios WHERE id_usuario = ?');
+
 if (!$consultaDocumento) {
-    throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
+    error_log('ajustes: prepare foto_documento falló: ' . ($connection->error ?? 'sin detalle'));
+    http_response_code(503);
+    exit('El servicio no está disponible temporalmente.');
 }
+
 $consultaDocumento->bind_param('i', $mi_id);
 $consultaDocumento->execute();
 $datosCuenta = $consultaDocumento->get_result()->fetch_assoc() ?: [];

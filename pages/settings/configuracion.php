@@ -13,8 +13,11 @@ $foto_documento = '';
 $consultaFotoDocumento = $connection->prepare(
     'SELECT foto_documento, biografia FROM usuarios WHERE id_usuario = ?'
 );
+
 if (!$consultaFotoDocumento) {
-    throw new RuntimeException('No se pudo consultar la foto del documento: ' . $connection->error);
+    error_log('configuracion: prepare foto_documento falló: ' . ($connection->error ?? 'sin detalle'));
+    http_response_code(503);
+    exit('El servicio no está disponible temporalmente.');
 }
 
 $consultaFotoDocumento->bind_param('i', $mi_id);

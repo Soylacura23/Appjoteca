@@ -1,13 +1,20 @@
 <?php
+
 $readingUserId = (int) ($_SESSION['usuario_id'] ?? 0);
+
 $readingGoalsQuery = $connection->prepare(
+
     'SELECT titulo, cantidad_objetivo, cantidad_actual, fecha_limite, completada
      FROM metas WHERE id_usuario = ? ORDER BY completada ASC, fecha_creacion DESC LIMIT 3'
 );
+
 $readingGoalsQuery->bind_param('i', $readingUserId);
+
 $readingGoalsQuery->execute();
+
 $readingGoalsResult = $readingGoalsQuery->get_result();
 $readingGoals = [];
+
 while ($goal = $readingGoalsResult->fetch_assoc()) $readingGoals[] = $goal;
 $readingGoalsQuery->close();
 
@@ -16,25 +23,42 @@ $readingBadgesQuery = $connection->prepare(
      FROM usuario_insignias ui JOIN insignias i ON i.id = ui.id_insignia
      WHERE ui.id_usuario = ? ORDER BY ui.fecha_obtencion DESC LIMIT 4'
 );
+
 $readingBadgesQuery->bind_param('i', $readingUserId);
+
 $readingBadgesQuery->execute();
+
 $readingBadgesResult = $readingBadgesQuery->get_result();
+
 $readingBadges = [];
 while ($badge = $readingBadgesResult->fetch_assoc()) $readingBadges[] = $badge;
+
 $readingBadgesQuery->close();
 
+
 $readingWishlistQuery = $connection->prepare(
-    'SELECT l.id_libro, l.titulo, l.portada
-     FROM lista_deseos w JOIN libros l ON l.id_libro = w.id_libro
+    "SELECT l.id_libro, l.titulo, l.portada,
+            COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '), 'Autor desconocido') AS autores
+     FROM lista_deseos w
+     JOIN libros l ON l.id_libro = w.id_libro
+     LEFT JOIN libro_autor la ON la.id_libro = l.id_libro
+     LEFT JOIN autores a ON a.id_autor = la.id_autor
      WHERE w.id_usuario = ? AND l.fecha_eliminacion_libro IS NULL
-     ORDER BY w.fecha_agregado DESC LIMIT 3'
+     GROUP BY l.id_libro, l.titulo, l.portada
+     ORDER BY w.fecha_agregado DESC
+     LIMIT 3"
 );
+
 $readingWishlistQuery->bind_param('i', $readingUserId);
+
 $readingWishlistQuery->execute();
+
 $readingWishlistResult = $readingWishlistQuery->get_result();
+
 $readingWishlist = [];
 while ($book = $readingWishlistResult->fetch_assoc()) $readingWishlist[] = $book;
 $readingWishlistQuery->close();
+
 ?>
 <section class="reading-summary" aria-label="Tus metas, insignias y libros deseados">
     <div class="reading-summary-card">
@@ -92,19 +116,33 @@ $readingWishlistQuery->close();
     </div>
 
     <div class="reading-summary-card">
-        <div class="reading-summary-heading">
-            <span class="material-symbols-outlined">favorite</span>
-            <h2>Quiero leer</h2>
-        </div>
-        <?php if ($readingWishlist): ?>
-            <ul class="reading-wishlist">
-                <?php foreach ($readingWishlist as $book): ?>
-                    <li><a href="/Appjoteca/pages/biblioteca-catalogo/vista-libro/book-view.php?id=<?= (int) $book['id_libro'] ?>"><?= htmlspecialchars($book['titulo'], ENT_QUOTES, 'UTF-8') ?></a></li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <p>Guarda aquí los libros que quieres leer más adelante.</p>
-        <?php endif; ?>
-        <a class="reading-summary-link" href="/Appjoteca/pages/history/historial.php?section=lista-deseos">Ver lista completa</a>
+    <div class="reading-summary-heading">
+        <span class="material-symbols-outlined">favorite</span>
+        <h2>Quiero leer</h2>
     </div>
+    <?php if ($readingWishlist): ?>
+        <div class="reading-wishlist-grid">
+            <?php foreach ($readingWishlist as $book):
+                $portada = $book['portada']
+                    ? '/Appjoteca/' . ltrim($book['portada'], '/')
+                    : '/Appjoteca/assets/images/books/default-cover.jpg';
+            ?>
+                <a class="reading-wishlist-card"
+                   href="/Appjoteca/pages/biblioteca-catalogo/vista-libro/book-view.php?id=<?= (int) $book['id_libro'] ?>">
+                    <img src="<?= htmlspecialchars($portada, ENT_QUOTES, 'UTF-8') ?>"
+                         alt=""
+                         loading="lazy"
+                         onerror="this.src='/Appjoteca/assets/images/books/default-cover.jpg'">
+                    <span class="reading-wishlist-info">
+                        <strong><?= htmlspecialchars($book['titulo'], ENT_QUOTES, 'UTF-8') ?></strong>
+                        <small><?= htmlspecialchars($book['autores'] ?? 'Autor desconocido', ENT_QUOTES, 'UTF-8') ?></small>
+                    </span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <p>Guarda aquí los libros que quieres leer más adelante.</p>
+    <?php endif; ?>
+    <a class="reading-summary-link" href="/Appjoteca/pages/history/historial.php?section=lista-deseos">Ver lista completa</a>
+</div>
 </section>

@@ -150,7 +150,7 @@
 
     const routesPerRole = {
         "Estudiante": '/Appjoteca/pages/settings/configuracion.php',
-        "Docente": 'Appjoteca/pages/settings/configuracion.php',
+        "Docente": '/Appjoteca/pages/settings/configuracion.php',
         "Bibliotecario": '/Appjoteca/dashboards/bibliotecario/pages/ajustes/ajustes.php',
         "Administrador": '/Appjoteca/pages/settings/configuracion.php'
     };

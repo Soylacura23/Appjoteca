@@ -1,9 +1,10 @@
 <?php
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
 
 function appStartSession() {
-    if (php_sapi_name() === 'cli') {
-        return;
-    }
 
     $host = strtolower($_SERVER['SERVER_NAME'] ?? '');
     $host = preg_replace('/:\d+$/', '', $host);

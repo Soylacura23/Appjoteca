@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 12-10-2026 a las 00:39:18
+-- Tiempo de generación: 12-10-2026 a las 22:43:12
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -155,6 +155,47 @@ CREATE TABLE `idioma` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `insignias`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:40:51
+--
+
+CREATE TABLE `insignias` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(50) NOT NULL,
+  `nombre` varchar(80) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `icono` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `insignias`
+--
+
+INSERT INTO `insignias` (`id`, `codigo`, `nombre`, `descripcion`, `icono`) VALUES
+(1, 'primera_pagina', 'Primera Página', 'Realizaste tu primer préstamo.', 'auto_stories'),
+(2, 'lector_novato', 'Lector Novato', 'Devolviste 3 libros.', 'menu_book'),
+(3, 'lector_intermedio', 'Lector Intermedio', 'Devolviste 10 libros.', 'library_books'),
+(4, 'lector_avanzado', 'Lector Avanzado', 'Devolviste 25 libros.', 'local_library'),
+(5, 'lector_experto', 'Lector Experto', 'Devolviste 50 libros.', 'school'),
+(6, 'lector_constante', 'Lector Constante', 'Leíste durante 3 meses consecutivos.', 'calendar_month'),
+(7, 'explorador', 'Explorador', 'Leíste libros de 3 categorías.', 'explore'),
+(8, 'polimata', 'Polímata', 'Leíste libros de 5 categorías.', 'psychology'),
+(9, 'meta_cumplida', 'Meta Cumplida', 'Completaste una meta personal.', 'flag'),
+(10, 'cumplidor_de_metas', 'Cumplidor de Metas', 'Completaste 3 metas personales.', 'military_tech'),
+(11, 'devolutor_puntual', 'Devolutor Puntual', 'Devolviste 5 libros a tiempo.', 'schedule'),
+(12, 'super_puntual', 'Súper Puntual', 'Devolviste 15 libros a tiempo.', 'verified'),
+(13, 'veloz', 'Veloz', 'Devolviste 3 libros en un mismo mes.', 'bolt'),
+(14, 'maratonista', 'Maratonista', 'Devolviste 5 libros en un mismo mes.', 'directions_run'),
+(15, 'cientifico', 'Científico', 'Leíste 5 libros de Ciencias.', 'science'),
+(16, 'literato', 'Literato', 'Leíste 5 libros de Literatura.', 'menu_book'),
+(17, 'historiador', 'Historiador', 'Leíste 5 libros de Historia.', 'history_edu'),
+(18, 'filosofo', 'Filósofo', 'Leíste 5 libros de Filosofía.', 'lightbulb');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `libros`
 --
 -- Creación: 26-09-2026 a las 21:04:08
@@ -197,6 +238,22 @@ CREATE TABLE `libro_autor` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `lista_deseos`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:51:50
+--
+
+CREATE TABLE `lista_deseos` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_libro` int(11) NOT NULL,
+  `fecha_agregado` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `materias`
 --
 -- Creación: 18-09-2026 a las 05:15:51
@@ -211,10 +268,50 @@ CREATE TABLE `materias` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `metas`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 19:51:22
+--
+
+CREATE TABLE `metas` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(120) NOT NULL,
+  `cantidad_objetivo` int(11) NOT NULL,
+  `cantidad_actual` int(11) NOT NULL DEFAULT 0,
+  `fecha_limite` date DEFAULT NULL,
+  `completada` tinyint(1) NOT NULL DEFAULT 0,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `notas_docente`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+-- Última actualización: 12-10-2026 a las 20:36:00
+--
+
+CREATE TABLE `notas_docente` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(120) NOT NULL,
+  `contenido` text NOT NULL,
+  `fecha_recordatorio` date DEFAULT NULL,
+  `es_importante` tinyint(1) NOT NULL DEFAULT 0,
+  `recordatorio_enviado` tinyint(1) NOT NULL DEFAULT 0,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `notificaciones`
 --
 -- Creación: 07-10-2026 a las 21:18:44
--- Última actualización: 11-10-2026 a las 21:55:39
+-- Última actualización: 12-10-2026 a las 18:45:56
 --
 
 CREATE TABLE `notificaciones` (
@@ -230,7 +327,7 @@ CREATE TABLE `notificaciones` (
 -- Estructura de tabla para la tabla `notificacion_usuario`
 --
 -- Creación: 07-10-2026 a las 21:18:21
--- Última actualización: 11-10-2026 a las 21:55:39
+-- Última actualización: 12-10-2026 a las 19:55:18
 --
 
 CREATE TABLE `notificacion_usuario` (
@@ -265,7 +362,7 @@ CREATE TABLE `prestamos` (
 -- Estructura de tabla para la tabla `rate_limits`
 --
 -- Creación: 10-10-2026 a las 17:22:16
--- Última actualización: 11-10-2026 a las 22:24:49
+-- Última actualización: 12-10-2026 a las 20:40:31
 --
 
 CREATE TABLE `rate_limits` (
@@ -323,8 +420,8 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `solicitudes_cambio`
 --
--- Creación: 27-09-2026 a las 18:42:44
--- Última actualización: 11-10-2026 a las 21:58:47
+-- Creación: 12-10-2026 a las 00:52:30
+-- Última actualización: 12-10-2026 a las 19:01:45
 --
 
 CREATE TABLE `solicitudes_cambio` (
@@ -361,7 +458,7 @@ CREATE TABLE `tipos_materiales` (
 -- Estructura de tabla para la tabla `usuarios`
 --
 -- Creación: 11-10-2026 a las 21:16:15
--- Última actualización: 11-10-2026 a las 21:57:49
+-- Última actualización: 12-10-2026 a las 19:02:45
 --
 
 CREATE TABLE `usuarios` (
@@ -382,6 +479,21 @@ CREATE TABLE `usuarios` (
   `ultimo_cambio_nombre` datetime DEFAULT NULL,
   `remember_token` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuario_insignias`
+--
+-- Creación: 12-10-2026 a las 19:40:51
+--
+
+CREATE TABLE `usuario_insignias` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_insignia` int(11) NOT NULL,
+  `fecha_obtencion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Índices para tablas volcadas
@@ -446,6 +558,13 @@ ALTER TABLE `idioma`
   ADD PRIMARY KEY (`id_idioma`);
 
 --
+-- Indices de la tabla `insignias`
+--
+ALTER TABLE `insignias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_insignias_codigo` (`codigo`);
+
+--
 -- Indices de la tabla `libros`
 --
 ALTER TABLE `libros`
@@ -464,11 +583,34 @@ ALTER TABLE `libro_autor`
   ADD KEY `id_autor` (`id_autor`);
 
 --
+-- Indices de la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_lista_deseos_usuario_libro` (`id_usuario`,`id_libro`),
+  ADD KEY `idx_lista_deseos_libro` (`id_libro`);
+
+--
 -- Indices de la tabla `materias`
 --
 ALTER TABLE `materias`
   ADD PRIMARY KEY (`id_materia`),
   ADD KEY `id_dewey` (`id_dewey`);
+
+--
+-- Indices de la tabla `metas`
+--
+ALTER TABLE `metas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_metas_usuario` (`id_usuario`,`completada`);
+
+--
+-- Indices de la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_notas_recordatorios` (`fecha_recordatorio`,`recordatorio_enviado`),
+  ADD KEY `idx_notas_usuario` (`id_usuario`,`es_importante`,`fecha_creacion`);
 
 --
 -- Indices de la tabla `notificaciones`
@@ -540,6 +682,14 @@ ALTER TABLE `usuarios`
   ADD KEY `id_rol` (`id_rol`);
 
 --
+-- Indices de la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_usuario_insignia` (`id_usuario`,`id_insignia`),
+  ADD KEY `fk_usuario_insignias_insignia` (`id_insignia`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -598,6 +748,12 @@ ALTER TABLE `idioma`
   MODIFY `id_idioma` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `insignias`
+--
+ALTER TABLE `insignias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
 -- AUTO_INCREMENT de la tabla `libros`
 --
 ALTER TABLE `libros`
@@ -610,10 +766,28 @@ ALTER TABLE `libro_autor`
   MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `materias`
 --
 ALTER TABLE `materias`
   MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `metas`
+--
+ALTER TABLE `metas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
@@ -670,6 +844,12 @@ ALTER TABLE `usuarios`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- Restricciones para tablas volcadas
 --
 
@@ -709,10 +889,29 @@ ALTER TABLE `libro_autor`
   ADD CONSTRAINT `id_libro` FOREIGN KEY (`id_libro`) REFERENCES `libros` (`id_libro`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
+-- Filtros para la tabla `lista_deseos`
+--
+ALTER TABLE `lista_deseos`
+  ADD CONSTRAINT `fk_lista_deseos_libro` FOREIGN KEY (`id_libro`) REFERENCES `libros` (`id_libro`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_lista_deseos_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `materias`
 --
 ALTER TABLE `materias`
   ADD CONSTRAINT `id_dewey` FOREIGN KEY (`id_dewey`) REFERENCES `dewey` (`id_dewey`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `metas`
+--
+ALTER TABLE `metas`
+  ADD CONSTRAINT `fk_metas_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `notas_docente`
+--
+ALTER TABLE `notas_docente`
+  ADD CONSTRAINT `fk_notas_docente_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `notificacion_usuario`
@@ -747,6 +946,13 @@ ALTER TABLE `solicitudes_cambio`
 --
 ALTER TABLE `usuarios`
   ADD CONSTRAINT `id_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `usuario_insignias`
+--
+ALTER TABLE `usuario_insignias`
+  ADD CONSTRAINT `fk_usuario_insignias_insignia` FOREIGN KEY (`id_insignia`) REFERENCES `insignias` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_usuario_insignias_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
