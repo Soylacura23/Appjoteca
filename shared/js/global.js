@@ -132,7 +132,7 @@
     function openProfileMenu() {
         if (!menuOffCanvas) return;
         closeNotifications(true); 
-        closeSidebar(); // Si el sidebar está abierto, lo cerramos
+        closeSidebar(); // Si el sidebar está abierto, se cierra
         menuOffCanvas.classList.add('open');
         showOverlay();
     }

@@ -1,7 +1,3 @@
-/**
- * navbar.js — Menú móvil y búsqueda del topbar
- * El estado "active" de los enlaces lo marca el servidor (topbar.php).
- */
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
