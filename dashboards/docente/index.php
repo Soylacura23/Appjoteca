@@ -142,7 +142,7 @@ $nuevoLibro = $resNuevos ? $resNuevos->fetch_assoc() : null;
                         <p>Notas y recordatorios privados</p>
                     </div>
                 </a>
-                <a href="../../pages/catalogo/index.php" class="action-card">
+                <a href="../../pages/biblioteca-digital/index.php" class="action-card">
                     <span class="material-symbols-outlined action-icon">search</span>
                     <div class="action-text">
                         <h3>Catálogo General</h3>
