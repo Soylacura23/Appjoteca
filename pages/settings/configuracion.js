@@ -365,94 +365,207 @@ document.addEventListener('DOMContentLoaded', function () {
                 documento: 'Cambio de Documento y Foto'
             };
 
-            Swal.fire({
-                title: (esDirecto ? 'Actualizar ' : 'Solicitar ') + (titulos[tipo] || 'cambio'),
-                input: tipo === 'email' ? 'email' : 'text',
-                inputLabel: tipo === 'documento' ? 'Nuevo número de documento' : 'Escribe el nuevo valor',
-                inputPlaceholder: tipo === 'email' ? 'correo@institucion.edu' : 'Nuevo valor...',
-                inputAttributes: { maxlength: tipo === 'nombre' ? '100' : (tipo === 'documento' ? '25' : '60') },
-                customClass: tipo === 'documento' ? { popup: 'change-document-swal' } : undefined,
-                html: tipo === 'documento' ? `
-                    <label class="change-document-upload" for="changeDocumentFile">
-                        <span class="material-symbols-outlined">upload_file</span>
-                        <span>Adjunta la foto del documento o un PDF (máximo 10 MB)</span>
-                        <input id="changeDocumentFile" class="change-document-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Selecciona una imagen o PDF del documento">
-                    </label>
-                    <p class="change-document-file-name" id="changeDocumentFileName">Ningún archivo seleccionado</p>
-                ` : undefined,
-                showCancelButton: true,
-                confirmButtonText: esDirecto ? 'Guardar cambio' : 'Enviar solicitud',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true,
-                background: '#121212',
-                color: '#e2e2e2',
-                confirmButtonColor: '#f2ca50',
-                cancelButtonColor: 'rgba(255,255,255,0.1)',
-                didOpen: function () {
-                    const fileInput = document.getElementById('changeDocumentFile');
-                    fileInput?.addEventListener('change', function () {
-                        archivoDocumento = this.files[0] || null;
-                        const name = document.getElementById('changeDocumentFileName');
-                        if (name) name.textContent = archivoDocumento ? archivoDocumento.name : 'Ningún archivo seleccionado';
-                    });
-                },
-                inputValidator: function (value) {
-                    if (!value || !value.trim()) {
-                        return 'Debes escribir un valor';
-                    }
-                    if (tipo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
-                        return 'Escribe un correo electrónico válido';
-                    }
-                    if (tipo === 'nombre' && !/^[\p{L}\p{M} .'-]{3,100}$/u.test(value.trim())) {
-                        return 'Escribe un nombre válido de 3 a 100 caracteres';
-                    }
-                    if (tipo === 'documento') {
-                        if (!/^[0-9-]{1,25}$/.test(value.trim())) return 'El documento solo puede contener números y guiones';
-                        if (!archivoDocumento) return 'Adjunta la foto o el PDF del documento nuevo';
-                        if (archivoDocumento.size > 10 * 1024 * 1024) return 'El archivo no puede superar 10 MB';
-                    }
-                }
-            }).then(function (result) {
-                if (!result.isConfirmed) return;
+            const palabrasClave = {
+                email: 'CORREO',
+                nombre: 'NOMBRE',
+                documento: 'DOCUMENTO'
+            };
 
-                const formData = new FormData();
-                const campoDirecto = {
-                    email: 'correo_institucional',
-                    nombre: 'nombre_apellido',
-                    documento: 'documento'
-                };
-                formData.append('accion', esDirecto ? 'update_directo' : 'solicitar_cambio');
-                if (esDirecto) {
+            const palabraClave = palabrasClave[tipo];
+
+            if (esDirecto) {
+                Swal.fire({
+                    title: 'Actualizar ' + (titulos[tipo] || 'cambio'),
+                    input: tipo === 'email' ? 'email' : 'text',
+                    inputLabel: tipo === 'documento' ? 'Nuevo número de documento' : 'Escribe el nuevo valor',
+                    inputPlaceholder: tipo === 'email' ? 'correo@institucion.edu' : 'Nuevo valor...',
+                    inputAttributes: { maxlength: tipo === 'nombre' ? '100' : (tipo === 'documento' ? '25' : '60') },
+                    customClass: tipo === 'documento' ? { popup: 'change-document-swal' } : undefined,
+                    html: tipo === 'documento' ? `
+                        <label class="change-document-upload" for="changeDocumentFile">
+                            <span class="material-symbols-outlined">upload_file</span>
+                            <span>Adjunta la foto del documento o un PDF (máximo 10 MB)</span>
+                            <input id="changeDocumentFile" class="change-document-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Selecciona una imagen o PDF del documento">
+                        </label>
+                        <p class="change-document-file-name" id="changeDocumentFileName">Ningún archivo seleccionado</p>
+                    ` : undefined,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar cambio',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    background: '#121212',
+                    color: '#e2e2e2',
+                    confirmButtonColor: '#f2ca50',
+                    cancelButtonColor: 'rgba(255,255,255,0.1)',
+                    didOpen: function () {
+                        const fileInput = document.getElementById('changeDocumentFile');
+                        fileInput?.addEventListener('change', function () {
+                            archivoDocumento = this.files[0] || null;
+                            const name = document.getElementById('changeDocumentFileName');
+                            if (name) name.textContent = archivoDocumento ? archivoDocumento.name : 'Ningún archivo seleccionado';
+                        });
+                    },
+                    inputValidator: function (value) {
+                        if (!value || !value.trim()) {
+                            return 'Debes escribir un valor';
+                        }
+                        if (tipo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+                            return 'Escribe un correo electrónico válido';
+                        }
+                        if (tipo === 'nombre' && !/^[\p{L}\p{M} .'-]{3,100}$/u.test(value.trim())) {
+                            return 'Escribe un nombre válido de 3 a 100 caracteres';
+                        }
+                        if (tipo === 'documento') {
+                            if (!/^[0-9-]{1,25}$/.test(value.trim())) return 'El documento solo puede contener números y guiones';
+                            if (!archivoDocumento) return 'Adjunta la foto o el PDF del documento nuevo';
+                            if (archivoDocumento.size > 10 * 1024 * 1024) return 'El archivo no puede superar 10 MB';
+                        }
+                    }
+                }).then(function (result) {
+                    if (!result.isConfirmed) return;
+
+                    const formData = new FormData();
+                    const campoDirecto = {
+                        email: 'correo_institucional',
+                        nombre: 'nombre_apellido',
+                        documento: 'documento'
+                    };
+                    formData.append('accion', 'update_directo');
                     formData.append('campo', campoDirecto[tipo]);
                     formData.append('valor', result.value.trim());
-                } else {
-                    formData.append('tipo', tipo);
-                    formData.append('valor_nuevo', result.value.trim());
-                }
-                if (archivoDocumento) formData.append('archivo_documento', archivoDocumento);
-                formData.append('csrf_token', getToken());
+                    if (archivoDocumento) formData.append('archivo_documento', archivoDocumento);
+                    formData.append('csrf_token', getToken());
 
-                fetch(ENDPOINT, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (data.success) {
-                        alerta('success', esDirecto ? 'Dato actualizado' : 'Solicitud enviada', data.message);
-                        if (tipo === 'documento') {
-                            const current = document.getElementById('displayDocument');
-                            if (esDirecto && current) current.textContent = 'DNI | ' + result.value.trim();
+                    fetch(ENDPOINT, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.success) {
+                            alerta('success', 'Dato actualizado', data.message);
+                            if (tipo === 'documento') {
+                                const current = document.getElementById('displayDocument');
+                                if (current) current.textContent = 'DNI | ' + result.value.trim();
+                            }
+                        } else {
+                            alerta('error', 'Error', data.message);
                         }
-                    } else {
-                        alerta('error', 'Error', data.message);
-                    }
-                })
-                .catch(function (err) {
-                    console.error(err);
-                    alerta('error', 'Error de red', 'No se pudo enviar la solicitud');
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                        alerta('error', 'Error de red', 'No se pudo enviar la solicitud');
+                    });
                 });
-            });
+            } else {
+                let archivoDocumento = null;
+
+                Swal.fire({
+                    title: 'Solicitar ' + (titulos[tipo] || 'cambio'),
+                    html: `
+                        <p style="margin-bottom: 8px;">Para continuar, escribe <strong>${palabraClave}</strong> e ingresa tu contraseña actual.</p>
+                        <input id="confirmRequestText" class="swal2-input" placeholder="${palabraClave}" autocomplete="off" style="margin-bottom: 8px;">
+                        <input id="confirmRequestPassword" class="swal2-input" type="password" placeholder="Contraseña actual" autocomplete="current-password" style="margin-bottom: 12px;">
+                        <label style="display: block; margin-bottom: 4px; font-size: 0.875rem; color: #e2e2e2;">${tipo === 'documento' ? 'Nuevo número de documento' : 'Escribe el nuevo valor'}</label>
+                        <input id="newValueInput" class="swal2-input" type="${tipo === 'email' ? 'email' : 'text'}" placeholder="${tipo === 'email' ? 'correo@institucion.edu' : 'Nuevo valor...'}" autocomplete="off" maxlength="${tipo === 'nombre' ? '100' : (tipo === 'documento' ? '25' : '60')}">
+                        ${tipo === 'documento' ? `
+                            <label class="change-document-upload" for="changeDocumentFile" style="margin-top: 12px;">
+                                <span class="material-symbols-outlined">upload_file</span>
+                                <span>Adjunta la foto del documento o un PDF (máximo 10 MB)</span>
+                                <input id="changeDocumentFile" class="change-document-file-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Selecciona una imagen o PDF del documento">
+                            </label>
+                            <p class="change-document-file-name" id="changeDocumentFileName" style="margin-top: 8px; font-size: 0.8125rem; color: #888;">Ningún archivo seleccionado</p>
+                        ` : ''}
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Enviar solicitud',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    background: '#121212',
+                    color: '#e2e2e2',
+                    confirmButtonColor: '#f2ca50',
+                    cancelButtonColor: 'rgba(255,255,255,0.1)',
+                    didOpen: function () {
+                        const fileInput = document.getElementById('changeDocumentFile');
+                        fileInput?.addEventListener('change', function () {
+                            archivoDocumento = this.files[0] || null;
+                            const name = document.getElementById('changeDocumentFileName');
+                            if (name) name.textContent = archivoDocumento ? archivoDocumento.name : 'Ningún archivo seleccionado';
+                        });
+                    },
+                    preConfirm: function () {
+                        const texto = document.getElementById('confirmRequestText').value.trim();
+                        const password = document.getElementById('confirmRequestPassword').value;
+                        const newValue = document.getElementById('newValueInput').value.trim();
+
+                        if (texto !== palabraClave || !password) {
+                            Swal.showValidationMessage(`Escribe ${palabraClave} e ingresa tu contraseña.`);
+                            return false;
+                        }
+
+                        if (!newValue || !newValue.trim()) {
+                            Swal.showValidationMessage('Debes escribir un valor.');
+                            return false;
+                        }
+
+                        if (tipo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newValue.trim())) {
+                            Swal.showValidationMessage('Escribe un correo electrónico válido.');
+                            return false;
+                        }
+
+                        if (tipo === 'nombre' && !/^[\p{L}\p{M} .'-]{3,100}$/u.test(newValue.trim())) {
+                            Swal.showValidationMessage('Escribe un nombre válido de 3 a 100 caracteres.');
+                            return false;
+                        }
+
+                        if (tipo === 'documento') {
+                            if (!/^[0-9-]{1,25}$/.test(newValue.trim())) {
+                                Swal.showValidationMessage('El documento solo puede contener números y guiones.');
+                                return false;
+                            }
+                            if (!archivoDocumento) {
+                                Swal.showValidationMessage('Adjunta la foto o el PDF del documento nuevo.');
+                                return false;
+                            }
+                            if (archivoDocumento.size > 10 * 1024 * 1024) {
+                                Swal.showValidationMessage('El archivo no puede superar 10 MB.');
+                                return false;
+                            }
+                        }
+
+                        return { texto: texto, password: password, valor: newValue };
+                    }
+                }).then(function (result) {
+                    if (!result.isConfirmed) return;
+
+                    const formData = new FormData();
+                    formData.append('accion', 'solicitar_cambio');
+                    formData.append('tipo', tipo);
+                    formData.append('valor_nuevo', result.value.valor);
+                    formData.append('confirmacion', result.value.texto);
+                    formData.append('contrasena_actual', result.value.password);
+                    if (archivoDocumento) formData.append('archivo_documento', archivoDocumento);
+                    formData.append('csrf_token', getToken());
+
+                    fetch(ENDPOINT, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.success) {
+                            alerta('success', 'Solicitud enviada', data.message);
+                        } else {
+                            alerta('error', 'Error', data.message);
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                        alerta('error', 'Error de red', 'No se pudo enviar la solicitud');
+                    });
+                });
+            }
         });
     });
 
@@ -463,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 title: esAdmin ? 'Eliminar cuenta de administrador' : '¿Solicitar eliminación?',
                 text: esAdmin ? undefined : 'Se enviará una solicitud de baja definitiva al administrador. ¿Está seguro?',
-                html: esAdmin ? '<p>Para continuar, escribe <strong>ELIMINAR</strong> e ingresa tu contraseña actual.</p><input id="confirmDeleteText" class="swal2-input" placeholder="ELIMINAR" autocomplete="off"><input id="confirmDeletePassword" class="swal2-input" type="password" placeholder="Contraseña actual" autocomplete="current-password">' : undefined,
+                html: '<p>Para continuar, escribe <strong>ELIMINAR</strong> e ingresa tu contraseña actual.</p><input id="confirmDeleteText" class="swal2-input" placeholder="ELIMINAR" autocomplete="off" style="margin-bottom: 8px;"><input id="confirmDeletePassword" class="swal2-input" type="password" placeholder="Contraseña actual" autocomplete="current-password">',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: esAdmin ? 'Eliminar mi cuenta' : 'Sí, solicitar',
@@ -475,7 +588,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButtonColor: '#ffb4ab',
                 cancelButtonColor: 'rgba(255,255,255,0.1)',
                 preConfirm: function () {
-                    if (!esAdmin) return {};
                     const texto = document.getElementById('confirmDeleteText').value.trim();
                     const password = document.getElementById('confirmDeletePassword').value;
                     if (texto !== 'ELIMINAR' || !password) {
@@ -492,6 +604,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!esAdmin) {
                     formData.append('tipo', 'eliminacion');
                     formData.append('valor_nuevo', '');
+                    formData.append('confirmacion', result.value.texto);
+                    formData.append('contrasena_actual', result.value.password);
                 } else {
                     formData.append('confirmacion', result.value.texto);
                     formData.append('contrasena_actual', result.value.password);

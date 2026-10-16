@@ -298,6 +298,21 @@ requiereRol([3]);
         </div>
     </div>
 
+    <!-- Overlay detalle de documento -->
+    <div class="document-detail-overlay" id="document-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="document-detail-title" hidden>
+        <div class="document-detail-backdrop" id="document-detail-backdrop"></div>
+        <div class="document-detail-content">
+            <button type="button" class="document-detail-close" id="document-detail-close" aria-label="Cerrar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <h3 id="document-detail-title">Documento de identidad</h3>
+            <div class="document-detail-viewer">
+                <img id="document-detail-image" alt="Documento de identidad" hidden>
+                <iframe id="document-detail-pdf" title="Documento de identidad en PDF" hidden></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
   
 

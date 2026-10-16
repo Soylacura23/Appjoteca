@@ -100,7 +100,6 @@ if (!function_exists('menuMovilBookUrl')) {
     <a href="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>"
        class="mobile-menu-logo topbar-logo"
        aria-label="Ir al panel">
-        <div class="logo" aria-hidden="true"></div>
         <img src="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>shared/images/logo-appjoteca.svg"
              alt="AppJoteca" class="logo-img" style="height: 38px; width: auto;">
     </a>

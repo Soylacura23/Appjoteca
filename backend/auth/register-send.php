@@ -109,6 +109,51 @@ if (!array_key_exists($mimeType, $allowedMimeTypes)) {
     exit;
 }
 
+function validarEstructuraDocumento($filePath, $mimeType) {
+    $minSizeBytes = 10240;
+
+    if (!file_exists($filePath) || filesize($filePath) < $minSizeBytes) {
+        return false;
+    }
+
+    $handle = fopen($filePath, 'rb');
+    if (!$handle) {
+        return false;
+    }
+
+    $header = fread($handle, 8);
+    fclose($handle);
+
+    if (strlen($header) < 8) {
+        return false;
+    }
+
+    $validHeaders = [
+        'image/jpeg' => [0xFF, 0xD8, 0xFF],
+        'image/png'  => [0x89, 0x50, 0x4E, 0x47],
+        'image/webp' => [0x52, 0x49, 0x46, 0x46],
+        'application/pdf' => [0x25, 0x50, 0x44, 0x46]
+    ];
+
+    $expected = $validHeaders[$mimeType] ?? null;
+    if (!$expected) {
+        return false;
+    }
+
+    for ($i = 0; $i < count($expected); $i++) {
+        if (ord($header[$i]) !== $expected[$i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+if (!validarEstructuraDocumento($file['tmp_name'], $mimeType)) {
+    echo json_encode(['status' => 'error', 'message' => 'El archivo no parece ser un documento válido. Verifica que el archivo no esté corrupto.']);
+    exit;
+}
+
 $extension   = $allowedMimeTypes[$mimeType];
 $nuevoNombre = 'doc_' . bin2hex(random_bytes(16)) . '.' . $extension;
 $rutaDestino = $uploadDir . $nuevoNombre;

@@ -13,7 +13,11 @@
     var overlayDetalle = document.getElementById('user-detail-overlay');
     var fondoDetalle = document.getElementById('user-detail-backdrop');
     var botonCerrarDetalle = document.getElementById('user-detail-close');
-  
+
+    var overlayDocumento = document.getElementById('document-detail-overlay');
+    var fondoDocumento = document.getElementById('document-detail-backdrop');
+    var botonCerrarDocumento = document.getElementById('document-detail-close');
+
     var modalConfirmar = document.getElementById('delete-confirm-modal');
     var fondoConfirmar = document.getElementById('delete-confirm-backdrop');
     var botonCancelar = document.getElementById('delete-confirm-cancel');
@@ -219,7 +223,7 @@
       var placeholderDoc = document.getElementById('id-placeholder');
       imgDoc.hidden = true;
       pdfDoc.hidden = true;
-      placeholderDoc.hidden = !d.foto_documento;
+      placeholderDoc.hidden = !!d.foto_documento;
       if (d.foto_documento) {
         if (/\.pdf(?:$|[?#])/i.test(d.foto_documento)) {
           pdfDoc.src = d.foto_documento;
@@ -237,12 +241,46 @@
   
       overlayDetalle.hidden = false;
       document.body.style.overflow = 'hidden';
+
+      document.getElementById('id-preview').onclick = function() {
+        if (usuarioSeleccionado && usuarioSeleccionado.foto_documento) {
+          abrirOverlayDocumento(usuarioSeleccionado.foto_documento);
+        }
+      };
     }
   
     function cerrarOverlay() {
       overlayDetalle.hidden = true;
       document.body.style.overflow = '';
       usuarioSeleccionado = null;
+    }
+
+    function abrirOverlayDocumento(url) {
+      if (!url) return;
+
+      var imgDetail = document.getElementById('document-detail-image');
+      var pdfDetail = document.getElementById('document-detail-pdf');
+
+      imgDetail.hidden = true;
+      pdfDetail.hidden = true;
+
+      if (/\.pdf(?:$|[?#])/i.test(url)) {
+        pdfDetail.src = url;
+        pdfDetail.hidden = false;
+        imgDetail.removeAttribute('src');
+      } else {
+        imgDetail.src = url;
+        imgDetail.hidden = false;
+        pdfDetail.removeAttribute('src');
+      }
+
+      overlayDocumento.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarOverlayDocumento() {
+      overlayDocumento.hidden = true;
+      document.body.style.overflow = '';
     }
   
     /* Eliminar usuario */
@@ -329,10 +367,13 @@
     }
   
     /* Eventos */
-  
+
     botonCerrarDetalle.addEventListener('click', cerrarOverlay);
     fondoDetalle.addEventListener('click', cerrarOverlay);
-  
+
+    botonCerrarDocumento.addEventListener('click', cerrarOverlayDocumento);
+    fondoDocumento.addEventListener('click', cerrarOverlayDocumento);
+
     botonEliminarCuenta.addEventListener('click', function (e) {
       e.stopPropagation();
       mostrarConfirmacion();
@@ -350,6 +391,8 @@
       if (e.key !== 'Escape') return;
       if (!modalConfirmar.hidden) {
         ocultarConfirmacion();
+      } else if (!overlayDocumento.hidden) {
+        cerrarOverlayDocumento();
       } else if (!overlayDetalle.hidden) {
         cerrarOverlay();
       }

@@ -22,7 +22,7 @@ const tablaUsuarios = new Tabulator('#tabla-usuarios', {
         rowFormatter: rowFormatterWithLabels(['ID', 'Nombre', 'Usuario', 'Correo', 'Rol', 'Estado', 'Acciones']),
         columns: [
             { title: 'ID', field: 'id_usuario', width: 70, hozAlign: 'center', responsive: 0 },
-            { title: 'Nombre', field: 'nombre_apellido', minWidth: 150, formatter: formatoNombreUsuario, cellDblClick: abrirPerfilDesdeCelda, responsive: 0 },
+            { title: 'Nombre', field: 'nombre_apellido', minWidth: 150, formatter: formatoNombreUsuario, cellClick: abrirPerfilDesdeCelda, responsive: 0 },
             { title: 'Usuario', field: 'nombre_usuario', minWidth: 110, responsive: 3 },
             { title: 'Correo', field: 'correo_institucional', minWidth: 170, widthGrow: 2, responsive: 2 },
             { title: 'Rol', field: 'rol', minWidth: 110, responsive: 1 },
@@ -295,14 +295,30 @@ const tablaUsuarios = new Tabulator('#tabla-usuarios', {
         };
     }
 
+    let mouseDownX = 0;
+    let mouseDownY = 0;
+
     function abrirPerfilDesdeCelda(event, cell) {
-        if (!event.target.closest('.admin-user-name')) return;
+        const dragDistance = Math.sqrt(
+            Math.pow(event.clientX - mouseDownX, 2) +
+            Math.pow(event.clientY - mouseDownY, 2)
+        );
+
+        if (dragDistance > 5) {
+            return;
+        }
+
         abrirPerfilDeUsuario(cell.getRow().getData().id_usuario);
     }
 
     function formatoNombreUsuario(cell) {
-        return '<span class="admin-user-name">' + escapeHtml(cell.getValue() || 'Sin nombre') + '</span>';
+        return escapeHtml(cell.getValue() || 'Sin nombre');
     }
+
+    document.addEventListener('mousedown', function(e) {
+        mouseDownX = e.clientX;
+        mouseDownY = e.clientY;
+    });
 
     // 1. Tabla Bibliotecarios
     const tablaBibliotecarios = new Tabulator('#tabla-bibliotecarios', {
@@ -316,7 +332,7 @@ const tablaUsuarios = new Tabulator('#tabla-usuarios', {
         columns: [
             { title: 'ID', field: 'id_usuario', width: 70, minWidth: 60, hozAlign: 'center', responsive: 0 },
             { title: 'Documento', field: 'documento', minWidth: 110, responsive: 3 },
-            { title: 'Nombre y Apellido', field: 'nombre_apellido', minWidth: 130, responsive: 0, formatter: formatoNombreUsuario, cellDblClick: abrirPerfilDesdeCelda },
+            { title: 'Nombre y Apellido', field: 'nombre_apellido', minWidth: 130, responsive: 0, formatter: formatoNombreUsuario, cellClick: abrirPerfilDesdeCelda },
             { title: 'Correo', field: 'correo_institucional', minWidth: 150, widthGrow: 2, responsive: 1,
                 tooltip: true },
             { title: 'Fecha de Alta', field: 'fecha_registro', minWidth: 100, hozAlign: 'center', responsive: 2 },
@@ -356,7 +372,7 @@ const tablaUsuarios = new Tabulator('#tabla-usuarios', {
         columns: [
             { title: 'ID', field: 'id_usuario', width: 70, minWidth: 60, hozAlign: 'center', responsive: 0 },
             { title: 'Documento', field: 'documento', minWidth: 110, responsive: 4 },
-            { title: 'Nombre', field: 'nombre_apellido', minWidth: 130, responsive: 0, formatter: formatoNombreUsuario, cellDblClick: abrirPerfilDesdeCelda },
+            { title: 'Nombre', field: 'nombre_apellido', minWidth: 130, responsive: 0, formatter: formatoNombreUsuario, cellClick: abrirPerfilDesdeCelda },
             { title: 'Usuario', field: 'nombre_usuario', minWidth: 110, responsive: 2 },
             { title: 'Correo', field: 'correo_institucional', minWidth: 155, responsive: 3 },
             { title: 'Rol', field: 'rol_nombre', minWidth: 95, hozAlign: 'center', responsive: 1 },

@@ -293,6 +293,7 @@ try {
     if ($accion === 'solicitar_cambio') {
         $tipo = is_string($_POST['tipo'] ?? null) ? $_POST['tipo'] : '';
         $valor = is_string($_POST['valor_nuevo'] ?? null) ? trim($_POST['valor_nuevo']) : '';
+        $contrasena_actual = is_string($_POST['contrasena_actual'] ?? null) ? $_POST['contrasena_actual'] : '';
 
         $tipos_ok = ['email', 'nombre', 'documento', 'eliminacion'];
         if (!in_array($tipo, $tipos_ok, true)) {
@@ -302,6 +303,24 @@ try {
 
         if ($mi_rol === 4 && $tipo !== 'eliminacion') {
             echo json_encode(['success' => false, 'message' => 'Como administrador puedes cambiar esto directamente']);
+            exit;
+        }
+
+        // Validar contraseña actual
+        if ($contrasena_actual === '') {
+            echo json_encode(['success' => false, 'message' => 'Debes ingresar tu contraseña actual para continuar.']);
+            exit;
+        }
+
+        $sql = "SELECT password FROM usuarios WHERE id_usuario = ?";
+        $query = $connection->prepare($sql);
+        $query->bind_param('i', $mi_id);
+        $query->execute();
+        $row = $query->get_result()->fetch_assoc();
+        $query->close();
+
+        if (!$row || !password_verify($contrasena_actual, $row['password'])) {
+            echo json_encode(['success' => false, 'message' => 'La contraseña actual es incorrecta.']);
             exit;
         }
 
