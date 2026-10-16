@@ -25,9 +25,6 @@ function setDate() {
   el.textContent = txt.charAt(0).toUpperCase() + txt.slice(1);
 }
 
-/**
- * Obtiene los libros desde el backend y construye las tarjetas dinámicamente
- */
 async function loadSuggestedBooks() {
   const container = document.getElementById('booksGrid');
   if (!container) return;
@@ -42,17 +39,19 @@ async function loadSuggestedBooks() {
     const books = await response.json();
 
     if (!Array.isArray(books) || books.length === 0) {
-      container.innerHTML = '<p class="empty-msg">No hay sugerencias pedagógicas disponibles actualmente.</p>';
+      container.innerHTML = '<p class="teacher-empty">No hay sugerencias pedagógicas disponibles actualmente.</p>';
       return;
     }
+
+    const defaultCover = '../../shared/images/logo-appjoteca.svg';
 
     container.innerHTML = books.map(book => `
       <article class="book-card" data-id="${Number(book.id) || 0}">
         <div class="book-cover">
-        <img src="${escapeHtml(book.portada_url || '../../shared/images/logo-appjoteca.svg')}"
-             alt="${escapeHtml(book.titulo)}"
-             class="libro-img"
-             onerror="this.onerror=null; this.src='../../shared/images/logo-appjoteca.svg';">
+          <img src="${escapeHtml(book.portada_url || defaultCover)}"
+               alt="${escapeHtml(book.titulo)}"
+               class="libro-img"
+               onerror="this.onerror=null; this.src='${defaultCover}';">
         </div>
         <div class="book-info">
           <h3 class="book-title">${escapeHtml(book.titulo)}</h3>
@@ -62,28 +61,8 @@ async function loadSuggestedBooks() {
     `).join('');
 
   } catch (error) {
-    console.warn('Utilizando datos de reserva local para sugerencias:', error);
-    // Fallback con materiales orientados a docencia
-    container.innerHTML = `
-      <article class="book-card">
-        <div class="book-cover">
-          <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800" alt="Física Aplicada" loading="lazy">
-        </div>
-        <div class="book-info">
-          <h3 class="book-title">Física Aplicada</h3>
-          <p class="book-author">Paul G. Hewitt</p>
-        </div>
-      </article>
-      <article class="book-card">
-        <div class="book-cover">
-          <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=800" alt="Pedagogía Ética" loading="lazy">
-        </div>
-        <div class="book-info">
-          <h3 class="book-title">Pedagogía Ética</h3>
-          <p class="book-author">Fernando Savater</p>
-        </div>
-      </article>
-    `;
+    console.warn('No se pudieron obtener las sugerencias del servidor:', error);
+    container.innerHTML = '<p class="teacher-empty">No se pudieron cargar los libros sugeridos en este momento.</p>';
   }
 }
 

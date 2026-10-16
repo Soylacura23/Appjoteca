@@ -24,9 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadNotes() {
+    if (!list) return;
     try {
       const result = await request('notes_list');
-      list.innerHTML = result.notes.length ? result.notes.map(note => `
+      list.innerHTML = result.notes && result.notes.length ? result.notes.map(note => `
         <article class="teacher-note-card ${Number(note.es_importante) ? 'is-important' : ''}">
           <div class="teacher-note-card-heading">
             <h2>${escapeHtml(note.titulo)}</h2>
@@ -45,16 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('new-note-button')?.addEventListener('click', () => {
+    if (!form) return;
     form.reset();
-    form.elements.id.value = '';
+    if (form.elements.id) form.elements.id.value = '';
     form.hidden = false;
-    form.elements.titulo.focus();
+    form.elements.titulo?.focus();
   });
 
   document.getElementById('cancel-note-button')?.addEventListener('click', () => {
+    if (!form) return;
     form.reset();
     form.hidden = true;
-    formMessage.textContent = '';
+    if (formMessage) formMessage.textContent = '';
   });
 
   form?.addEventListener('submit', async event => {
@@ -62,15 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = new FormData(form);
     data.append('action', 'note_save');
     data.set('es_importante', form.elements.es_importante.checked ? '1' : '0');
-    formMessage.textContent = 'Guardando…';
+    if (formMessage) formMessage.textContent = 'Guardando…';
     try {
       await request('note_save', data);
       form.hidden = true;
       form.reset();
-      formMessage.textContent = '';
+      if (formMessage) formMessage.textContent = '';
       await loadNotes();
     } catch (error) {
-      formMessage.textContent = error.message;
+      if (formMessage) formMessage.textContent = error.message;
     }
   });
 
@@ -81,16 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const result = await request('notes_list');
         const note = result.notes.find(item => Number(item.id) === Number(edit.dataset.edit));
-        if (!note) return;
-        form.elements.id.value = note.id;
-        form.elements.titulo.value = note.titulo;
-        form.elements.contenido.value = note.contenido;
-        form.elements.fecha_recordatorio.value = note.fecha_recordatorio || '';
-        form.elements.es_importante.checked = Number(note.es_importante) === 1;
+        if (!note || !form) return;
+        if (form.elements.id) form.elements.id.value = note.id;
+        if (form.elements.titulo) form.elements.titulo.value = note.titulo;
+        if (form.elements.contenido) form.elements.contenido.value = note.contenido;
+        if (form.elements.fecha_recordatorio) form.elements.fecha_recordatorio.value = note.fecha_recordatorio || '';
+        if (form.elements.es_importante) form.elements.es_importante.checked = Number(note.es_importante) === 1;
         form.hidden = false;
-        form.elements.titulo.focus();
+        form.elements.titulo?.focus();
       } catch (error) {
-        formMessage.textContent = error.message;
+        if (formMessage) formMessage.textContent = error.message;
       }
     }
     if (remove && window.confirm('¿Eliminar esta nota?')) {

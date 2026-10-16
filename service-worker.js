@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appjoteca-v2';
+const CACHE_NAME = 'appjoteca-v3';
 
 const urlsToCache = [
   '/Appjoteca/',
